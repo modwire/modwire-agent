@@ -1,0 +1,58 @@
+[project]
+name = "new_project"
+version = "0.1.0"
+description = "New Project API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dj-database-url",
+    "django",
+    "django-health-check",
+    "django-model-utils",
+    "django-ninja-extra",
+    "gunicorn",
+    "pgvector",
+    "psycopg[binary]",
+    "pydantic",
+    "python-dotenv",
+    "pyyaml",
+    "structlog",
+    "wireup",
+]
+
+[dependency-groups]
+dev = [
+    "openapi-python-client",
+    "pytest",
+    "pytest-django",
+    "ruff",
+]
+
+[tool.uv]
+package = false
+cache-dir = ".dev/uv-cache"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "core.settings"
+cache_dir = ".dev/pytest-cache"
+python_files = ["test_*.py", "*_test.py"]
+testpaths = ["tests"]
+
+[tool.ruff]
+cache-dir = ".dev/ruff-cache"
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"*/migrations/*.py" = ["E501"]
+"core/settings.py" = ["E402"]
+
+[tool.coverage.run]
+data_file = ".dev/coverage"
+
+[tool.mypy]
+cache_dir = ".dev/mypy-cache"

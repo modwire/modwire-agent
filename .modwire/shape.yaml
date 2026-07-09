@@ -1,0 +1,5 @@
+max_classes_per_file: -1
+max_interfaces_per_file: -1
+max_types_per_file: -1
+max_abstract_classes_per_file: -1
+max_functions_per_file: 0

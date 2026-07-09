@@ -1,0 +1,75 @@
+tags:
+  - name: app
+    match: "*"
+    excluded_patterns:
+      - "core"
+      - ".dev"
+      - "manage"
+
+  - name: project
+    match: "core"
+
+  - name: entrypoint
+    match: "manage"
+
+  - name: project_api
+    match: "core/api"
+
+  - name: routing
+    match: "core/urls"
+
+  - name: runtime
+    match: "core/asgi"
+
+  - name: runtime
+    match: "core/wsgi"
+
+  - name: settings
+    match: "core/settings"
+
+  - name: app_config
+    match: "*/apps"
+
+  - name: api
+    match: "*/api"
+
+  - name: admin
+    match: "*/admin"
+
+  - name: management
+    match: "*/management"
+
+  - name: services
+    match: "*/services"
+
+  - name: models
+    match: "*/models"
+
+  - name: migrations
+    match: "*/migrations"
+
+rules: []
+
+flow:
+  module_tag: app
+  layers:
+    - app_config
+    - api
+    - admin
+    - management
+    - services
+    - models
+    - migrations
+  realms:
+    - name: project
+      module_tag: project
+      layers:
+        - entrypoint
+        - routing
+        - runtime
+        - project_api
+        - settings
+  analyzers:
+    - backward-flow
+    - no-cycles
+    - no-reentry
