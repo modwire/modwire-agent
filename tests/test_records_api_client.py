@@ -2,6 +2,7 @@ import pytest
 from oa.api.records import create_record, get_record, list_records, search_records
 from oa.api.sections import create_section, list_sections
 from oa.api.tags import create_tag, list_tags
+from oa.client import Client
 from oa.models.content_in import ContentIn
 from oa.models.content_in_role import ContentInRole
 from oa.models.record_content_in_metadata import RecordContentInMetadata
@@ -15,7 +16,17 @@ from oa.models.tag_in import TagIn
 
 
 @pytest.mark.django_db(transaction=True)
+def test_records_api_requires_apikey_header(live_server):
+    with Client(base_url=live_server.url, raise_on_unexpected_status=False) as client:
+        response = list_tags.sync_detailed(client=client)
+
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db(transaction=True)
 def test_records_api_roundtrip_and_vector_search_use_generated_client(api_client):
+    assert api_client.get_httpx_client().headers["apikey"]
+
     tag = create_tag.sync(
         client=api_client,
         body=TagIn(name="Architecture", description="Architecture knowledge."),

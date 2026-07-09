@@ -5,7 +5,9 @@ from pkgutil import walk_packages
 from django.apps import apps
 from ninja_extra import NinjaExtraAPI
 
-api = NinjaExtraAPI(title="New Project API", version="0.1.0")
+from tokens.auth import ApiKeyAuth
+
+api = NinjaExtraAPI(title="New Project API", version="0.1.0", auth=ApiKeyAuth())
 
 
 def _import(name, root):

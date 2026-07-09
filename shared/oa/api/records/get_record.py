@@ -48,7 +48,7 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 def sync_detailed(
     record_slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[RecordOut]:
     """Get record.
 
@@ -77,7 +77,7 @@ def sync_detailed(
 def sync(
     record_slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> RecordOut | None:
     """Get record.
 
@@ -101,7 +101,7 @@ def sync(
 async def asyncio_detailed(
     record_slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[RecordOut]:
     """Get record.
 
@@ -128,7 +128,7 @@ async def asyncio_detailed(
 async def asyncio(
     record_slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> RecordOut | None:
     """Get record.
 

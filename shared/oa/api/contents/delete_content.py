@@ -45,7 +45,7 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 def sync_detailed(
     content_id: int,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[Any]:
     """Delete content.
 
@@ -74,7 +74,7 @@ def sync_detailed(
 async def asyncio_detailed(
     content_id: int,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[Any]:
     """Delete content.
 

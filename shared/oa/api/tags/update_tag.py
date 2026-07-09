@@ -57,7 +57,7 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 def sync_detailed(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: TagIn,
 ) -> Response[TagOut]:
     """Update tag.
@@ -89,7 +89,7 @@ def sync_detailed(
 def sync(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: TagIn,
 ) -> TagOut | None:
     """Update tag.
@@ -116,7 +116,7 @@ def sync(
 async def asyncio_detailed(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: TagIn,
 ) -> Response[TagOut]:
     """Update tag.
@@ -146,7 +146,7 @@ async def asyncio_detailed(
 async def asyncio(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
     body: TagIn,
 ) -> TagOut | None:
     """Update tag.

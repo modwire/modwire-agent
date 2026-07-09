@@ -48,7 +48,7 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 def sync_detailed(
     content_id: int,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[ContentOut]:
     """Get content.
 
@@ -77,7 +77,7 @@ def sync_detailed(
 def sync(
     content_id: int,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> ContentOut | None:
     """Get content.
 
@@ -101,7 +101,7 @@ def sync(
 async def asyncio_detailed(
     content_id: int,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[ContentOut]:
     """Get content.
 
@@ -128,7 +128,7 @@ async def asyncio_detailed(
 async def asyncio(
     content_id: int,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> ContentOut | None:
     """Get content.
 

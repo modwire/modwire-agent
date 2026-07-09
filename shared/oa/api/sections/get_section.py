@@ -48,7 +48,7 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 def sync_detailed(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[SectionOut]:
     """Get section.
 
@@ -77,7 +77,7 @@ def sync_detailed(
 def sync(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> SectionOut | None:
     """Get section.
 
@@ -101,7 +101,7 @@ def sync(
 async def asyncio_detailed(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> Response[SectionOut]:
     """Get section.
 
@@ -128,7 +128,7 @@ async def asyncio_detailed(
 async def asyncio(
     slug: str,
     *,
-    client: AuthenticatedClient | Client,
+    client: AuthenticatedClient,
 ) -> SectionOut | None:
     """Get section.
 
