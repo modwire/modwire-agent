@@ -1,8 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from model_utils.models import TimeStampedModel
+from pgvector.django import VectorField
 
-from .section import Section
+from .section import EMBEDDING_DIMENSIONS, Section
 from .tag import Tag, slug_validator
 
 
@@ -19,7 +20,7 @@ class Record(TimeStampedModel):
     sources = models.JSONField()
     tags = models.ManyToManyField(Tag, related_name="records")
     search_text = models.TextField()
-    embedding = models.JSONField()
+    embedding = VectorField(dimensions=EMBEDDING_DIMENSIONS)
 
     class Meta:
         ordering = ["slug"]
@@ -49,5 +50,5 @@ class Record(TimeStampedModel):
             raise ValidationError({"search_text": "Record search text is required."})
         if not isinstance(self.embedding, list):
             raise ValidationError({"embedding": "Record embedding must be a list."})
-        if not self.embedding:
+        if len(self.embedding) != EMBEDDING_DIMENSIONS:
             raise ValidationError({"embedding": "Record embedding is required."})

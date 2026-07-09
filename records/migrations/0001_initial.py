@@ -4,7 +4,9 @@ import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
+import pgvector.django.vector
 from django.db import migrations, models
+from pgvector.django import VectorExtension
 
 
 class Migration(migrations.Migration):
@@ -15,6 +17,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        VectorExtension(),
         migrations.CreateModel(
             name='Tag',
             fields=[
@@ -37,7 +40,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=160)),
                 ('description', models.TextField()),
                 ('search_text', models.TextField()),
-                ('embedding', models.JSONField()),
+                ('embedding', pgvector.django.vector.VectorField(dimensions=384)),
                 ('tags', models.ManyToManyField(related_name='sections', to='records.tag')),
             ],
             options={
@@ -55,7 +58,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('sources', models.JSONField()),
                 ('search_text', models.TextField()),
-                ('embedding', models.JSONField()),
+                ('embedding', pgvector.django.vector.VectorField(dimensions=384)),
                 ('section', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='records', to='records.section')),
                 ('tags', models.ManyToManyField(related_name='records', to='records.tag')),
             ],

@@ -16,6 +16,7 @@ dependencies = [
     "pydantic",
     "python-dotenv",
     "pyyaml",
+    "scrapy",
     "structlog",
     "wireup",
 ]

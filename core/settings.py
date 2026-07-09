@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "health_check",
     "ninja_extra",
+    "pgvector.django",
     "wireup.integration.django.apps.WireupConfig",
 ] + local_apps()
 MIDDLEWARE = [
@@ -77,6 +78,9 @@ TIME_ZONE = "UTC"
 USE_I18N = USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+RECORDS_EMBEDDING_DIMENSIONS = 384
+RECORDS_EMBEDDINGS_ENABLED = os.getenv("RECORDS_EMBEDDINGS_ENABLED", "1") == "1"
+RECORDS_EMBEDDING_PROVIDER = os.getenv("RECORDS_EMBEDDING_PROVIDER", "deterministic")
 
 LOGGING = {
     "version": 1,

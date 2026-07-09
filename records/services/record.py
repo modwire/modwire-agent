@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from pgvector.django import CosineDistance
 from wireup import injectable
 
 from records.embeddings import embed_text
@@ -11,7 +12,6 @@ from ..models.section import Section
 from .shared import (
     RecordSearchResult,
     SectionSearchResult,
-    cosine_similarity,
     filter_by_tags,
     lexical_score,
     set_tags,
@@ -176,14 +176,22 @@ class RecordService:
         if section_slugs:
             queryset = queryset.filter(section_id__in=section_slugs)
         queryset = filter_by_tags(queryset, tag_slugs)
-        query_embedding = embed_text(query) if mode == "vector" else []
+        if mode == "vector":
+            return [
+                RecordSearchResult(
+                    "record",
+                    row.slug,
+                    1.0 - float(row.distance or 1.0),
+                    row.title,
+                    row.section_id,
+                )
+                for row in queryset.annotate(distance=CosineDistance("embedding", embed_text(query)))
+                .order_by("distance", "slug")
+            ]
+
         results = []
         for record in queryset:
-            score = (
-                cosine_similarity(query_embedding, record.embedding)
-                if mode == "vector"
-                else lexical_score(query, record.search_text)
-            )
+            score = lexical_score(query, record.search_text)
             if score > 0:
                 results.append(
                     RecordSearchResult(
@@ -206,14 +214,21 @@ class RecordService:
         queryset = filter_by_tags(Section.objects.prefetch_related("tags"), tag_slugs)
         if section_slugs:
             queryset = queryset.filter(slug__in=section_slugs)
-        query_embedding = embed_text(query) if mode == "vector" else []
+        if mode == "vector":
+            return [
+                SectionSearchResult(
+                    "section",
+                    row.slug,
+                    1.0 - float(row.distance or 1.0),
+                    row.title,
+                )
+                for row in queryset.annotate(distance=CosineDistance("embedding", embed_text(query)))
+                .order_by("distance", "slug")
+            ]
+
         results = []
         for section in queryset:
-            score = (
-                cosine_similarity(query_embedding, section.embedding)
-                if mode == "vector"
-                else lexical_score(query, section.search_text)
-            )
+            score = lexical_score(query, section.search_text)
             if score > 0:
                 results.append(SectionSearchResult("section", section.slug, score, section.title))
         return results
