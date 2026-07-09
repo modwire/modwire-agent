@@ -37,10 +37,12 @@ cache-dir = ".dev/uv-cache"
 DJANGO_SETTINGS_MODULE = "core.settings"
 cache_dir = ".dev/pytest-cache"
 python_files = ["test_*.py", "*_test.py"]
+pythonpath = ["shared"]
 testpaths = ["tests"]
 
 [tool.ruff]
 cache-dir = ".dev/ruff-cache"
+extend-exclude = ["shared/oa"]
 line-length = 120
 target-version = "py312"
 

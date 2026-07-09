@@ -8,14 +8,14 @@ class ContentIn(Schema):
     role: Literal["heading", "subheading", "paragraph", "list", "markdown", "snippet", "image"]
     content: str
     language: str
-    metadata: dict
+    metadata: dict[str, object] = Field(title="RecordContentInMetadata")
 
 
 class ContentOut(Schema):
     role: str
     content: str
     language: str
-    metadata: dict
+    metadata: dict[str, object] = Field(title="RecordContentOutMetadata")
 
 
 class RecordIn(Schema):

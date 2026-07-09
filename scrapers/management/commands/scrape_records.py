@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from django.core.management.base import BaseCommand, CommandError
 from scrapy import signals
 from scrapy.crawler import CrawlerProcess
@@ -15,7 +17,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("source", nargs="?", help="Scrape source name.")
         parser.add_argument("--list-sources", action="store_true", help="List sources and exit.")
-        parser.add_argument("--limit", type=int, default=10, help="Maximum source records to crawl.")
+        parser.add_argument("--limit", type=int, default=0, help="Maximum source records to crawl; 0 means all.")
         parser.add_argument("--dry-run", action="store_true", help="Scrape without writing records.")
         parser.add_argument("--no-update", action="store_true", help="Skip existing records.")
         parser.add_argument("--no-images", action="store_true", help="Do not fetch image assets.")
@@ -79,6 +81,7 @@ class Command(BaseCommand):
         settings = Settings()
         settings.setmodule(settings_module)
         settings.set("LOG_ENABLED", verbosity > 1, priority="cmdline")
+        logging.getLogger("scrapy").setLevel(logging.INFO if verbosity > 1 else logging.WARNING)
         process = CrawlerProcess(settings=settings)
         crawler = process.create_crawler(spider)
         crawler.signals.connect(

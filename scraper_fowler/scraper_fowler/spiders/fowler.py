@@ -41,7 +41,7 @@ class FowlerSpider(Spider):
 
     def parse(self, response: TextResponse):
         for href in self.article_links(response):
-            if self._scheduled >= self.limit:
+            if self.limit and self._scheduled >= self.limit:
                 break
             self._scheduled += 1
             yield response.follow(href, callback=self.parse_article)

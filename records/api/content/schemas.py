@@ -20,7 +20,7 @@ class ContentIn(Schema):
     role: ContentRole
     content: str
     language: str
-    metadata: dict
+    metadata: dict[str, object] = Field(title="ContentInMetadata")
 
 
 class ContentPatchIn(Schema):
@@ -28,7 +28,7 @@ class ContentPatchIn(Schema):
     role: ContentRole
     content: str
     language: str
-    metadata: dict
+    metadata: dict[str, object] = Field(title="ContentPatchInMetadata")
 
 
 class ContentOut(Schema):
@@ -38,7 +38,7 @@ class ContentOut(Schema):
     role: str
     content: str
     language: str
-    metadata: dict
+    metadata: dict[str, object] = Field(title="ContentOutMetadata")
 
     @staticmethod
     def resolve_record_slug(obj):

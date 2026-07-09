@@ -4,4 +4,4 @@
 __pycache__/
 *.py[cod]
 db.sqlite3
-shared/oa/
+.scrapy/

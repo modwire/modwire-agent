@@ -76,7 +76,7 @@ class SourceMakingSpider(Spider):
             url = response.urljoin(href)
             if not self.is_item_url(url) or url in seen:
                 continue
-            if self._scheduled >= self.limit:
+            if self.limit and self._scheduled >= self.limit:
                 break
             seen.add(url)
             self._scheduled += 1

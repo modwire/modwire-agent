@@ -87,7 +87,6 @@ HTTPCACHE_DIR = str(CACHE_ROOT / "httpcache")
 HTTPCACHE_IGNORE_HTTP_CODES = []
 HTTPCACHE_POLICY = "scrapy.extensions.httpcache.DummyPolicy"
 HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
-JOBDIR = str(CACHE_ROOT / "jobs" / "default")
 
 # Set settings whose default value is deprecated to a future-proof value
 FEED_EXPORT_ENCODING = "utf-8"

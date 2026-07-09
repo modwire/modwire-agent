@@ -32,6 +32,17 @@ class RecordController(ControllerBase):
     ):
         return service.list(limit=limit, offset=offset, section_slugs=section_slugs, tag_slugs=tag)
 
+    @route.post(
+        "/search",
+        response=SearchOut,
+        operation_id="search_records",
+        summary="Search records and sections.",
+    )
+    @inject
+    def search(self, data: SearchIn, service: Annotated[RecordService, Inject()]):
+        results = service.search(**data.model_dump())
+        return {"results": [result.__dict__ for result in results]}
+
     @route.get(
         "/{path:record_slug}",
         response=RecordOut,
@@ -101,14 +112,3 @@ class RecordController(ControllerBase):
     def delete(self, record_slug: str, service: Annotated[RecordService, Inject()]):
         service.delete(record_slug)
         return Status(204, None)
-
-    @route.post(
-        "/search",
-        response=SearchOut,
-        operation_id="search_records",
-        summary="Search records and sections.",
-    )
-    @inject
-    def search(self, data: SearchIn, service: Annotated[RecordService, Inject()]):
-        results = service.search(**data.model_dump())
-        return {"results": [result.__dict__ for result in results]}

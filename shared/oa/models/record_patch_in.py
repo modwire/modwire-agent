@@ -1,0 +1,107 @@
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, TypeVar, cast
+
+from attrs import define as _attrs_define
+from attrs import field as _attrs_field
+
+if TYPE_CHECKING:
+    from ..models.content_in import ContentIn
+
+
+T = TypeVar("T", bound="RecordPatchIn")
+
+
+@_attrs_define
+class RecordPatchIn:
+    """
+    Attributes:
+        title (str):
+        description (str):
+        sources (list[str]):
+        tag_slugs (list[str]):
+        content (list[ContentIn]):
+    """
+
+    title: str
+    description: str
+    sources: list[str]
+    tag_slugs: list[str]
+    content: list[ContentIn]
+    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        title = self.title
+
+        description = self.description
+
+        sources = self.sources
+
+        tag_slugs = self.tag_slugs
+
+        content = []
+        for content_item_data in self.content:
+            content_item = content_item_data.to_dict()
+            content.append(content_item)
+
+        field_dict: dict[str, Any] = {}
+        field_dict.update(self.additional_properties)
+        field_dict.update(
+            {
+                "title": title,
+                "description": description,
+                "sources": sources,
+                "tag_slugs": tag_slugs,
+                "content": content,
+            }
+        )
+
+        return field_dict
+
+    @classmethod
+    def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.content_in import ContentIn
+
+        d = dict(src_dict)
+        title = d.pop("title")
+
+        description = d.pop("description")
+
+        sources = cast(list[str], d.pop("sources"))
+
+        tag_slugs = cast(list[str], d.pop("tag_slugs"))
+
+        content = []
+        _content = d.pop("content")
+        for content_item_data in _content:
+            content_item = ContentIn.from_dict(content_item_data)
+
+            content.append(content_item)
+
+        record_patch_in = cls(
+            title=title,
+            description=description,
+            sources=sources,
+            tag_slugs=tag_slugs,
+            content=content,
+        )
+
+        record_patch_in.additional_properties = d
+        return record_patch_in
+
+    @property
+    def additional_keys(self) -> list[str]:
+        return list(self.additional_properties.keys())
+
+    def __getitem__(self, key: str) -> Any:
+        return self.additional_properties[key]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self.additional_properties[key] = value
+
+    def __delitem__(self, key: str) -> None:
+        del self.additional_properties[key]
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.additional_properties
