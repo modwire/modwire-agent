@@ -9,8 +9,9 @@ from ..models.package_manager import PackageManager
 class CommandService:
     model = Command
 
-    def list(self):
-        return self.model.objects.select_related("package_manager").order_by("package_manager", "result")
+    def list(self, package_manager_id: str):
+        queryset = self.model.objects.select_related("package_manager").order_by("package_manager", "result")
+        return queryset.filter(package_manager_id=package_manager_id)
 
     def upsert(self, *, package_manager, result: str, cmd: str):
         instance, _ = self.model.objects.update_or_create(

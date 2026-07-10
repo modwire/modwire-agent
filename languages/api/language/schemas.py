@@ -5,5 +5,5 @@ from ...models.language import Language
 
 class LanguageOut(ModelSchema):
     class Meta:
-        model = Language 
+        model = Language
         fields = "__all__"

@@ -17,5 +17,5 @@ class PackageManagerController(ControllerBase):
         summary="List package_managers.",
     )
     @inject
-    def list(self, service: Annotated[PackageManagerService, Inject()]):
-        return service.list()
+    def list(self, language_id: str, service: Annotated[PackageManagerService, Inject()]):
+        return service.list(language_id=language_id)

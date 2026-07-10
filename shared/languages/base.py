@@ -11,13 +11,34 @@ class LanguageVersionError(RuntimeError):
 class PackageManagerDefinition:
     name: str
     executable: str
+    manifest_paths: tuple[str, ...]
+    lockfile_paths: tuple[str, ...]
+    registry_url: str
+    package_url_type: str
+    version_constraint: str
+    supports_workspaces: bool
+    commit_lockfiles: bool
     commands: dict[str, str]
+
+
+@dataclass(frozen=True)
+class ToolDefinition:
+    name: str
+    roles: tuple[str, ...]
+    executable: str
+    package_name: str
+    homepage_url: str
+    config_paths: tuple[str, ...]
+    default_enabled: bool
+    commands: dict[str, str]
+    stable_version: str = ""
 
 
 class LanguageDefinition(abc.ABC):
     name: str
     executable: str
     package_managers: tuple[PackageManagerDefinition, ...]
+    tools: tuple[ToolDefinition, ...]
 
     @property
     @abc.abstractmethod

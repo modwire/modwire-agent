@@ -9,6 +9,13 @@ class PackageManager(ShortUUIDModel):
     language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name="package_managers")
     name = models.CharField(max_length=120)
     executable = models.CharField(max_length=32)
+    manifest_paths = models.JSONField(default=list)
+    lockfile_paths = models.JSONField(default=list)
+    registry_url = models.URLField(default="")
+    package_url_type = models.CharField(max_length=32, default="")
+    version_constraint = models.CharField(max_length=32, default="")
+    supports_workspaces = models.BooleanField(default=False)
+    commit_lockfiles = models.BooleanField(default=True)
 
     class Meta:
         ordering = ("name",)

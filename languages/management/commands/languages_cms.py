@@ -30,6 +30,7 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"Synchronized {result.languages} languages, "
-                f"{result.package_managers} package managers, and {result.commands} commands."
+                f"{result.package_managers} package managers, {result.commands} package-manager commands, "
+                f"{result.tools} tools, and {result.tool_commands} tool commands."
             )
         )
