@@ -27,3 +27,5 @@ class ScaffoldingService:
     def delete(self, scaffolding_id: int):
         instance = self.get(scaffolding_id)
         instance.delete()
+
+    def import_from_code_package(self, )

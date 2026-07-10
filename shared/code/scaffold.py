@@ -10,21 +10,14 @@ from .package import CodePackage
 
 
 class Scaffold:
-    _name_word_pattern = re.compile(
-        r"[A-Z]+(?=[A-Z][a-z0-9]|\b)|[A-Z]?[a-z0-9]+",
-    )
-
     def __init__(self, root: Path):
         assert root.is_dir(), f"Path {root} is not a directory."
 
         manifest_file = root / "copier.yml"
         templates_folder = root / "templates"
 
-        assert manifest_file.is_file(
-        ), f"Manifest for copier: {manifest_file} does not exist."
-        assert templates_folder.is_dir(
-        ), f"Templates folder for copier: {templates_folder} does not exist."
-
+        assert manifest_file.is_file(), f"Manifest is missing"
+        assert templates_folder.is_dir(), f"No directory"
         self.root = root
 
     @property
@@ -47,7 +40,7 @@ class Scaffold:
             and "default" not in question
         ]
 
-    def build_package(self, root: Path, data: dict) -> CodePackage:
+    def build_package(self, data: dict) -> CodePackage:
         with TemporaryDirectory() as temporary_directory:
             temporary_path = Path(temporary_directory)
             run_copy(
@@ -74,9 +67,3 @@ class Scaffold:
             for chunk in normalized.split()
             for match in self._name_word_pattern.finditer(chunk)
         ]
-
-    def _pascal_case(self, value: str) -> str:
-        return "".join(word[:1].upper() + word[1:] for word in self._name_words(value))
-
-    def _snake_case(self, value: str) -> str:
-        return "_".join(self._name_words(value))
