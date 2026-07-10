@@ -1,8 +1,10 @@
 import {
+  Add,
   ArrowForward,
   CheckCircleOutline,
   Code,
   ContentCopy,
+  DeleteOutline,
   FolderOutlined,
   Key,
   Logout,
@@ -18,6 +20,10 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   IconButton,
   InputAdornment,
@@ -29,13 +35,14 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useId, useMemo, useState } from "react";
 
 type Properties = Record<string, unknown>;
 type SirenLink = { rel: string[]; href: string; title?: string };
 type SirenAction = { name: string; href: string; method: string; type?: string };
 type SirenEntity = { properties?: Properties; entities?: SirenEntity[]; links?: SirenLink[]; actions?: SirenAction[] };
 type Scaffolding = { id: string; name: string; description: string; language: string; href: string };
+type Language = { id: string; name: string };
 type RecordSummary = { slug: string; section_slug: string; title: string; description: string; tag_slugs: string[]; href: string };
 type RecordContent = { role: string; content: string; language: string; metadata: Properties };
 type RecordResource = RecordSummary & { sources: string[]; content: RecordContent[] };
@@ -96,6 +103,96 @@ function action(document: SirenEntity, name: string): SirenAction {
   return found;
 }
 
+function fieldLabel(name: string) {
+  return name.replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase());
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function valueFromInput(raw: string, previous: unknown) {
+  if (typeof previous === "number") return Number(raw);
+  if (typeof previous === "boolean") return raw === "true";
+  return raw;
+}
+
+function InlineValue({ label, value, onChange }: { label: string; value: unknown; onChange: (value: unknown) => void }) {
+  if (typeof value === "boolean") return (
+    <TextField select SelectProps={{ native: true }} size="small" label={fieldLabel(label)} value={String(value)} onChange={(event) => onChange(event.target.value === "true")}>
+      <option value="true">true</option><option value="false">false</option>
+    </TextField>
+  );
+  return <TextField size="small" fullWidth label={fieldLabel(label)} type={typeof value === "number" ? "number" : "text"} value={String(value ?? "")} onChange={(event) => onChange(valueFromInput(event.target.value, value))} />;
+}
+
+function ArrayEditor({ name, value, defaultValue, onChange }: { name: string; value: unknown; defaultValue: unknown; onChange: (value: unknown[]) => void }) {
+  const items = Array.isArray(value) ? value : [];
+  const sample = items[0] ?? (Array.isArray(defaultValue) ? defaultValue[0] : "");
+  const objectItems = items.some((item) => Object.keys(asRecord(item)).length > 0) || Object.keys(asRecord(sample)).length > 0;
+  const add = () => onChange([...items, objectItems ? { ...asRecord(sample) } : ""]);
+  const remove = (index: number) => onChange(items.filter((_, itemIndex) => itemIndex !== index));
+  const replace = (index: number, next: unknown) => onChange(items.map((item, itemIndex) => itemIndex === index ? next : item));
+  return (
+    <Box className="structured-field">
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Typography variant="subtitle2" fontWeight={750}>{fieldLabel(name)}</Typography>
+        <Button size="small" startIcon={<Add />} onClick={add}>Add</Button>
+      </Stack>
+      <Stack spacing={1}>
+        {items.map((item, index) => {
+          const object = asRecord(item);
+          return <Box className="structured-row" key={index}>
+            {objectItems
+              ? <Box className="structured-columns">{Object.entries(object).map(([key, entry]) => <InlineValue key={key} label={key} value={entry} onChange={(next) => replace(index, { ...object, [key]: next })} />)}</Box>
+              : <InlineValue label={`${fieldLabel(name)} ${index + 1}`} value={item} onChange={(next) => replace(index, next)} />}
+            <IconButton aria-label={`Remove ${fieldLabel(name)} ${index + 1}`} size="small" onClick={() => remove(index)}><DeleteOutline fontSize="small" /></IconButton>
+          </Box>;
+        })}
+        {items.length === 0 && <Button className="add-empty" size="small" startIcon={<Add />} onClick={add}>Add item</Button>}
+      </Stack>
+    </Box>
+  );
+}
+
+function ObjectEditor({ name, value, onChange }: { name: string; value: unknown; onChange: (value: Record<string, unknown>) => void }) {
+  const object = asRecord(value);
+  const entries = Object.entries(object);
+  const replaceKey = (oldKey: string, nextKey: string) => onChange(Object.fromEntries(entries.map(([key, entry]) => [key === oldKey ? nextKey : key, entry])));
+  return (
+    <Box className="structured-field">
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Typography variant="subtitle2" fontWeight={750}>{fieldLabel(name)}</Typography>
+        <Button size="small" startIcon={<Add />} onClick={() => onChange({ ...object, [`key_${entries.length + 1}`]: "" })}>Add</Button>
+      </Stack>
+      <Stack spacing={1}>{entries.map(([key, entry]) => <Box className="structured-row" key={key}>
+        <TextField size="small" label="Key" value={key} onChange={(event) => replaceKey(key, event.target.value)} />
+        <InlineValue label="Value" value={entry} onChange={(next) => onChange({ ...object, [key]: next })} />
+        <IconButton aria-label={`Remove ${key}`} size="small" onClick={() => onChange(Object.fromEntries(entries.filter(([entryKey]) => entryKey !== key)))}><DeleteOutline fontSize="small" /></IconButton>
+      </Box>)}</Stack>
+    </Box>
+  );
+}
+
+function MermaidPreview({ source }: { source: string }) {
+  const id = `mermaid-${useId().replaceAll(":", "")}`;
+  const [svg, setSvg] = useState("");
+  const [renderError, setRenderError] = useState("");
+  useEffect(() => {
+    let current = true;
+    setSvg(""); setRenderError("");
+    void import("mermaid").then(async ({ default: mermaid }) => {
+      mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "neutral" });
+      const result = await mermaid.render(id, source);
+      if (current) setSvg(result.svg);
+    }).catch((reason) => { if (current) setRenderError(messageFrom(reason)); });
+    return () => { current = false; };
+  }, [id, source]);
+  if (renderError) return <Alert severity="error">{renderError}</Alert>;
+  if (!svg) return <Stack alignItems="center" py={8}><CircularProgress size={24} /></Stack>;
+  return <Box className="mermaid-view" dangerouslySetInnerHTML={{ __html: svg }} />;
+}
+
 function Field({ name, property, required, value, onChange }: {
   name: string;
   property: SchemaProperty;
@@ -103,7 +200,9 @@ function Field({ name, property, required, value, onChange }: {
   value: unknown;
   onChange: (value: unknown) => void;
 }) {
-  const label = name.replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase());
+  const label = fieldLabel(name);
+  if (property.type === "array") return <ArrayEditor name={name} value={value} defaultValue={property.default} onChange={onChange} />;
+  if (property.type === "object") return <ObjectEditor name={name} value={value} onChange={onChange} />;
   if (property.type === "boolean") {
     return (
       <Button
@@ -117,22 +216,17 @@ function Field({ name, property, required, value, onChange }: {
       </Button>
     );
   }
-  const structured = property.type === "array" || property.type === "object";
   return (
     <TextField
       fullWidth
       required={required}
       label={label}
-      value={structured ? JSON.stringify(value ?? property.default, null, 2) : String(value ?? "")}
+      size="small"
+      value={String(value ?? "")}
       type={property.type === "integer" || property.type === "number" ? "number" : "text"}
-      multiline={structured}
-      minRows={structured ? 3 : undefined}
-      helperText={property.description}
       onChange={(event) => {
         const raw = event.target.value;
-        if (structured) {
-          try { onChange(JSON.parse(raw)); } catch { onChange(raw); }
-        } else if (property.type === "integer") onChange(Number.parseInt(raw, 10));
+        if (property.type === "integer") onChange(Number.parseInt(raw, 10));
         else if (property.type === "number") onChange(Number(raw));
         else onChange(raw);
       }}
@@ -144,6 +238,10 @@ export function App() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("modwire-api-key") || "");
   const [keyDraft, setKeyDraft] = useState(apiKey);
   const [scaffoldings, setScaffoldings] = useState<Scaffolding[]>([]);
+  const [scaffoldingCollection, setScaffoldingCollection] = useState<SirenEntity | null>(null);
+  const [variableCollection, setVariableCollection] = useState<SirenEntity | null>(null);
+  const [templateCollection, setTemplateCollection] = useState<SirenEntity | null>(null);
+  const [languages, setLanguages] = useState<Language[]>([]);
   const [records, setRecords] = useState<RecordSummary[]>([]);
   const [sections, setSections] = useState<SectionSummary[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<RecordResource | null>(null);
@@ -155,10 +253,16 @@ export function App() {
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [activeFile, setActiveFile] = useState(0);
+  const [showMermaidSource, setShowMermaidSource] = useState(false);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [error, setError] = useState("");
+  const [newScaffoldingOpen, setNewScaffoldingOpen] = useState(false);
+  const [newScaffolding, setNewScaffolding] = useState({ language_id: "", name: "", description: "", relative_path: "README.md", file_content: "# Generated file.\n" });
+  const [newVariableOpen, setNewVariableOpen] = useState(false);
+  const [newVariable, setNewVariable] = useState<{ name: string; type: "str" | "int" | "float" | "bool" | "list" | "dict"; description: string; default_value: unknown; required: boolean }>({ name: "", type: "str", description: "", default_value: "", required: false });
+  const [saving, setSaving] = useState(false);
 
   const selected = scaffoldings.find((item) => item.id === selectedId);
   const filtered = useMemo(() => scaffoldings.filter((item) =>
@@ -172,13 +276,22 @@ export function App() {
     setLoading(true); setError("");
     try {
       const root = await api<SirenEntity>(API_URL, key);
-      const [scaffoldingCollection, recordCollection, sectionCollection] = await Promise.all([
+      const [nextScaffoldingCollection, recordCollection, sectionCollection, languageCollection, nextVariableCollection, nextTemplateCollection] = await Promise.all([
         api<SirenEntity>(link(root, "scaffoldings").href, key),
         api<SirenEntity>(link(root, "records").href, key),
         api<SirenEntity>(link(root, "sections").href, key),
+        api<SirenEntity>(link(root, "languages").href, key),
+        api<SirenEntity>(link(root, "variables").href, key),
+        api<SirenEntity>(link(root, "templates").href, key),
       ]);
-      const items = readCollection(scaffoldingCollection);
+      const items = readCollection(nextScaffoldingCollection);
       const recordItems = readRecords(recordCollection);
+      setScaffoldingCollection(nextScaffoldingCollection);
+      setVariableCollection(nextVariableCollection);
+      setTemplateCollection(nextTemplateCollection);
+      const languageItems = (languageCollection.entities || []).map((entity) => entity.properties as unknown as Language);
+      setLanguages(languageItems);
+      setNewScaffolding((current) => ({ ...current, language_id: current.language_id || languageItems[0]?.id || "" }));
       setScaffoldings(items);
       setRecords(recordItems);
       setSections((sectionCollection.entities || []).map((entity) => entity.properties as unknown as SectionSummary));
@@ -232,9 +345,52 @@ export function App() {
         method: operation.method, body: JSON.stringify({ values, template_overrides: [] }),
       });
       const next = (result.properties?.files || []) as PreviewFile[];
-      setFiles(next); setActiveFile(0);
+      setFiles(next); setActiveFile(0); setShowMermaidSource(false);
     } catch (reason) { setError(messageFrom(reason)); }
     finally { setPreviewing(false); }
+  }
+
+  async function createScaffolding() {
+    if (!scaffoldingCollection || !templateCollection) return;
+    setSaving(true); setError("");
+    try {
+      const create = action(scaffoldingCollection, "create_scaffolding");
+      const created = await api<SirenEntity>(create.href, apiKey, {
+        method: create.method,
+        body: JSON.stringify({ language_id: newScaffolding.language_id, name: newScaffolding.name, description: newScaffolding.description }),
+      });
+      const id = String(created.properties?.id || "");
+      const createTemplate = action(templateCollection, "create_template");
+      await api<SirenEntity>(createTemplate.href, apiKey, {
+        method: createTemplate.method,
+        body: JSON.stringify({ scaffolding_id: id, relative_path: newScaffolding.relative_path, file_content: newScaffolding.file_content }),
+      });
+      setSelectedId(id);
+      setNewScaffoldingOpen(false);
+      setNewScaffolding((current) => ({ ...current, name: "", description: "", relative_path: "README.md", file_content: "# Generated file.\n" }));
+      await loadStudio();
+    } catch (reason) { setError(messageFrom(reason)); }
+    finally { setSaving(false); }
+  }
+
+  async function createVariable() {
+    if (!variableCollection || !selected) return;
+    setSaving(true); setError("");
+    try {
+      const create = action(variableCollection, "create_variable");
+      await api<SirenEntity>(create.href, apiKey, {
+        method: create.method,
+        body: JSON.stringify({ ...newVariable, scaffolding_id: selected.id }),
+      });
+      setNewVariableOpen(false);
+      setNewVariable({ name: "", type: "str", description: "", default_value: "", required: false });
+      const resource = await api<SirenEntity>(selected.href, apiKey);
+      const document = await api<SirenEntity>(action(resource, "get_scaffolding_schema").href, apiKey);
+      const next = document.properties as unknown as FormSchema;
+      setSchema(next);
+      setValues(Object.fromEntries(Object.entries(next.properties).map(([name, property]) => [name, property.default])));
+    } catch (reason) { setError(messageFrom(reason)); }
+    finally { setSaving(false); }
   }
 
   if (!apiKey) return (
@@ -242,13 +398,10 @@ export function App() {
       <Container maxWidth="sm" sx={{ py: { xs: 8, md: 16 } }}>
         <Stack alignItems="center" spacing={4}>
           <Box className="brand-mark"><Code /></Box>
-          <Stack spacing={1} textAlign="center">
-            <Typography component="h1" variant="h3" fontWeight={800} letterSpacing="-0.045em">Modwire Studio</Typography>
-            <Typography color="text.secondary">Explore and render your project scaffoldings.</Typography>
-          </Stack>
+          <Typography component="h1" variant="h4" fontWeight={800} letterSpacing="-0.035em">Modwire Studio</Typography>
           <Paper component="form" onSubmit={connect} className="key-card" elevation={0}>
             <Stack spacing={2.5}>
-              <Box><Typography variant="h6" fontWeight={700}>Connect to your workspace</Typography><Typography variant="body2" color="text.secondary">Enter an API key to access the catalog.</Typography></Box>
+              <Typography variant="subtitle1" fontWeight={750}>Connect</Typography>
               <TextField autoFocus required label="API key" type="password" value={keyDraft} onChange={(e) => setKeyDraft(e.target.value)} InputProps={{ startAdornment: <InputAdornment position="start"><Key /></InputAdornment> }} />
               <Button type="submit" size="large" variant="contained" endIcon={<ArrowForward />}>Open studio</Button>
             </Stack>
@@ -266,10 +419,11 @@ export function App() {
       </Box>
       <Box className="workspace">
         <Paper component="aside" className="sidebar" elevation={0} square>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2.5, pt: 1.5 }}><Tabs value={area} onChange={(_, value) => { setArea(value); setSearch(""); }} variant="fullWidth"><Tab value="scaffoldings" label="Scaffolds" /><Tab value="records" label="Records" /></Tabs><Tooltip title="Refresh"><IconButton size="small" onClick={() => void loadStudio()}><Refresh fontSize="small" /></IconButton></Tooltip></Stack>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2, pt: 1.5 }}><Tabs value={area} onChange={(_, value) => { setArea(value); setSearch(""); }} variant="fullWidth"><Tab value="scaffoldings" label="Scaffolds" /><Tab value="records" label="Records" /></Tabs><Tooltip title="Refresh"><IconButton size="small" onClick={() => void loadStudio()}><Refresh fontSize="small" /></IconButton></Tooltip></Stack>
+          {area === "scaffoldings" && <Button size="small" startIcon={<Add />} onClick={() => setNewScaffoldingOpen(true)} sx={{ mx: 2, justifyContent: "flex-start" }}>New scaffolding</Button>}
           <TextField size="small" placeholder="Search catalog" value={search} onChange={(e) => setSearch(e.target.value)} sx={{ m: 2, mt: 1.5 }} InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }} />
           <Stack className="catalog" spacing={0.75}>
-            {area === "scaffoldings" && filtered.map((item) => <Button key={item.id} className="catalog-item" data-selected={selectedId === item.id} onClick={() => setSelectedId(item.id)}><Stack alignItems="flex-start"><Typography fontWeight={700} textTransform="none">{item.name}</Typography><Typography variant="caption" color="text.secondary" noWrap>{item.description || "No description"}</Typography></Stack></Button>)}
+            {area === "scaffoldings" && filtered.map((item) => <Button key={item.id} className="catalog-item" data-selected={selectedId === item.id} onClick={() => setSelectedId(item.id)}><Typography fontWeight={700} textTransform="none" noWrap>{item.name}</Typography></Button>)}
             {area === "records" && filteredRecords.map((item) => <Button key={item.slug} className="catalog-item" data-selected={selectedRecordSlug === item.slug} onClick={() => setSelectedRecordSlug(item.slug)}><Stack alignItems="flex-start"><Typography fontWeight={700} textTransform="none">{item.title}</Typography><Typography variant="caption" color="text.secondary" noWrap>{sectionTitles[item.section_slug] || item.section_slug}</Typography></Stack></Button>)}
             {!loading && area === "scaffoldings" && filtered.length === 0 && <Typography color="text.secondary" variant="body2" sx={{ px: 2.5, py: 3 }}>No scaffoldings found.</Typography>}
             {!loading && area === "records" && filteredRecords.length === 0 && <Typography color="text.secondary" variant="body2" sx={{ px: 2.5, py: 3 }}>No records found.</Typography>}
@@ -280,20 +434,19 @@ export function App() {
           {loading && area === "scaffoldings" && !selected && <Stack alignItems="center" py={12}><CircularProgress /></Stack>}
           {area === "scaffoldings" && selected && <>
             <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2} mb={3}>
-              <Box><Chip icon={<FolderOutlined />} label="Scaffolding" size="small" variant="outlined" /><Typography component="h1" variant="h4" fontWeight={800} mt={1}>{selected.name}</Typography><Typography color="text.secondary">{selected.description}</Typography></Box>
-              <Button variant="contained" size="large" disabled={previewing || loading} onClick={() => void preview()} startIcon={previewing ? <CircularProgress size={18} color="inherit" /> : <Code />}>{previewing ? "Rendering…" : "Generate preview"}</Button>
+              <Box><Chip icon={<FolderOutlined />} label="Scaffolding" size="small" variant="outlined" /><Typography component="h1" variant="h5" fontWeight={800} mt={1}>{selected.name}</Typography></Box>
+              <Button variant="contained" disabled={previewing || loading} onClick={() => void preview()} startIcon={previewing ? <CircularProgress size={18} color="inherit" /> : <Code />}>{previewing ? "Rendering…" : "Preview"}</Button>
             </Stack>
             <Box className="content-grid">
-              <Paper className="panel form-panel" elevation={0}><Stack direction="row" spacing={1} alignItems="center" mb={2.5}><Tune color="primary" /><Typography variant="h6" fontWeight={750}>Configure</Typography></Stack><Stack spacing={2.5}>{schema && Object.entries(schema.properties).map(([name, property]) => <Field key={name} name={name} property={property} required={schema.required.includes(name)} value={values[name]} onChange={(value) => setValues((current) => ({ ...current, [name]: value }))} />)}{schema && Object.keys(schema.properties).length === 0 && <Typography color="text.secondary">This scaffolding has no variables. It is ready to render.</Typography>}</Stack></Paper>
+              <Paper className="panel form-panel" elevation={0}><Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}><Stack direction="row" spacing={1} alignItems="center"><Tune color="primary" fontSize="small" /><Typography variant="subtitle1" fontWeight={750}>Variables</Typography></Stack><Button size="small" startIcon={<Add />} onClick={() => setNewVariableOpen(true)}>Add</Button></Stack><Stack spacing={2}>{schema && Object.entries(schema.properties).map(([name, property]) => <Field key={name} name={name} property={property} required={schema.required.includes(name)} value={values[name]} onChange={(value) => setValues((current) => ({ ...current, [name]: value }))} />)}</Stack></Paper>
               <Paper className="panel preview-panel" elevation={0}>
-                {files.length ? <><Stack direction="row" alignItems="center" justifyContent="space-between" px={2}><Tabs value={activeFile} onChange={(_, value) => setActiveFile(value)} variant="scrollable" scrollButtons="auto">{files.map((file) => <Tab key={file.path} label={file.path} />)}</Tabs><Tooltip title="Copy source"><IconButton onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Stack><Divider /><Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} /></> : <Stack className="preview-empty" alignItems="center" justifyContent="center" textAlign="center" spacing={1.5}><Box className="empty-icon"><Code /></Box><Typography variant="h6" fontWeight={700}>Your preview will appear here</Typography><Typography variant="body2" color="text.secondary" maxWidth={320}>Configure the variables, then generate a complete, syntax-highlighted project.</Typography></Stack>}
+                {files.length ? <><Box className="preview-toolbar"><label className="file-select"><span>File</span><select aria-label="Preview file" value={activeFile} onChange={(event) => { setActiveFile(Number(event.target.value)); setShowMermaidSource(false); }}>{files.map((file, index) => <option value={index} key={file.path}>{file.path}</option>)}</select></label><Stack direction="row" spacing={0.5}>{files[activeFile].path.endsWith(".mermaid") && <Button size="small" onClick={() => setShowMermaidSource((current) => !current)}>{showMermaidSource ? "Diagram" : "Source"}</Button>}<Tooltip title="Copy source"><IconButton onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Stack></Box><Divider />{files[activeFile].path.endsWith(".mermaid") && !showMermaidSource ? <MermaidPreview source={files[activeFile].source} /> : <Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} />}</> : <Box className="preview-empty"><Code fontSize="small" /></Box>}
               </Paper>
             </Box>
           </>}
           {area === "records" && selectedRecord && <>
             <Stack gap={1} mb={3}>
-              <Box><Chip icon={<MenuBookOutlined />} label={sectionTitles[selectedRecord.section_slug] || "Record"} size="small" variant="outlined" /><Typography component="h1" variant="h4" fontWeight={800} mt={1}>{selectedRecord.title}</Typography></Box>
-              <Typography color="text.secondary" maxWidth={900}>{selectedRecord.description}</Typography>
+              <Box><Chip icon={<MenuBookOutlined />} label={sectionTitles[selectedRecord.section_slug] || "Record"} size="small" variant="outlined" /><Typography component="h1" variant="h5" fontWeight={800} mt={1}>{selectedRecord.title}</Typography></Box>
               <Stack direction="row" gap={1} flexWrap="wrap">{selectedRecord.tag_slugs.map((tag) => <Chip key={tag} label={tag} size="small" />)}</Stack>
             </Stack>
             <Paper className="panel record-panel" elevation={0}>
@@ -307,6 +460,28 @@ export function App() {
           </>}
         </Box>
       </Box>
+      <Dialog open={newScaffoldingOpen} onClose={() => setNewScaffoldingOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>New scaffolding</DialogTitle>
+        <DialogContent><Stack spacing={2} pt={1}>
+          <TextField select SelectProps={{ native: true }} size="small" label="Language" value={newScaffolding.language_id} onChange={(event) => setNewScaffolding((current) => ({ ...current, language_id: event.target.value }))}>{languages.map((language) => <option key={language.id} value={language.id}>{language.name}</option>)}</TextField>
+          <TextField autoFocus required size="small" label="Name" value={newScaffolding.name} onChange={(event) => setNewScaffolding((current) => ({ ...current, name: event.target.value }))} />
+          <TextField required size="small" label="Description" value={newScaffolding.description} onChange={(event) => setNewScaffolding((current) => ({ ...current, description: event.target.value }))} />
+          <TextField required size="small" label="First output path" value={newScaffolding.relative_path} onChange={(event) => setNewScaffolding((current) => ({ ...current, relative_path: event.target.value }))} />
+          <TextField required label="Template" multiline minRows={8} value={newScaffolding.file_content} onChange={(event) => setNewScaffolding((current) => ({ ...current, file_content: event.target.value }))} InputProps={{ sx: { fontFamily: "monospace", fontSize: 13 } }} />
+        </Stack></DialogContent>
+        <DialogActions><Button onClick={() => setNewScaffoldingOpen(false)}>Cancel</Button><Button variant="contained" disabled={saving || !newScaffolding.language_id || !newScaffolding.name || !newScaffolding.description || !newScaffolding.relative_path || !newScaffolding.file_content} onClick={() => void createScaffolding()}>Create</Button></DialogActions>
+      </Dialog>
+      <Dialog open={newVariableOpen} onClose={() => setNewVariableOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>New variable</DialogTitle>
+        <DialogContent><Stack spacing={2} pt={1}>
+          <TextField autoFocus required size="small" label="Name" value={newVariable.name} onChange={(event) => setNewVariable((current) => ({ ...current, name: event.target.value }))} />
+          <TextField select SelectProps={{ native: true }} size="small" label="Type" value={newVariable.type} onChange={(event) => { const type = event.target.value as typeof newVariable.type; const defaults = { str: "", int: 0, float: 0, bool: false, list: [], dict: {} }; setNewVariable((current) => ({ ...current, type, default_value: defaults[type] })); }}><option value="str">String</option><option value="int">Integer</option><option value="float">Number</option><option value="bool">Boolean</option><option value="list">List</option><option value="dict">Dictionary</option></TextField>
+          <TextField required size="small" label="Description" value={newVariable.description} onChange={(event) => setNewVariable((current) => ({ ...current, description: event.target.value }))} />
+          {newVariable.type === "list" ? <ArrayEditor name="default_value" value={newVariable.default_value} defaultValue={[]} onChange={(default_value) => setNewVariable((current) => ({ ...current, default_value }))} /> : newVariable.type === "dict" ? <ObjectEditor name="default_value" value={newVariable.default_value} onChange={(default_value) => setNewVariable((current) => ({ ...current, default_value }))} /> : newVariable.type === "bool" ? <Button variant={newVariable.default_value ? "contained" : "outlined"} onClick={() => setNewVariable((current) => ({ ...current, default_value: !current.default_value }))}>Default: {newVariable.default_value ? "true" : "false"}</Button> : <TextField size="small" label="Default" type={newVariable.type === "str" ? "text" : "number"} value={String(newVariable.default_value)} onChange={(event) => setNewVariable((current) => ({ ...current, default_value: newVariable.type === "str" ? event.target.value : Number(event.target.value) }))} />}
+          <Button variant={newVariable.required ? "contained" : "outlined"} startIcon={newVariable.required ? <CheckCircleOutline /> : <Tune />} onClick={() => setNewVariable((current) => ({ ...current, required: !current.required }))}>Required</Button>
+        </Stack></DialogContent>
+        <DialogActions><Button onClick={() => setNewVariableOpen(false)}>Cancel</Button><Button variant="contained" disabled={saving || !newVariable.name || !newVariable.description} onClick={() => void createVariable()}>Add variable</Button></DialogActions>
+      </Dialog>
     </Box>
   );
 }
