@@ -1,12 +1,12 @@
 import json
-from urllib.request import Request, urlopen
+from urllib.request import Request
 
 from wireup import injectable
 
-from .base import LanguageDefinition, LanguageVersionError, PackageManagerDefinition
+from .base import LanguageDefinition, PackageManagerDefinition
 
 
-@injectable
+@injectable(as_type=LanguageDefinition, qualifier="php")
 class PHP(LanguageDefinition):
     name = "PHP"
     executable = "php"
@@ -23,16 +23,12 @@ class PHP(LanguageDefinition):
         ),
     )
 
-    def get_current_version(self, timeout: float = 10) -> str:
-        request = Request(
+    @property
+    def version_request(self) -> Request:
+        return Request(
             "https://endoflife.date/api/php.json",
             headers={"Accept": "application/json", "User-Agent": "modwire-languages-cms/1.0"},
         )
-        try:
-            with urlopen(request, timeout=timeout) as response:  # noqa: S310
-                version = json.load(response)[0]["latest"]
-        except (OSError, ValueError, IndexError, KeyError, TypeError) as error:
-            raise LanguageVersionError(f"Could not obtain the current PHP version: {error}") from error
-        if not isinstance(version, str) or not version:
-            raise LanguageVersionError("The PHP lifecycle API returned an invalid current version.")
-        return version
+
+    def on_version_response(self, response) -> str:
+        return json.load(response)[0]["latest"]

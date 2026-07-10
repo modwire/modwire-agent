@@ -179,7 +179,7 @@ def test_catalog_sync_does_not_write_when_version_fetch_fails(language, monkeypa
     monkeypatch.setattr(Typescript, "get_current_version", lambda self, timeout: "6.0.0")
 
     with pytest.raises(LanguageVersionError):
-        LanguageCatalogService(Python(), PHP(), Typescript()).sync()
+        LanguageCatalogService((Python(), PHP(), Typescript())).sync()
 
     assert list(Language.objects.values_list("name", flat=True)) == ["Python"]
 
