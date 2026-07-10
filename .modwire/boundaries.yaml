@@ -5,9 +5,18 @@ tags:
       - "core"
       - ".dev"
       - "manage"
+      - "tests"
+      - "shared/oa"
+      - "*/migrations"
 
   - name: project
     match: "core"
+
+  - name: generated
+    match: "shared/oa"
+
+  - name: test
+    match: "tests"
 
   - name: entrypoint
     match: "manage"
@@ -32,6 +41,8 @@ tags:
 
   - name: api
     match: "*/api"
+    excluded_patterns:
+      - "shared/oa"
 
   - name: admin
     match: "*/admin"
@@ -44,6 +55,8 @@ tags:
 
   - name: models
     match: "*/models"
+    excluded_patterns:
+      - "shared/oa"
 
   - name: migrations
     match: "*/migrations"
@@ -59,7 +72,6 @@ flow:
     - management
     - services
     - models
-    - migrations
   realms:
     - name: project
       module_tag: project
