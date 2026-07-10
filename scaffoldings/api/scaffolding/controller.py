@@ -5,6 +5,8 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
+from shared.api_errors import validated
+
 from ...services.scaffolding import ScaffoldingService
 from .schemas import ScaffoldingIn, ScaffoldingOut, ScaffoldingPatchIn
 
@@ -22,14 +24,14 @@ class ScaffoldingController(ControllerBase):
         return service.list()
 
     @route.get(
-        "/{slug}",
+        "/{scaffolding_id}",
         response=ScaffoldingOut,
         operation_id="get_scaffolding",
         summary="Get scaffolding.",
     )
     @inject
-    def get(self, slug: str, service: Annotated[ScaffoldingService, Inject()]):
-        return service.get(slug)
+    def get(self, scaffolding_id: str, service: Annotated[ScaffoldingService, Inject()]):
+        return service.get(scaffolding_id)
 
     @route.post(
         "",
@@ -39,7 +41,7 @@ class ScaffoldingController(ControllerBase):
     )
     @inject
     def create(self, data: ScaffoldingIn, service: Annotated[ScaffoldingService, Inject()]):
-        return service.create(**data.model_dump())
+        return validated(service.create, **data.model_dump())
 
     @route.put(
         "/{scaffolding_id}",
@@ -50,11 +52,11 @@ class ScaffoldingController(ControllerBase):
     @inject
     def update(
         self,
-        scaffolding_id: int,
+        scaffolding_id: str,
         data: ScaffoldingIn,
         service: Annotated[ScaffoldingService, Inject()],
     ):
-        return service.update(scaffolding_id, **data.model_dump())
+        return validated(service.update, scaffolding_id, **data.model_dump())
 
     @route.patch(
         "/{scaffolding_id}",
@@ -65,11 +67,11 @@ class ScaffoldingController(ControllerBase):
     @inject
     def partial_update(
         self,
-        scaffolding_id: int,
+        scaffolding_id: str,
         data: ScaffoldingPatchIn,
         service: Annotated[ScaffoldingService, Inject()],
     ):
-        return service.update(scaffolding_id, **data.model_dump(exclude_unset=True))
+        return validated(service.update, scaffolding_id, **data.model_dump(exclude_unset=True))
 
     @route.delete(
         "/{scaffolding_id}",
@@ -78,6 +80,6 @@ class ScaffoldingController(ControllerBase):
         summary="Delete scaffolding.",
     )
     @inject
-    def delete(self, scaffolding_id: int, service: Annotated[ScaffoldingService, Inject()]):
+    def delete(self, scaffolding_id: str, service: Annotated[ScaffoldingService, Inject()]):
         service.delete(scaffolding_id)
         return Status(204, None)

@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from wireup import injectable
 
+from ..models.scaffolding import Scaffolding
 from ..models.variable import Variable
 
 
@@ -14,14 +15,19 @@ class VariableService:
     def get(self, variable_id: str):
         return get_object_or_404(self.model, id=variable_id)
 
-    def create(self, **data):
-        assert not self.model.objects.filter(name=data["name"]).exists()
-        return self.model.objects.create(**data)
+    def create(self, scaffolding_id: str, **data):
+        instance = self.model(scaffolding=get_object_or_404(Scaffolding, id=scaffolding_id), **data)
+        instance.full_clean()
+        instance.save()
+        return instance
 
     def update(self, variable_id: str, **data):
         instance = self.get(variable_id)
+        if "scaffolding_id" in data:
+            instance.scaffolding = get_object_or_404(Scaffolding, id=data.pop("scaffolding_id"))
         for field, value in data.items():
             setattr(instance, field, value)
+        instance.full_clean()
         instance.save()
         return instance
 

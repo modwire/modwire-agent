@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404
 from wireup import injectable
 
+from languages.models.language import Language
+
 from ..models.scaffolding import Scaffolding
-from ...languages.models.language import Language
 
 
 @injectable
@@ -12,24 +13,29 @@ class ScaffoldingService:
     def list(self):
         return self.model.objects.order_by("name")
 
-    def get(self, slug: str):
-        return get_object_or_404(self.model, slug=slug)
+    def get(self, scaffolding_id: str):
+        return get_object_or_404(self.model, id=scaffolding_id)
 
     def create(self, language_id: str, name: str, description: str):
-        scaffold = self.model(language=get_object_or_404(Language, id=language_id))
-        assert not self.model.objects.filter(name=name).exists()
-        
-        scaffold.name = name
-        scaffold.description = description
-        scaffold.save()
+        scaffolding = self.model(
+            language=get_object_or_404(Language, id=language_id),
+            name=name,
+            description=description,
+        )
+        scaffolding.full_clean()
+        scaffolding.save()
+        return scaffolding
 
-    def update(self, slug: str, **data):
-        instance = self.get(slug)
+    def update(self, scaffolding_id: str, **data):
+        instance = self.get(scaffolding_id)
+        if "language_id" in data:
+            instance.language = get_object_or_404(Language, id=data.pop("language_id"))
         for field, value in data.items():
             setattr(instance, field, value)
+        instance.full_clean()
         instance.save()
         return instance
 
-    def delete(self, slug: str):
-        instance = self.get(slug)
+    def delete(self, scaffolding_id: str):
+        instance = self.get(scaffolding_id)
         instance.delete()

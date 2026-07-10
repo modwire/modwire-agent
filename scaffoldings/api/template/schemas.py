@@ -1,17 +1,21 @@
 from ninja import ModelSchema, Schema
 
-from ...models.template import Template 
+from ...models.template import Template
 
 
 class TemplateIn(Schema):
-    name: str
+    scaffolding_id: str
+    relative_path: str
+    file_content: str
 
 
 class TemplatePatchIn(Schema):
-    name: str
+    scaffolding_id: str | None = None
+    relative_path: str | None = None
+    file_content: str | None = None
 
 
 class TemplateOut(ModelSchema):
     class Meta:
         model = Template 
-        fields = ("id", "name", "created_at", "updated_at")
+        fields = "__all__"

@@ -5,6 +5,8 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
+from shared.api_errors import validated
+
 from ...services.language import LanguageService
 from .schemas import LanguageIn, LanguageOut, LanguagePatchIn
 
@@ -28,7 +30,7 @@ class LanguageController(ControllerBase):
         summary="Get language.",
     )
     @inject
-    def get(self, language_id: int, service: Annotated[LanguageService, Inject()]):
+    def get(self, language_id: str, service: Annotated[LanguageService, Inject()]):
         return service.get(language_id)
 
     @route.post(
@@ -39,7 +41,7 @@ class LanguageController(ControllerBase):
     )
     @inject
     def create(self, data: LanguageIn, service: Annotated[LanguageService, Inject()]):
-        return service.create(**data.model_dump())
+        return validated(service.create, **data.model_dump())
 
     @route.put(
         "/{language_id}",
@@ -50,11 +52,11 @@ class LanguageController(ControllerBase):
     @inject
     def update(
         self,
-        language_id: int,
+        language_id: str,
         data: LanguageIn,
         service: Annotated[LanguageService, Inject()],
     ):
-        return service.update(language_id, **data.model_dump())
+        return validated(service.update, language_id, **data.model_dump())
 
     @route.patch(
         "/{language_id}",
@@ -65,11 +67,11 @@ class LanguageController(ControllerBase):
     @inject
     def partial_update(
         self,
-        language_id: int,
+        language_id: str,
         data: LanguagePatchIn,
         service: Annotated[LanguageService, Inject()],
     ):
-        return service.update(language_id, **data.model_dump(exclude_unset=True))
+        return validated(service.update, language_id, **data.model_dump(exclude_unset=True))
 
     @route.delete(
         "/{language_id}",
@@ -78,6 +80,6 @@ class LanguageController(ControllerBase):
         summary="Delete language.",
     )
     @inject
-    def delete(self, language_id: int, service: Annotated[LanguageService, Inject()]):
+    def delete(self, language_id: str, service: Annotated[LanguageService, Inject()]):
         service.delete(language_id)
         return Status(204, None)

@@ -1,8 +1,9 @@
 from django.contrib import admin
 
-from ..models.language import Language 
+from ..models.language import Language
 
 
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "name", "executable", "stable_version")
+    search_fields = ("name", "executable")

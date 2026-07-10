@@ -5,6 +5,8 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
+from shared.api_errors import validated
+
 from ...services.package_manager import PackageManagerService
 from .schemas import PackageManagerIn, PackageManagerOut, PackageManagerPatchIn
 
@@ -28,7 +30,7 @@ class PackageManagerController(ControllerBase):
         summary="Get package_manager.",
     )
     @inject
-    def get(self, package_manager_id: int, service: Annotated[PackageManagerService, Inject()]):
+    def get(self, package_manager_id: str, service: Annotated[PackageManagerService, Inject()]):
         return service.get(package_manager_id)
 
     @route.post(
@@ -39,7 +41,7 @@ class PackageManagerController(ControllerBase):
     )
     @inject
     def create(self, data: PackageManagerIn, service: Annotated[PackageManagerService, Inject()]):
-        return service.create(**data.model_dump())
+        return validated(service.create, **data.model_dump())
 
     @route.put(
         "/{package_manager_id}",
@@ -50,11 +52,11 @@ class PackageManagerController(ControllerBase):
     @inject
     def update(
         self,
-        package_manager_id: int,
+        package_manager_id: str,
         data: PackageManagerIn,
         service: Annotated[PackageManagerService, Inject()],
     ):
-        return service.update(package_manager_id, **data.model_dump())
+        return validated(service.update, package_manager_id, **data.model_dump())
 
     @route.patch(
         "/{package_manager_id}",
@@ -65,11 +67,11 @@ class PackageManagerController(ControllerBase):
     @inject
     def partial_update(
         self,
-        package_manager_id: int,
+        package_manager_id: str,
         data: PackageManagerPatchIn,
         service: Annotated[PackageManagerService, Inject()],
     ):
-        return service.update(package_manager_id, **data.model_dump(exclude_unset=True))
+        return validated(service.update, package_manager_id, **data.model_dump(exclude_unset=True))
 
     @route.delete(
         "/{package_manager_id}",
@@ -78,6 +80,6 @@ class PackageManagerController(ControllerBase):
         summary="Delete package_manager.",
     )
     @inject
-    def delete(self, package_manager_id: int, service: Annotated[PackageManagerService, Inject()]):
+    def delete(self, package_manager_id: str, service: Annotated[PackageManagerService, Inject()]):
         service.delete(package_manager_id)
         return Status(204, None)

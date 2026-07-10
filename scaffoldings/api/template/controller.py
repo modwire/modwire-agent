@@ -5,6 +5,8 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
+from shared.api_errors import validated
+
 from ...services.template import TemplateService
 from .schemas import TemplateIn, TemplateOut, TemplatePatchIn
 
@@ -28,7 +30,7 @@ class TemplateController(ControllerBase):
         summary="Get template.",
     )
     @inject
-    def get(self, template_id: int, service: Annotated[TemplateService, Inject()]):
+    def get(self, template_id: str, service: Annotated[TemplateService, Inject()]):
         return service.get(template_id)
 
     @route.post(
@@ -39,7 +41,7 @@ class TemplateController(ControllerBase):
     )
     @inject
     def create(self, data: TemplateIn, service: Annotated[TemplateService, Inject()]):
-        return service.create(**data.model_dump())
+        return validated(service.create, **data.model_dump())
 
     @route.put(
         "/{template_id}",
@@ -50,11 +52,11 @@ class TemplateController(ControllerBase):
     @inject
     def update(
         self,
-        template_id: int,
+        template_id: str,
         data: TemplateIn,
         service: Annotated[TemplateService, Inject()],
     ):
-        return service.update(template_id, **data.model_dump())
+        return validated(service.update, template_id, **data.model_dump())
 
     @route.patch(
         "/{template_id}",
@@ -65,11 +67,11 @@ class TemplateController(ControllerBase):
     @inject
     def partial_update(
         self,
-        template_id: int,
+        template_id: str,
         data: TemplatePatchIn,
         service: Annotated[TemplateService, Inject()],
     ):
-        return service.update(template_id, **data.model_dump(exclude_unset=True))
+        return validated(service.update, template_id, **data.model_dump(exclude_unset=True))
 
     @route.delete(
         "/{template_id}",
@@ -78,6 +80,6 @@ class TemplateController(ControllerBase):
         summary="Delete template.",
     )
     @inject
-    def delete(self, template_id: int, service: Annotated[TemplateService, Inject()]):
+    def delete(self, template_id: str, service: Annotated[TemplateService, Inject()]):
         service.delete(template_id)
         return Status(204, None)

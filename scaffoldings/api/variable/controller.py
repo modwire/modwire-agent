@@ -5,6 +5,8 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
+from shared.api_errors import validated
+
 from ...services.variable import VariableService
 from .schemas import VariableIn, VariableOut, VariablePatchIn
 
@@ -28,7 +30,7 @@ class VariableController(ControllerBase):
         summary="Get variable.",
     )
     @inject
-    def get(self, variable_id: int, service: Annotated[VariableService, Inject()]):
+    def get(self, variable_id: str, service: Annotated[VariableService, Inject()]):
         return service.get(variable_id)
 
     @route.post(
@@ -39,7 +41,7 @@ class VariableController(ControllerBase):
     )
     @inject
     def create(self, data: VariableIn, service: Annotated[VariableService, Inject()]):
-        return service.create(**data.model_dump())
+        return validated(service.create, **data.model_dump())
 
     @route.put(
         "/{variable_id}",
@@ -50,11 +52,11 @@ class VariableController(ControllerBase):
     @inject
     def update(
         self,
-        variable_id: int,
+        variable_id: str,
         data: VariableIn,
         service: Annotated[VariableService, Inject()],
     ):
-        return service.update(variable_id, **data.model_dump())
+        return validated(service.update, variable_id, **data.model_dump())
 
     @route.patch(
         "/{variable_id}",
@@ -65,11 +67,11 @@ class VariableController(ControllerBase):
     @inject
     def partial_update(
         self,
-        variable_id: int,
+        variable_id: str,
         data: VariablePatchIn,
         service: Annotated[VariableService, Inject()],
     ):
-        return service.update(variable_id, **data.model_dump(exclude_unset=True))
+        return validated(service.update, variable_id, **data.model_dump(exclude_unset=True))
 
     @route.delete(
         "/{variable_id}",
@@ -78,6 +80,6 @@ class VariableController(ControllerBase):
         summary="Delete variable.",
     )
     @inject
-    def delete(self, variable_id: int, service: Annotated[VariableService, Inject()]):
+    def delete(self, variable_id: str, service: Annotated[VariableService, Inject()]):
         service.delete(variable_id)
         return Status(204, None)

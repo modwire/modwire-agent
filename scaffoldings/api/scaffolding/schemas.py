@@ -1,6 +1,6 @@
 from ninja import ModelSchema, Schema
 
-from ...models.scaffolding import Scaffolding 
+from ...models.scaffolding import Scaffolding
 
 
 class ScaffoldingIn(Schema):
@@ -10,8 +10,9 @@ class ScaffoldingIn(Schema):
 
 
 class ScaffoldingPatchIn(Schema):
-    name: str
-    description: str
+    language_id: str | None = None
+    name: str | None = None
+    description: str | None = None
 
 
 class ScaffoldingOut(ModelSchema):
