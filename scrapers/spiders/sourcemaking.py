@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from scrapy import Spider
 from scrapy.http import TextResponse
 
-from scraper_sourcemaking.items import ScrapedContent, ScrapedRecord
+from scrapers.items import ScrapedContent, ScrapedRecord
 
 DESIGN_PATTERNS_URL = "https://sourcemaking.com/design_patterns"
 CODE_SMELLS_URL = "https://sourcemaking.com/refactoring/smells"

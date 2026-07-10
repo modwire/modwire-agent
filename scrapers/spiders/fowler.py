@@ -8,7 +8,7 @@ from urllib.parse import urlparse, urlunparse
 from scrapy import Spider
 from scrapy.http import TextResponse
 
-from scraper_fowler.items import ScrapedContent, ScrapedRecord
+from scrapers.items import ScrapedContent, ScrapedRecord
 
 ARCHITECTURE_URL = "https://martinfowler.com/architecture/"
 AGILE_URL = "https://martinfowler.com/agile.html"

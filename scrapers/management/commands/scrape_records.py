@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from django.core.management.base import BaseCommand, CommandError
 from scrapy import signals
@@ -42,7 +43,7 @@ class Command(BaseCommand):
 
         scraped_records = self.run_spider(
             source.spider,
-            settings_module=source.settings_module,
+            settings_overrides=source.settings_overrides,
             limit=options["limit"],
             include_images=not options["no_images"],
             verbosity=options["verbosity"],
@@ -72,14 +73,16 @@ class Command(BaseCommand):
         self,
         spider,
         *,
-        settings_module: str,
+        settings_overrides: dict[str, Any],
         limit: int,
         include_images: bool,
         verbosity: int,
     ) -> list:
         items: list = []
         settings = Settings()
-        settings.setmodule(settings_module)
+        settings.setmodule("scrapers.settings")
+        for key, value in settings_overrides.items():
+            settings.set(key, value, priority="cmdline")
         settings.set("LOG_ENABLED", verbosity > 1, priority="cmdline")
         logging.getLogger("scrapy").setLevel(logging.INFO if verbosity > 1 else logging.WARNING)
         process = CrawlerProcess(settings=settings)

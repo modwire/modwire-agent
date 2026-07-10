@@ -1,17 +1,7 @@
-# Define here the models for your scraped items
-#
-# See documentation in:
-# https://docs.scrapy.org/en/latest/topics/items.html
+from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any
-
-
-@dataclass
-class ScraperFowlerItem:
-    # define the fields for your item here like:
-    # name: str | None = None
-    pass
 
 
 @dataclass(frozen=True)
@@ -26,7 +16,7 @@ class ScrapedContent:
             "role": self.role,
             "content": self.content,
             "language": self.language or "text",
-            "metadata": self.metadata or {"source": "scraper_fowler"},
+            "metadata": self.metadata or {"source": "scraper"},
         }
 
 

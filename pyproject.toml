@@ -1,7 +1,7 @@
 [project]
-name = "new_project"
+name = "modwire-mcp"
 version = "0.1.0"
-description = "New Project API"
+description = "Modwire MCP Server"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
