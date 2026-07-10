@@ -1,6 +1,6 @@
 from ninja import ModelSchema
 
-from shared.api_types import ShortUUID
+from shared.api.types import ShortUUID
 
 from ...models.command import Command, CommandResult
 

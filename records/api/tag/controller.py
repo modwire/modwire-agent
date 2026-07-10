@@ -8,7 +8,7 @@ from wireup import Inject
 from wireup.integration.django import inject
 
 from records.api.errors import validation_error
-from shared.api_types import Slug
+from shared.api.types import Slug
 
 from ...services.tag import TagService
 from .schemas import TagIn, TagOut, TagPatchIn

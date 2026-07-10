@@ -2,8 +2,8 @@ from ninja import Schema
 from pydantic import Field
 from pydantic_core import PydanticUndefined
 
-from shared.api_schema import StrictSchema
-from shared.api_types import Slug
+from shared.api.schema import StrictSchema
+from shared.api.types import Slug
 
 
 class SectionIn(StrictSchema):

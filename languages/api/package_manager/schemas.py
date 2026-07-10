@@ -3,7 +3,7 @@ from typing import Literal
 from ninja import ModelSchema
 from pydantic import AnyHttpUrl
 
-from shared.api_types import ShortUUID
+from shared.api.types import ShortUUID
 
 from ...models.package_manager import PackageManager
 

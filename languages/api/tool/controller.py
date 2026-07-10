@@ -4,7 +4,7 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
-from shared.api_types import ShortUUID
+from shared.api.types import ShortUUID
 
 from ...services.tool import ToolService
 from .schemas import ToolOut, ToolRole

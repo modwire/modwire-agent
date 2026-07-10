@@ -2,8 +2,8 @@ from ninja import Field, ModelSchema
 from pydantic import JsonValue
 from pydantic_core import PydanticUndefined
 
-from shared.api_schema import StrictSchema
-from shared.api_types import ShortUUID
+from shared.api.schema import StrictSchema
+from shared.api.types import ShortUUID
 
 from ...models.variable import Variable, VariableType
 

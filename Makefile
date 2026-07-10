@@ -12,6 +12,9 @@ init:
 	mkdir -p .dev shared
 	$(INSTALL)
 
+apikey:
+	$(RUN) python manage.py apikey
+
 dev:
 	$(RUN) python manage.py runserver $(PORT)
 	open http://localhost:$(PORT)/browser/

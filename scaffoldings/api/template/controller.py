@@ -5,8 +5,8 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
-from shared.api_errors import validated
-from shared.api_types import ShortUUID
+from shared.api.errors import validated
+from shared.api.types import ShortUUID
 
 from ...services.template import TemplateService
 from .schemas import TemplateIn, TemplateOut, TemplatePatchIn

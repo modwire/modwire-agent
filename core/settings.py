@@ -48,7 +48,7 @@ INSTALLED_APPS = [
 ] + local_apps()
 MIDDLEWARE = [
     "wireup.integration.django.wireup_middleware",
-    "shared.siren.SirenMiddleware",
+    "shared.api.siren.SirenMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

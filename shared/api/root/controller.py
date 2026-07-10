@@ -1,6 +1,6 @@
 from ninja_extra import ControllerBase, api_controller, route
 
-from shared.siren import SIREN_TYPE
+from shared.api.siren import SIREN_TYPE
 
 COLLECTIONS = (
     "records",

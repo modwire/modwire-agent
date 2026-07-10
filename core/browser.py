@@ -5,7 +5,7 @@ from django.http import FileResponse, HttpResponse, JsonResponse
 from django.views.static import serve
 
 from shared.api.root.controller import COLLECTIONS
-from shared.siren import PROBLEM_TYPE, SIREN_TYPE
+from shared.api.siren import PROBLEM_TYPE, SIREN_TYPE
 from tokens.models.api_key import ApiKey
 
 
