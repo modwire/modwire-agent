@@ -111,6 +111,38 @@ def _openapi():
     return paths, schema.get("components", {}).get("schemas", {})
 
 
+def api_root_document(request) -> dict:
+    """Build API discovery links from the generated OpenAPI document."""
+    paths, _ = _openapi()
+    collections = {}
+    for path, path_item in paths.items():
+        segments = path.strip("/").split("/")
+        if len(segments) != 1 or not segments[0] or "{" in segments[0]:
+            continue
+        name = segments[0]
+        operation = path_item.get("get") or path_item.get("post") or {}
+        collections[name] = operation.get("tags", [name.replace("_", " ").title()])[0]
+    absolute = request.build_absolute_uri
+    return {
+        "class": ["api", "entry-point"],
+        "properties": {"title": "Modwire API", "version": "1.0.0"},
+        "links": [
+            _link("self", absolute("/api/")),
+            *(
+                _link(name.replace("_", "-"), absolute(f"/api/{name}"), title)
+                for name, title in sorted(collections.items())
+            ),
+            {
+                "rel": ["service-desc"],
+                "href": absolute("/api/openapi.json"),
+                "type": "application/vnd.oai.openapi+json;version=3.1",
+            },
+            _link("browser", absolute("/browser/")),
+        ],
+        "actions": [],
+    }
+
+
 def _matching_operations(api_path: str, item: bool) -> list[tuple[str, str, dict]]:
     paths, _ = _openapi()
     matches = []

@@ -31,8 +31,10 @@ import {
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Properties = Record<string, unknown>;
-type SirenEntity = { properties?: Properties; entities?: SirenEntity[] };
-type Scaffolding = { id: string; name: string; description: string; language: string };
+type SirenLink = { rel: string[]; href: string; title?: string };
+type SirenAction = { name: string; href: string; method: string; type?: string };
+type SirenEntity = { properties?: Properties; entities?: SirenEntity[]; links?: SirenLink[]; actions?: SirenAction[] };
+type Scaffolding = { id: string; name: string; description: string; language: string; href: string };
 type SchemaProperty = {
   type: "string" | "integer" | "number" | "boolean" | "array" | "object";
   description: string;
@@ -48,8 +50,9 @@ function messageFrom(error: unknown) {
   return "Something went wrong. Please try again.";
 }
 
-async function api<T>(path: string, apiKey: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path.replace(/^\//, "")}`, {
+async function api<T>(href: string, apiKey: string, init?: RequestInit): Promise<T> {
+  const apiRoot = new URL(API_URL, window.location.origin);
+  const response = await fetch(new URL(href, apiRoot), {
     ...init,
     headers: { apikey: apiKey, "Content-Type": "application/json", ...init?.headers },
   });
@@ -63,7 +66,22 @@ async function api<T>(path: string, apiKey: string, init?: RequestInit): Promise
 }
 
 function readCollection(document: SirenEntity): Scaffolding[] {
-  return (document.entities || []).map((entity) => entity.properties as unknown as Scaffolding);
+  return (document.entities || []).map((entity) => ({
+    ...(entity.properties as unknown as Omit<Scaffolding, "href">),
+    href: link(entity, "self").href,
+  }));
+}
+
+function link(document: SirenEntity, relation: string): SirenLink {
+  const found = document.links?.find((item) => item.rel.includes(relation));
+  if (!found) throw new Error(`The API did not advertise a “${relation}” link.`);
+  return found;
+}
+
+function action(document: SirenEntity, name: string): SirenAction {
+  const found = document.actions?.find((item) => item.name === name);
+  if (!found) throw new Error(`The API did not advertise the “${name}” operation.`);
+  return found;
 }
 
 function Field({ name, property, required, value, onChange }: {
@@ -114,6 +132,7 @@ export function App() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("modwire-api-key") || "");
   const [keyDraft, setKeyDraft] = useState(apiKey);
   const [scaffoldings, setScaffoldings] = useState<Scaffolding[]>([]);
+  const [selectedResource, setSelectedResource] = useState<SirenEntity | null>(null);
   const [selectedId, setSelectedId] = useState("");
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [values, setValues] = useState<Record<string, unknown>>({});
@@ -132,8 +151,9 @@ export function App() {
     if (!key) return;
     setLoading(true); setError("");
     try {
-      const result = await api<SirenEntity>("scaffoldings", key);
-      const items = readCollection(result);
+      const root = await api<SirenEntity>(API_URL, key);
+      const collection = await api<SirenEntity>(link(root, "scaffoldings").href, key);
+      const items = readCollection(collection);
       setScaffoldings(items);
       setSelectedId((current) => items.some((item) => item.id === current) ? current : items[0]?.id || "");
     } catch (reason) { setError(messageFrom(reason)); }
@@ -142,17 +162,21 @@ export function App() {
 
   useEffect(() => { void loadScaffoldings(); }, [apiKey]);
   useEffect(() => {
-    if (!selectedId || !apiKey) { setSchema(null); return; }
+    if (!selectedId || !apiKey) { setSchema(null); setSelectedResource(null); return; }
     setLoading(true); setError(""); setFiles([]);
-    void api<SirenEntity>(`scaffoldings/${selectedId}/schema`, apiKey)
-      .then((document) => {
+    const item = scaffoldings.find((candidate) => candidate.id === selectedId);
+    if (!item) return;
+    void api<SirenEntity>(item.href, apiKey)
+      .then(async (resource) => {
+        setSelectedResource(resource);
+        const document = await api<SirenEntity>(action(resource, "get_scaffolding_schema").href, apiKey);
         const next = document.properties as unknown as FormSchema;
         setSchema(next);
         setValues(Object.fromEntries(Object.entries(next.properties).map(([name, property]) => [name, property.default])));
       })
       .catch((reason) => setError(messageFrom(reason)))
       .finally(() => setLoading(false));
-  }, [selectedId, apiKey]);
+  }, [selectedId, apiKey, scaffoldings]);
 
   function connect(event: FormEvent) {
     event.preventDefault();
@@ -162,11 +186,12 @@ export function App() {
   }
 
   async function preview() {
-    if (!selectedId) return;
+    if (!selectedResource) return;
     setPreviewing(true); setError("");
     try {
-      const result = await api<SirenEntity>(`scaffoldings/${selectedId}/preview`, apiKey, {
-        method: "POST", body: JSON.stringify({ values, template_overrides: [] }),
+      const operation = action(selectedResource, "preview_scaffolding");
+      const result = await api<SirenEntity>(operation.href, apiKey, {
+        method: operation.method, body: JSON.stringify({ values, template_overrides: [] }),
       });
       const next = (result.properties?.files || []) as PreviewFile[];
       setFiles(next); setActiveFile(0);
