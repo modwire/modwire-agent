@@ -21,22 +21,3 @@ class PackageManager(ShortUUIDModel):
 
     def __str__(self):
         return self.name
-
-
-class CommandResult(models.TextChoices):
-    INIT = "init"
-    INSTALL = "install"
-    ADD = "add"
-    REMOVE = "remove"
-
-
-class Command(ShortUUIDModel):
-    package_manager = models.ForeignKey(PackageManager, on_delete=models.CASCADE, related_name="commands")
-    result = models.CharField(max_length=16, choices=CommandResult.choices)
-    cmd = models.CharField(max_length=255)
-
-    class Meta:
-        ordering = ("package_manager", "result")
-
-    def __str__(self):
-        return self.cmd

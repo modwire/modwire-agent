@@ -19,7 +19,7 @@ def local_apps():
 
 
 def local_service_modules():
-    modules = []
+    modules = ["shared.languages"]
     for app in local_apps():
         services_dir = BASE_DIR / app / "services"
         if not services_dir.is_dir():
