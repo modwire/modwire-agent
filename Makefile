@@ -14,6 +14,7 @@ init:
 
 dev:
 	$(RUN) python manage.py runserver $(PORT)
+	open http://localhost:$(PORT)/browser/
 
 m:
 	$(RUN) python manage.py migrate
@@ -43,7 +44,7 @@ remove:
 	$(REMOVE) $(pkg)
 
 modwire:
-	mkdir -p .dev
+	@mkdir -p .dev
 	@modwire -d .modwire architecture health . python > $(MODWIRE_REPORT)
 	@jq -se '[.[] | if .metadata.id == "architecture.map" then .unknown_files[]? | {source_id: ., rule_name: "unknown_file"} elif .metadata.id == "architecture.violations.flow" then .violations[] elif .metadata.id == "architecture.violations.shape" then .violations[] | select(.rule_name == "allow_optional_class_properties") | select(.source_id | startswith("shared/oa/") | not) | select(.source_id | startswith("tests/") | not) | select(.source_id | contains("/migrations/") | not) else empty end] | if length == 0 then {"status": "healthy", "report": "$(MODWIRE_REPORT)"} else {"status": "violations", "report": "$(MODWIRE_REPORT)", "violations": .}, false end' $(MODWIRE_REPORT)
 

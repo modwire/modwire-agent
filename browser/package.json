@@ -1,19 +1,20 @@
 {
-  "name": "modwire-hypermedia-browser",
+  "name": "modwire-browser",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "vitest run"
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
-    "ketting": "^9.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

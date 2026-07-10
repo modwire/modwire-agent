@@ -8,11 +8,13 @@ from wireup.integration.django import inject
 from shared.api_errors import validated
 from shared.api_types import ShortUUID
 
+from ...services.bundle import ScaffoldingBundleService
 from ...services.preview import ScaffoldingPreviewService
 from ...services.preview_errors import PreviewFailed
 from ...services.scaffolding import ScaffoldingService
 from ...services.schema import ScaffoldingSchemaService
 from .schemas import (
+    ScaffoldingBundleOut,
     ScaffoldingFormSchemaOut,
     ScaffoldingIn,
     ScaffoldingOut,
@@ -60,6 +62,16 @@ class ScaffoldingController(ControllerBase):
         schemas: Annotated[ScaffoldingSchemaService, Inject()],
     ):
         return schemas.build(scaffoldings.get(scaffolding_id))
+
+    @route.get(
+        "/{scaffolding_id}/bundle",
+        response=ScaffoldingBundleOut,
+        operation_id="get_scaffolding_bundle",
+        summary="Get a generic scaffolding bundle for a local generator.",
+    )
+    @inject
+    def bundle(self, scaffolding_id: ShortUUID, service: Annotated[ScaffoldingBundleService, Inject()]):
+        return service.get(scaffolding_id)
 
     @route.post(
         "/{scaffolding_id}/preview",

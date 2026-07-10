@@ -30,7 +30,7 @@ class ScaffoldingOut(ModelSchema):
         return obj.language_id
 
     class Meta:
-        model = Scaffolding 
+        model = Scaffolding
         fields = "__all__"
 
 
@@ -90,3 +90,31 @@ class ScaffoldingFormSchemaOut(Schema):
     properties: dict[str, VariableFormPropertyOut]
     required: list[str]
     allow_additional_properties: Literal[False] = Field(alias="additionalProperties")
+
+
+class ScaffoldingBundleVariableOut(Schema):
+    name: str
+    type: Literal["str", "int", "float", "bool", "list", "dict"]
+    description: str
+    default_value: JsonValue
+    required: bool
+
+
+class ScaffoldingBundleTemplateOut(Schema):
+    relative_path: str
+    file_content: str
+
+
+class ScaffoldingBundleOut(Schema):
+    id: ShortUUID
+    name: str
+    variables: list[ScaffoldingBundleVariableOut]
+    templates: list[ScaffoldingBundleTemplateOut]
+
+    @staticmethod
+    def resolve_variables(obj):
+        return obj.variables.order_by("name")
+
+    @staticmethod
+    def resolve_templates(obj):
+        return obj.templates.order_by("relative_path")
