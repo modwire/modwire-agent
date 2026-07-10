@@ -10,9 +10,8 @@ class ScaffoldingIn(Schema):
 
 
 class ScaffoldingPatchIn(Schema):
-    language_id: str | None = None
-    name: str | None = None
-    description: str | None = None
+    name: str
+    description: str
 
 
 class ScaffoldingOut(ModelSchema):

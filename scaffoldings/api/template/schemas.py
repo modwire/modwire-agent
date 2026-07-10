@@ -10,9 +10,8 @@ class TemplateIn(Schema):
 
 
 class TemplatePatchIn(Schema):
-    scaffolding_id: str | None = None
-    relative_path: str | None = None
-    file_content: str | None = None
+    relative_path: str
+    file_content: str
 
 
 class TemplateOut(ModelSchema):

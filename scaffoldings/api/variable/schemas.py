@@ -14,11 +14,10 @@ class VariableIn(Schema):
 
 
 class VariablePatchIn(Schema):
-    scaffolding_id: str | None = None
-    name: str | None = None
-    type: str | None = None
-    description: str | None = None
-    default_value: Any | None = None
+    name: str
+    type: str
+    description: str
+    default_value: Any
 
 
 class VariableOut(ModelSchema):
