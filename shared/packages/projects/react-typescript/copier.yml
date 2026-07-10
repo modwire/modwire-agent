@@ -1,0 +1,26 @@
+_min_copier_version: "9.0.0"
+_templates_suffix: ".jinja"
+_subdirectory: templates
+
+project_name:
+  type: str
+  default: react-app
+  help: Application and npm package name.
+  validator: >-
+    {% if not (project_name | regex_search('^[a-z0-9][a-z0-9._-]*$')) %}
+    Use a lowercase npm package name containing letters, numbers, dots, underscores, or hyphens.
+    {% endif %}
+
+project_title:
+  type: str
+  default: React App
+  help: Human-readable application title.
+
+package_manager:
+  type: str
+  default: npm
+  choices:
+    - npm
+    - pnpm
+    - yarn
+  help: Package manager used in the generated README.

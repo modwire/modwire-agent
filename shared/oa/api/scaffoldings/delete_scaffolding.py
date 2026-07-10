@@ -4,28 +4,42 @@ from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...types import UNSET, Response
+from ...types import Response, UNSET
+from ... import errors
+
+from ...models.siren_entity import SirenEntity
+from typing import cast
+
 
 
 def _get_kwargs(
     scaffolding_id: str,
+
 ) -> dict[str, Any]:
+    
+
+    
+
+    
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
-        "url": "/api/scaffoldings/{scaffolding_id}".format(
-            scaffolding_id=quote(str(scaffolding_id), safe=""),
-        ),
+        "url": "/api/scaffoldings/{scaffolding_id}".format(scaffolding_id=quote(str(scaffolding_id), safe=""),),
     }
+
 
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Any | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 204:
-        return None
+        response_204 = SirenEntity.from_dict(response.json())
+
+
+
+        return response_204
 
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
@@ -33,7 +47,7 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[Any]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[SirenEntity]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -46,8 +60,9 @@ def sync_detailed(
     scaffolding_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Any]:
-    """Delete scaffolding.
+
+) -> Response[SirenEntity]:
+    """ Delete scaffolding.
 
     Args:
         scaffolding_id (str):
@@ -57,11 +72,13 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         scaffolding_id=scaffolding_id,
+
     )
 
     response = client.get_httpx_client().request(
@@ -70,13 +87,13 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
-async def asyncio_detailed(
+def sync(
     scaffolding_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Any]:
-    """Delete scaffolding.
+
+) -> SirenEntity | None:
+    """ Delete scaffolding.
 
     Args:
         scaffolding_id (str):
@@ -86,13 +103,69 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any]
-    """
+        SirenEntity
+     """
+
+
+    return sync_detailed(
+        scaffolding_id=scaffolding_id,
+client=client,
+
+    ).parsed
+
+async def asyncio_detailed(
+    scaffolding_id: str,
+    *,
+    client: AuthenticatedClient,
+
+) -> Response[SirenEntity]:
+    """ Delete scaffolding.
+
+    Args:
+        scaffolding_id (str):
+
+    Raises:
+        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+    Returns:
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         scaffolding_id=scaffolding_id,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
+
+async def asyncio(
+    scaffolding_id: str,
+    *,
+    client: AuthenticatedClient,
+
+) -> SirenEntity | None:
+    """ Delete scaffolding.
+
+    Args:
+        scaffolding_id (str):
+
+    Raises:
+        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+    Returns:
+        SirenEntity
+     """
+
+
+    return (await asyncio_detailed(
+        scaffolding_id=scaffolding_id,
+client=client,
+
+    )).parsed

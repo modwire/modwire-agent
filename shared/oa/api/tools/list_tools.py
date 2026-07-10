@@ -4,18 +4,25 @@ from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.list_tools_role import ListToolsRole
-from ...models.tool_out import ToolOut
-from ...types import UNSET, Response
+from ...models.siren_entity import SirenEntity
+from typing import cast
+
 
 
 def _get_kwargs(
     *,
     language_id: str,
     role: ListToolsRole,
+
 ) -> dict[str, Any]:
+    
+
+    
 
     params: dict[str, Any] = {}
 
@@ -24,7 +31,9 @@ def _get_kwargs(
     json_role = role.value
     params["role"] = json_role
 
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -32,17 +41,16 @@ def _get_kwargs(
         "params": params,
     }
 
+
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> list[ToolOut] | None:
-    if response.status_code == 200:
-        response_200 = []
-        _response_200 = response.json()
-        for response_200_item_data in _response_200:
-            response_200_item = ToolOut.from_dict(response_200_item_data)
 
-            response_200.append(response_200_item)
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
+    if response.status_code == 200:
+        response_200 = SirenEntity.from_dict(response.json())
+
+
 
         return response_200
 
@@ -52,7 +60,7 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[list[ToolOut]]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[SirenEntity]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -66,8 +74,9 @@ def sync_detailed(
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-) -> Response[list[ToolOut]]:
-    """List tools.
+
+) -> Response[SirenEntity]:
+    """ List tools.
 
     Args:
         language_id (str):
@@ -78,12 +87,14 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[list[ToolOut]]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         language_id=language_id,
-        role=role,
+role=role,
+
     )
 
     response = client.get_httpx_client().request(
@@ -92,14 +103,14 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     *,
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-) -> list[ToolOut] | None:
-    """List tools.
+
+) -> SirenEntity | None:
+    """ List tools.
 
     Args:
         language_id (str):
@@ -110,23 +121,25 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        list[ToolOut]
-    """
+        SirenEntity
+     """
+
 
     return sync_detailed(
         client=client,
-        language_id=language_id,
-        role=role,
-    ).parsed
+language_id=language_id,
+role=role,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-) -> Response[list[ToolOut]]:
-    """List tools.
+
+) -> Response[SirenEntity]:
+    """ List tools.
 
     Args:
         language_id (str):
@@ -137,26 +150,30 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[list[ToolOut]]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         language_id=language_id,
-        role=role,
+role=role,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-) -> list[ToolOut] | None:
-    """List tools.
+
+) -> SirenEntity | None:
+    """ List tools.
 
     Args:
         language_id (str):
@@ -167,13 +184,13 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        list[ToolOut]
-    """
+        SirenEntity
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            language_id=language_id,
-            role=role,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+language_id=language_id,
+role=role,
+
+    )).parsed

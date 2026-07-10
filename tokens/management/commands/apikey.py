@@ -8,4 +8,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **opts):
         api_key, key = ApiKeyService().generate("api key")
-        self.stdout.write(f"{key}")
+        self.stdout.write(f"key={key}")

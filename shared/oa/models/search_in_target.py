@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class SearchInTarget(str, Enum):
     ALL = "all"
     RECORDS = "records"

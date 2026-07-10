@@ -1,28 +1,36 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar, cast
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from typing import cast
+
+
+
+
+
+
 T = TypeVar("T", bound="RecordSummaryOut")
+
 
 
 @_attrs_define
 class RecordSummaryOut:
-    """
-    Attributes:
-        slug (str):
-        local_slug (str):
-        section_slug (str):
-        title (str):
-        description (str):
-        sources (list[str]):
-        tag_slugs (list[str]):
-    """
+    """ 
+        Attributes:
+            slug (str):
+            local_slug (str):
+            section_slug (str):
+            title (str):
+            description (str):
+            sources (list[str]):
+            tag_slugs (list[str]):
+     """
 
     slug: str
     local_slug: str
@@ -32,6 +40,10 @@ class RecordSummaryOut:
     sources: list[str]
     tag_slugs: list[str]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         slug = self.slug
@@ -46,23 +58,28 @@ class RecordSummaryOut:
 
         sources = self.sources
 
+
+
         tag_slugs = self.tag_slugs
+
+
+
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "slug": slug,
-                "local_slug": local_slug,
-                "section_slug": section_slug,
-                "title": title,
-                "description": description,
-                "sources": sources,
-                "tag_slugs": tag_slugs,
-            }
-        )
+        field_dict.update({
+            "slug": slug,
+            "local_slug": local_slug,
+            "section_slug": section_slug,
+            "title": title,
+            "description": description,
+            "sources": sources,
+            "tag_slugs": tag_slugs,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -79,7 +96,9 @@ class RecordSummaryOut:
 
         sources = cast(list[str], d.pop("sources"))
 
+
         tag_slugs = cast(list[str], d.pop("tag_slugs"))
+
 
         record_summary_out = cls(
             slug=slug,
@@ -90,6 +109,7 @@ class RecordSummaryOut:
             sources=sources,
             tag_slugs=tag_slugs,
         )
+
 
         record_summary_out.additional_properties = d
         return record_summary_out

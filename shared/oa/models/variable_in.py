@@ -1,28 +1,36 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
 from ..models.variable_type import VariableType
 from ..types import UNSET, Unset
+
+
+
+
+
 
 T = TypeVar("T", bound="VariableIn")
 
 
+
 @_attrs_define
 class VariableIn:
-    """
-    Attributes:
-        scaffolding_id (str):
-        name (str):
-        type_ (VariableType):
-        description (str):
-        default_value (Any):
-        required (bool | Unset):  Default: False.
-    """
+    """ 
+        Attributes:
+            scaffolding_id (str):
+            name (str):
+            type_ (VariableType):
+            description (str):
+            default_value (Any):
+            required (bool | Unset):  Default: False.
+     """
 
     scaffolding_id: str
     name: str
@@ -30,6 +38,10 @@ class VariableIn:
     description: str
     default_value: Any
     required: bool | Unset = False
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         scaffolding_id = self.scaffolding_id
@@ -44,21 +56,22 @@ class VariableIn:
 
         required = self.required
 
+
         field_dict: dict[str, Any] = {}
 
-        field_dict.update(
-            {
-                "scaffolding_id": scaffolding_id,
-                "name": name,
-                "type": type_,
-                "description": description,
-                "default_value": default_value,
-            }
-        )
+        field_dict.update({
+            "scaffolding_id": scaffolding_id,
+            "name": name,
+            "type": type_,
+            "description": description,
+            "default_value": default_value,
+        })
         if required is not UNSET:
             field_dict["required"] = required
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -68,6 +81,9 @@ class VariableIn:
         name = d.pop("name")
 
         type_ = VariableType(d.pop("type"))
+
+
+
 
         description = d.pop("description")
 
@@ -85,3 +101,4 @@ class VariableIn:
         )
 
         return variable_in
+

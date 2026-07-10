@@ -4,10 +4,13 @@ from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.section_out import SectionOut
-from ...types import UNSET, Response
+from ...types import Response, UNSET
+from ... import errors
+
+from ...models.siren_entity import SirenEntity
+from typing import cast
+
 
 
 def _get_kwargs(
@@ -15,7 +18,11 @@ def _get_kwargs(
     limit: int,
     offset: int,
     tag: list[str],
+
 ) -> dict[str, Any]:
+    
+
+    
 
     params: dict[str, Any] = {}
 
@@ -25,9 +32,12 @@ def _get_kwargs(
 
     json_tag = tag
 
+
     params["tag"] = json_tag
 
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -35,17 +45,16 @@ def _get_kwargs(
         "params": params,
     }
 
+
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> list[SectionOut] | None:
-    if response.status_code == 200:
-        response_200 = []
-        _response_200 = response.json()
-        for response_200_item_data in _response_200:
-            response_200_item = SectionOut.from_dict(response_200_item_data)
 
-            response_200.append(response_200_item)
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
+    if response.status_code == 200:
+        response_200 = SirenEntity.from_dict(response.json())
+
+
 
         return response_200
 
@@ -55,7 +64,7 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[list[SectionOut]]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[SirenEntity]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -70,8 +79,9 @@ def sync_detailed(
     limit: int,
     offset: int,
     tag: list[str],
-) -> Response[list[SectionOut]]:
-    """List sections.
+
+) -> Response[SirenEntity]:
+    """ List sections.
 
     Args:
         limit (int):
@@ -83,13 +93,15 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[list[SectionOut]]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         limit=limit,
-        offset=offset,
-        tag=tag,
+offset=offset,
+tag=tag,
+
     )
 
     response = client.get_httpx_client().request(
@@ -98,15 +110,15 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     *,
     client: AuthenticatedClient,
     limit: int,
     offset: int,
     tag: list[str],
-) -> list[SectionOut] | None:
-    """List sections.
+
+) -> SirenEntity | None:
+    """ List sections.
 
     Args:
         limit (int):
@@ -118,16 +130,17 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        list[SectionOut]
-    """
+        SirenEntity
+     """
+
 
     return sync_detailed(
         client=client,
-        limit=limit,
-        offset=offset,
-        tag=tag,
-    ).parsed
+limit=limit,
+offset=offset,
+tag=tag,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
@@ -135,8 +148,9 @@ async def asyncio_detailed(
     limit: int,
     offset: int,
     tag: list[str],
-) -> Response[list[SectionOut]]:
-    """List sections.
+
+) -> Response[SirenEntity]:
+    """ List sections.
 
     Args:
         limit (int):
@@ -148,19 +162,22 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[list[SectionOut]]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         limit=limit,
-        offset=offset,
-        tag=tag,
+offset=offset,
+tag=tag,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
@@ -168,8 +185,9 @@ async def asyncio(
     limit: int,
     offset: int,
     tag: list[str],
-) -> list[SectionOut] | None:
-    """List sections.
+
+) -> SirenEntity | None:
+    """ List sections.
 
     Args:
         limit (int):
@@ -181,14 +199,14 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        list[SectionOut]
-    """
+        SirenEntity
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            limit=limit,
-            offset=offset,
-            tag=tag,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+limit=limit,
+offset=offset,
+tag=tag,
+
+    )).parsed

@@ -1,30 +1,36 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar, cast
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.content_out_role import ContentOutRole
 from ..types import UNSET, Unset
 
+from ..models.content_out_role import ContentOutRole
+from typing import cast
+
 if TYPE_CHECKING:
-    from ..models.record_content_out_metadata import RecordContentOutMetadata
+  from ..models.record_content_out_metadata import RecordContentOutMetadata
+
+
+
 
 
 T = TypeVar("T", bound="ContentOut")
 
 
+
 @_attrs_define
 class ContentOut:
-    """
-    Attributes:
-        role (ContentOutRole):
-        content (str):
-        language (str):
-        metadata (RecordContentOutMetadata):
-    """
+    """ 
+        Attributes:
+            role (ContentOutRole):
+            content (str):
+            language (str):
+            metadata (RecordContentOutMetadata):
+     """
 
     role: ContentOutRole
     content: str
@@ -32,9 +38,12 @@ class ContentOut:
     metadata: RecordContentOutMetadata
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
         from ..models.record_content_out_metadata import RecordContentOutMetadata
-
         role = self.role.value
 
         content = self.content
@@ -43,25 +52,28 @@ class ContentOut:
 
         metadata = self.metadata.to_dict()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "role": role,
-                "content": content,
-                "language": language,
-                "metadata": metadata,
-            }
-        )
+        field_dict.update({
+            "role": role,
+            "content": content,
+            "language": language,
+            "metadata": metadata,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.record_content_out_metadata import RecordContentOutMetadata
-
         d = dict(src_dict)
         role = ContentOutRole(d.pop("role"))
+
+
+
 
         content = d.pop("content")
 
@@ -69,12 +81,16 @@ class ContentOut:
 
         metadata = RecordContentOutMetadata.from_dict(d.pop("metadata"))
 
+
+
+
         content_out = cls(
             role=role,
             content=content,
             language=language,
             metadata=metadata,
         )
+
 
         content_out.additional_properties = d
         return content_out

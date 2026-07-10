@@ -65,7 +65,7 @@ def test_schema_endpoint(client, preview_scaffolding):
     scaffolding, _ = preview_scaffolding
     response = client.get(f"/api/scaffoldings/{scaffolding.id}/schema")
     assert response.status_code == 200
-    schema = response.json()
+    schema = response.json()["properties"]
     assert schema["$schema"].endswith("2020-12/schema")
     assert schema["additionalProperties"] is False
     assert schema["properties"]["modules"]["type"] == "array"
@@ -77,8 +77,8 @@ def test_preview_renders_complete_package_and_unsaved_override(client, preview_s
     response = client.post(
         f"/api/scaffoldings/{scaffolding.id}/preview",
         data={
-                "values": {"project_name": "HTTP API", "modules": ["users"]},
-                "template_overrides": [
+            "values": {"project_name": "HTTP API", "modules": ["users"]},
+            "template_overrides": [
                 {
                     "template_id": str(first.id),
                     "relative_path": first.relative_path,
@@ -89,7 +89,7 @@ def test_preview_renders_complete_package_and_unsaved_override(client, preview_s
         content_type="application/json",
     )
     assert response.status_code == 200, response.content
-    files = response.json()["files"]
+    files = response.json()["properties"]["files"]
     assert [item["path"] for item in files] == ["http-api/README.md", "http_api/main.py"]
     assert "def httpApi()" in files[1]["source"]
     assert "<span" in files[1]["html"]
@@ -105,7 +105,7 @@ def test_preview_returns_structured_errors(client, preview_scaffolding):
         content_type="application/json",
     )
     assert missing.status_code == 422
-    assert missing.json()["errors"][0]["code"] == "required_variable"
+    assert missing.json()["detail"]["errors"][0]["code"] == "required_variable"
 
     unsafe = client.post(
         f"/api/scaffoldings/{scaffolding.id}/preview",
@@ -122,4 +122,4 @@ def test_preview_returns_structured_errors(client, preview_scaffolding):
         content_type="application/json",
     )
     assert unsafe.status_code == 422
-    assert unsafe.json()["errors"][0]["code"] == "jinja_render"
+    assert unsafe.json()["detail"]["errors"][0]["code"] == "jinja_render"

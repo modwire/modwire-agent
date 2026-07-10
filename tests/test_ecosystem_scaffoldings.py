@@ -124,8 +124,11 @@ def test_child_services_validate_duplicates_on_create_and_update(scaffolding, la
 def test_languages_and_package_managers_apis_are_list_only(client, language):
     manager = PackageManager.objects.create(language=language, name="uv", executable="uv")
 
-    assert client.get("/api/languages").json()[0]["name"] == "Python"
-    assert client.get(f"/api/package_managers?language_id={language.id}").json()[0]["id"] == manager.id
+    assert client.get("/api/languages").json()["entities"][0]["properties"]["name"] == "Python"
+    assert (
+        client.get(f"/api/package_managers?language_id={language.id}").json()["entities"][0]["properties"]["id"]
+        == manager.id
+    )
     assert client.get("/api/package_managers").status_code == 422
     assert client.get(f"/api/languages/{language.id}").status_code == 404
     assert (
@@ -145,7 +148,7 @@ def test_command_api_is_filtered_and_read_only(client, language):
 
     response = client.get(f"/api/commands?package_manager_id={manager.id}")
     assert response.status_code == 200
-    assert response.json()[0]["id"] == command.id
+    assert response.json()["entities"][0]["properties"]["id"] == command.id
     assert (
         client.post(
             "/api/commands",
@@ -194,7 +197,7 @@ def test_tool_api_filters_by_language_and_role_and_is_read_only(client, monkeypa
 
     response = client.get(f"/api/tools?language_id={python.id}&role=formatter")
     assert response.status_code == 200
-    assert [tool["name"] for tool in response.json()] == ["Ruff"]
+    assert [tool["properties"]["name"] for tool in response.json()["entities"]] == ["Ruff"]
     assert client.post("/api/tools", data={"name": "other"}, content_type="application/json").status_code == 405
 
 
@@ -228,7 +231,7 @@ def test_scaffoldings_variables_and_templates_crud_and_duplicate_errors(client, 
         content_type="application/json",
     )
     assert scaffolding_response.status_code == 200
-    scaffolding = scaffolding_response.json()
+    scaffolding = scaffolding_response.json()["properties"]
 
     variable_data = {
         "scaffolding_id": scaffolding["id"],
@@ -248,7 +251,7 @@ def test_scaffoldings_variables_and_templates_crud_and_duplicate_errors(client, 
     }
     template_response = client.post("/api/templates", data=template_data, content_type="application/json")
     assert template_response.status_code == 200
-    template = template_response.json()
+    template = template_response.json()["properties"]
     assert client.post("/api/templates", data=template_data, content_type="application/json").status_code == 400
 
     assert (
@@ -256,7 +259,7 @@ def test_scaffoldings_variables_and_templates_crud_and_duplicate_errors(client, 
             f"/api/templates/{template['id']}",
             data={"file_content": "updated"},
             content_type="application/json",
-        ).json()["file_content"]
+        ).json()["properties"]["file_content"]
         == "updated"
     )
     assert client.delete(f"/api/templates/{template['id']}").status_code == 204

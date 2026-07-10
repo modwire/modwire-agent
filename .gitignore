@@ -5,3 +5,8 @@ __pycache__/
 *.py[cod]
 db.sqlite3
 .scrapy/
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.vite/

@@ -4,29 +4,40 @@ from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.content_out import ContentOut
-from ...types import UNSET, Response
+from ...types import Response, UNSET
+from ... import errors
+
+from ...models.siren_entity import SirenEntity
+from typing import cast
+
 
 
 def _get_kwargs(
     content_id: int,
+
 ) -> dict[str, Any]:
+    
+
+    
+
+    
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/api/contents/{content_id}".format(
-            content_id=quote(str(content_id), safe=""),
-        ),
+        "url": "/api/contents/{content_id}".format(content_id=quote(str(content_id), safe=""),),
     }
+
 
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> ContentOut | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
-        response_200 = ContentOut.from_dict(response.json())
+        response_200 = SirenEntity.from_dict(response.json())
+
+
 
         return response_200
 
@@ -36,7 +47,7 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[ContentOut]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[SirenEntity]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -49,8 +60,9 @@ def sync_detailed(
     content_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[ContentOut]:
-    """Get content.
+
+) -> Response[SirenEntity]:
+    """ Get content.
 
     Args:
         content_id (int):
@@ -60,11 +72,13 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[ContentOut]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         content_id=content_id,
+
     )
 
     response = client.get_httpx_client().request(
@@ -73,13 +87,13 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     content_id: int,
     *,
     client: AuthenticatedClient,
-) -> ContentOut | None:
-    """Get content.
+
+) -> SirenEntity | None:
+    """ Get content.
 
     Args:
         content_id (int):
@@ -89,21 +103,23 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        ContentOut
-    """
+        SirenEntity
+     """
+
 
     return sync_detailed(
         content_id=content_id,
-        client=client,
-    ).parsed
+client=client,
 
+    ).parsed
 
 async def asyncio_detailed(
     content_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[ContentOut]:
-    """Get content.
+
+) -> Response[SirenEntity]:
+    """ Get content.
 
     Args:
         content_id (int):
@@ -113,24 +129,28 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[ContentOut]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         content_id=content_id,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     content_id: int,
     *,
     client: AuthenticatedClient,
-) -> ContentOut | None:
-    """Get content.
+
+) -> SirenEntity | None:
+    """ Get content.
 
     Args:
         content_id (int):
@@ -140,12 +160,12 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        ContentOut
-    """
+        SirenEntity
+     """
 
-    return (
-        await asyncio_detailed(
-            content_id=content_id,
-            client=client,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        content_id=content_id,
+client=client,
+
+    )).parsed

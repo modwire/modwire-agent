@@ -1,63 +1,78 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar, cast
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from typing import cast
+
 if TYPE_CHECKING:
-    from ..models.preview_error_out import PreviewErrorOut
+  from ..models.preview_error_out import PreviewErrorOut
+
+
+
 
 
 T = TypeVar("T", bound="ScaffoldingPreviewErrorOut")
 
 
+
 @_attrs_define
 class ScaffoldingPreviewErrorOut:
-    """
-    Attributes:
-        errors (list[PreviewErrorOut]):
-    """
+    """ 
+        Attributes:
+            errors (list[PreviewErrorOut]):
+     """
 
     errors: list[PreviewErrorOut]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
         from ..models.preview_error_out import PreviewErrorOut
-
         errors = []
         for errors_item_data in self.errors:
             errors_item = errors_item_data.to_dict()
             errors.append(errors_item)
 
+
+
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "errors": errors,
-            }
-        )
+        field_dict.update({
+            "errors": errors,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.preview_error_out import PreviewErrorOut
-
         d = dict(src_dict)
         errors = []
         _errors = d.pop("errors")
-        for errors_item_data in _errors:
+        for errors_item_data in (_errors):
             errors_item = PreviewErrorOut.from_dict(errors_item_data)
 
+
+
             errors.append(errors_item)
+
 
         scaffolding_preview_error_out = cls(
             errors=errors,
         )
+
 
         scaffolding_preview_error_out.additional_properties = d
         return scaffolding_preview_error_out

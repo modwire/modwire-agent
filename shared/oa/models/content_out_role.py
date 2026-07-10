@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ContentOutRole(str, Enum):
     HEADING = "heading"
     IMAGE = "image"

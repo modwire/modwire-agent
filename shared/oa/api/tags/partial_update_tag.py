@@ -4,25 +4,32 @@ from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.tag_out import TagOut
+from ...types import Response, UNSET
+from ... import errors
+
+from ...models.siren_entity import SirenEntity
 from ...models.tag_patch_in import TagPatchIn
-from ...types import UNSET, Response
+from typing import cast
+
 
 
 def _get_kwargs(
     slug: str,
     *,
     body: TagPatchIn,
+
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
+
+    
+
+    
+
     _kwargs: dict[str, Any] = {
         "method": "patch",
-        "url": "/api/tags/{slug}".format(
-            slug=quote(str(slug), safe=""),
-        ),
+        "url": "/api/tags/{slug}".format(slug=quote(str(slug), safe=""),),
     }
 
     _kwargs["json"] = body.to_dict()
@@ -33,9 +40,12 @@ def _get_kwargs(
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> TagOut | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
-        response_200 = TagOut.from_dict(response.json())
+        response_200 = SirenEntity.from_dict(response.json())
+
+
 
         return response_200
 
@@ -45,7 +55,7 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[TagOut]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[SirenEntity]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -59,8 +69,9 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TagPatchIn,
-) -> Response[TagOut]:
-    """Partially update tag.
+
+) -> Response[SirenEntity]:
+    """ Partially update tag.
 
     Args:
         slug (str):
@@ -71,12 +82,14 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[TagOut]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         slug=slug,
-        body=body,
+body=body,
+
     )
 
     response = client.get_httpx_client().request(
@@ -85,14 +98,14 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     slug: str,
     *,
     client: AuthenticatedClient,
     body: TagPatchIn,
-) -> TagOut | None:
-    """Partially update tag.
+
+) -> SirenEntity | None:
+    """ Partially update tag.
 
     Args:
         slug (str):
@@ -103,23 +116,25 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        TagOut
-    """
+        SirenEntity
+     """
+
 
     return sync_detailed(
         slug=slug,
-        client=client,
-        body=body,
-    ).parsed
+client=client,
+body=body,
 
+    ).parsed
 
 async def asyncio_detailed(
     slug: str,
     *,
     client: AuthenticatedClient,
     body: TagPatchIn,
-) -> Response[TagOut]:
-    """Partially update tag.
+
+) -> Response[SirenEntity]:
+    """ Partially update tag.
 
     Args:
         slug (str):
@@ -130,26 +145,30 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[TagOut]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         slug=slug,
-        body=body,
+body=body,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     slug: str,
     *,
     client: AuthenticatedClient,
     body: TagPatchIn,
-) -> TagOut | None:
-    """Partially update tag.
+
+) -> SirenEntity | None:
+    """ Partially update tag.
 
     Args:
         slug (str):
@@ -160,13 +179,13 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        TagOut
-    """
+        SirenEntity
+     """
 
-    return (
-        await asyncio_detailed(
-            slug=slug,
-            client=client,
-            body=body,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        slug=slug,
+client=client,
+body=body,
+
+    )).parsed

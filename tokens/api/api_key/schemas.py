@@ -20,3 +20,7 @@ class ApiKeyOut(ModelSchema):
     class Meta:
         model = ApiKey
         fields = ("id", "name", "created_at", "updated_at")
+
+
+class ApiKeyCreatedOut(ApiKeyOut):
+    key: str

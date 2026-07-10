@@ -1,28 +1,39 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+
+
+
+
+
+
 T = TypeVar("T", bound="TemplateOverrideIn")
+
 
 
 @_attrs_define
 class TemplateOverrideIn:
-    """
-    Attributes:
-        template_id (str):
-        relative_path (str):
-        file_content (str):
-    """
+    """ 
+        Attributes:
+            template_id (str):
+            relative_path (str):
+            file_content (str):
+     """
 
     template_id: str
     relative_path: str
     file_content: str
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         template_id = self.template_id
@@ -31,17 +42,18 @@ class TemplateOverrideIn:
 
         file_content = self.file_content
 
+
         field_dict: dict[str, Any] = {}
 
-        field_dict.update(
-            {
-                "template_id": template_id,
-                "relative_path": relative_path,
-                "file_content": file_content,
-            }
-        )
+        field_dict.update({
+            "template_id": template_id,
+            "relative_path": relative_path,
+            "file_content": file_content,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -59,3 +71,4 @@ class TemplateOverrideIn:
         )
 
         return template_override_in
+

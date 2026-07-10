@@ -1,29 +1,40 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+
+
+
+
+
+
 T = TypeVar("T", bound="TagOut")
+
 
 
 @_attrs_define
 class TagOut:
-    """
-    Attributes:
-        slug (str):
-        name (str):
-        description (str):
-    """
+    """ 
+        Attributes:
+            slug (str):
+            name (str):
+            description (str):
+     """
 
     slug: str
     name: str
     description: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         slug = self.slug
@@ -32,17 +43,18 @@ class TagOut:
 
         description = self.description
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "slug": slug,
-                "name": name,
-                "description": description,
-            }
-        )
+        field_dict.update({
+            "slug": slug,
+            "name": name,
+            "description": description,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -58,6 +70,7 @@ class TagOut:
             name=name,
             description=description,
         )
+
 
         tag_out.additional_properties = d
         return tag_out

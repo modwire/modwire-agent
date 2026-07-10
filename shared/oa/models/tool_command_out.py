@@ -1,32 +1,43 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.tool_command_capability import ToolCommandCapability
 from ..types import UNSET, Unset
+
+from ..models.tool_command_capability import ToolCommandCapability
+
+
+
+
+
 
 T = TypeVar("T", bound="ToolCommandOut")
 
 
+
 @_attrs_define
 class ToolCommandOut:
-    """
-    Attributes:
-        id (str):
-        tool (str):
-        capability (ToolCommandCapability):
-        cmd (str):
-    """
+    """ 
+        Attributes:
+            id (str):
+            tool (str):
+            capability (ToolCommandCapability):
+            cmd (str):
+     """
 
     id: str
     tool: str
     capability: ToolCommandCapability
     cmd: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         id = self.id
@@ -37,18 +48,19 @@ class ToolCommandOut:
 
         cmd = self.cmd
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "id": id,
-                "tool": tool,
-                "capability": capability,
-                "cmd": cmd,
-            }
-        )
+        field_dict.update({
+            "id": id,
+            "tool": tool,
+            "capability": capability,
+            "cmd": cmd,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -59,6 +71,9 @@ class ToolCommandOut:
 
         capability = ToolCommandCapability(d.pop("capability"))
 
+
+
+
         cmd = d.pop("cmd")
 
         tool_command_out = cls(
@@ -67,6 +82,7 @@ class ToolCommandOut:
             capability=capability,
             cmd=cmd,
         )
+
 
         tool_command_out.additional_properties = d
         return tool_command_out

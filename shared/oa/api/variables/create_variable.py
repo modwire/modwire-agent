@@ -4,18 +4,27 @@ from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
+from ...models.siren_entity import SirenEntity
 from ...models.variable_in import VariableIn
-from ...models.variable_out import VariableOut
-from ...types import UNSET, Response
+from typing import cast
+
 
 
 def _get_kwargs(
     *,
     body: VariableIn,
+
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
+
+
+    
+
+    
 
     _kwargs: dict[str, Any] = {
         "method": "post",
@@ -30,9 +39,12 @@ def _get_kwargs(
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> VariableOut | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
-        response_200 = VariableOut.from_dict(response.json())
+        response_200 = SirenEntity.from_dict(response.json())
+
+
 
         return response_200
 
@@ -42,7 +54,7 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[VariableOut]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[SirenEntity]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -55,8 +67,9 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: VariableIn,
-) -> Response[VariableOut]:
-    """Create variable.
+
+) -> Response[SirenEntity]:
+    """ Create variable.
 
     Args:
         body (VariableIn):
@@ -66,11 +79,13 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[VariableOut]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         body=body,
+
     )
 
     response = client.get_httpx_client().request(
@@ -79,13 +94,13 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     *,
     client: AuthenticatedClient,
     body: VariableIn,
-) -> VariableOut | None:
-    """Create variable.
+
+) -> SirenEntity | None:
+    """ Create variable.
 
     Args:
         body (VariableIn):
@@ -95,21 +110,23 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        VariableOut
-    """
+        SirenEntity
+     """
+
 
     return sync_detailed(
         client=client,
-        body=body,
-    ).parsed
+body=body,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: VariableIn,
-) -> Response[VariableOut]:
-    """Create variable.
+
+) -> Response[SirenEntity]:
+    """ Create variable.
 
     Args:
         body (VariableIn):
@@ -119,24 +136,28 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[VariableOut]
-    """
+        Response[SirenEntity]
+     """
+
 
     kwargs = _get_kwargs(
         body=body,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
     body: VariableIn,
-) -> VariableOut | None:
-    """Create variable.
+
+) -> SirenEntity | None:
+    """ Create variable.
 
     Args:
         body (VariableIn):
@@ -146,12 +167,12 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        VariableOut
-    """
+        SirenEntity
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            body=body,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+body=body,
+
+    )).parsed
