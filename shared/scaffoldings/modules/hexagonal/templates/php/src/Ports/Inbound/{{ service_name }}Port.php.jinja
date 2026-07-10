@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\{{ module_class_name }}\Ports\Inbound;
+
+use App\{{ module_class_name }}\Domain\Models\{{ aggregate_name }};
+
+interface {{ service_name }}Port
+{
+    public function handle({{ command_name }} $command): {{ aggregate_name }};
+}

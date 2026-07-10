@@ -1,0 +1,10 @@
+from pydantic import BaseModel, ConfigDict
+
+
+class {{ model_name }}(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    name: str
+
+
+__all__ = ["{{ model_name }}"]

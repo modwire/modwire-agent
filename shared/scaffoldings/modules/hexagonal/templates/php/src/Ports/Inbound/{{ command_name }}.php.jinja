@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\{{ module_class_name }}\Ports\Inbound;
+
+final class {{ command_name }}
+{
+    public function __construct(
+        public readonly string $aggregateId,
+        public readonly string $name,
+    ) {
+    }
+}

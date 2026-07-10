@@ -1,0 +1,13 @@
+import { {{ aggregate_name }} } from "../../domain/models/{{ aggregate_name }}";
+import { {{ command_name }} } from "../../ports/inbound/{{ command_name }}";
+import { {{ repository_name }} } from "../../ports/outbound/{{ repository_name }}";
+
+export class {{ service_name }} {
+  constructor(private readonly repository: {{ repository_name }}) {}
+
+  handle(command: {{ command_name }}): {{ aggregate_name }} {
+    const aggregate = {{ aggregate_name }}.create(command.aggregateId, command.name);
+    this.repository.save(aggregate);
+    return aggregate;
+  }
+}

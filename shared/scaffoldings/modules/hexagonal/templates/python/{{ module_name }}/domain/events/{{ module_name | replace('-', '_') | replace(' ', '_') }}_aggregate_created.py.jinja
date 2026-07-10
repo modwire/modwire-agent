@@ -1,0 +1,7 @@
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class {{ aggregate_name }}Created:
+    aggregate_id: str
+    name: str

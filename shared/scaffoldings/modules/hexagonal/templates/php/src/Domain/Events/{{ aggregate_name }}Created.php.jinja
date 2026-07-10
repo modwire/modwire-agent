@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\{{ module_class_name }}\Domain\Events;
+
+final class {{ aggregate_name }}Created
+{
+    public function __construct(
+        public readonly string $aggregateId,
+        public readonly string $name,
+    ) {
+    }
+}

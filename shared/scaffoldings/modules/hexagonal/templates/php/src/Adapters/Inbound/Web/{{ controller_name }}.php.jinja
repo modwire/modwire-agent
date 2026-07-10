@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\{{ module_class_name }}\Adapters\Inbound\Web;
+
+use App\{{ module_class_name }}\Ports\Inbound\{{ command_name }};
+use App\{{ module_class_name }}\Ports\Inbound\{{ service_name }}Port;
+
+final class {{ controller_name }}
+{
+    public function __construct(private readonly {{ service_name }}Port $service)
+    {
+    }
+
+    /** @return array{id: string, name: string} */
+    public function create(string $aggregateId, string $name): array
+    {
+        $aggregate = $this->service->handle(new {{ command_name }}($aggregateId, $name));
+
+        return ['id' => $aggregate->aggregateId, 'name' => $aggregate->name];
+    }
+}

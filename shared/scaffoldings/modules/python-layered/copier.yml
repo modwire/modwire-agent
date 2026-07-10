@@ -1,0 +1,23 @@
+_min_copier_version: "9.0.0"
+_templates_suffix: ".jinja"
+_subdirectory: templates
+
+module_name:
+  type: str
+  default: sample_package
+  help: Importable package name that will own the four layer files.
+
+model_name:
+  type: str
+  default: SampleItem
+  help: Pydantic domain model class name.
+
+repository_name:
+  type: str
+  default: SampleRepository
+  help: Infrastructure repository class name.
+
+service_name:
+  type: str
+  default: SampleApplication
+  help: Application service class name.

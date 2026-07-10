@@ -1,0 +1,6 @@
+import { {{ aggregate_name }} } from "../../domain/models/{{ aggregate_name }}";
+
+export interface {{ repository_name }} {
+  save(aggregate: {{ aggregate_name }}): void;
+  get(aggregateId: string): {{ aggregate_name }} | undefined;
+}

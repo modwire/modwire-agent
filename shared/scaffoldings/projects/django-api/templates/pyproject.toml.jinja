@@ -1,35 +1,20 @@
 [project]
-name = "modwire-mcp"
+name = "{{ project_name }}"
 version = "0.1.0"
-description = "Modwire MCP Server"
+description = "{{ project_title }} API"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "copier>=9.16.0",
-    "dj-database-url",
-    "django",
-    "django-health-check",
-    "django-model-utils",
-    "django-ninja-extra",
-    "gunicorn",
-    "modwire-extraction>=1.0.2",
-    "pgvector",
-    "psycopg[binary]",
-    "pydantic",
-    "pydantic-yaml>=1.7.0",
-    "python-dotenv",
-    "pyyaml",
-    "scrapy",
-    "structlog",
-    "wireup",
+{%- for dependency in dependencies %}
+    "{{ dependency }}",
+{%- endfor %}
 ]
 
 [dependency-groups]
 dev = [
-    "openapi-python-client",
-    "pytest",
-    "pytest-django",
-    "ruff",
+{%- for dependency in dev_dependencies %}
+    "{{ dependency }}",
+{%- endfor %}
 ]
 
 [tool.uv]
@@ -37,15 +22,13 @@ package = false
 cache-dir = ".dev/uv-cache"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "core.settings"
+DJANGO_SETTINGS_MODULE = "{{ project_package }}.settings"
 cache_dir = ".dev/pytest-cache"
 python_files = ["test_*.py", "*_test.py"]
-pythonpath = ["shared"]
 testpaths = ["tests"]
 
 [tool.ruff]
 cache-dir = ".dev/ruff-cache"
-extend-exclude = ["shared/oa"]
 line-length = 120
 target-version = "py312"
 
@@ -55,7 +38,7 @@ ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "*/migrations/*.py" = ["E501"]
-"core/settings.py" = ["E402"]
+"{{ project_package }}/settings.py" = ["E402"]
 
 [tool.coverage.run]
 data_file = ".dev/coverage"

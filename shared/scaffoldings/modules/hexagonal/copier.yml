@@ -1,0 +1,38 @@
+_min_copier_version: "9.0.0"
+_templates_suffix: ".jinja"
+_subdirectory: templates
+
+module_name:
+  type: str
+  default: sample_module
+  help: Importable module or package directory name.
+
+module_class_name:
+  type: str
+  default: "{{ module_name | replace('-', '_') | replace(' ', '_') | title | replace('_', '') }}"
+  help: PascalCase module name used to derive default class names.
+
+aggregate_name:
+  type: str
+  default: "{{ module_class_name }}Aggregate"
+  help: Domain aggregate class name.
+
+command_name:
+  type: str
+  default: "Create{{ module_class_name }}"
+  help: Application command class name.
+
+service_name:
+  type: str
+  default: "{{ module_class_name }}Service"
+  help: Application service class name.
+
+repository_name:
+  type: str
+  default: "{{ module_class_name }}Repository"
+  help: Repository port and adapter class suffix.
+
+controller_name:
+  type: str
+  default: "{{ module_class_name }}Controller"
+  help: UI/controller class name.

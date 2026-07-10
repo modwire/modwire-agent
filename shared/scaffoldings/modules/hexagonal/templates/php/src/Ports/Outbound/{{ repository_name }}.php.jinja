@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\{{ module_class_name }}\Ports\Outbound;
+
+use App\{{ module_class_name }}\Domain\Models\{{ aggregate_name }};
+
+interface {{ repository_name }}
+{
+    public function save({{ aggregate_name }} $aggregate): void;
+
+    public function get(string $aggregateId): ?{{ aggregate_name }};
+}

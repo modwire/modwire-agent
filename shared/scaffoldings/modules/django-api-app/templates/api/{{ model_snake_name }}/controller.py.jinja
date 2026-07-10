@@ -1,0 +1,83 @@
+from typing import Annotated
+
+from ninja import Status
+from ninja_extra import ControllerBase, api_controller, route
+from wireup import Inject
+from wireup.integration.django import inject
+
+from ...services.{{ model_snake_name }} import {{ model_pascal_name }}Service
+from .schemas import {{ model_pascal_name }}In, {{ model_pascal_name }}Out, {{ model_pascal_name }}PatchIn
+
+
+@api_controller("/{{ model_snake_name }}s", tags=["{{ model_pascal_name }}s"])
+class {{ model_pascal_name }}Controller(ControllerBase):
+    @route.get(
+        "",
+        response=list[{{ model_pascal_name }}Out],
+        operation_id="list_{{ model_snake_name }}s",
+        summary="List {{ model_snake_name }}s.",
+    )
+    @inject
+    def list(self, service: Annotated[{{ model_pascal_name }}Service, Inject()]):
+        return service.list()
+
+    @route.get(
+        "/{% raw %}{{% endraw %}{{ model_snake_name }}_id{% raw %}}{% endraw %}",
+        response={{ model_pascal_name }}Out,
+        operation_id="get_{{ model_snake_name }}",
+        summary="Get {{ model_snake_name }}.",
+    )
+    @inject
+    def get(self, {{ model_snake_name }}_id: int, service: Annotated[{{ model_pascal_name }}Service, Inject()]):
+        return service.get({{ model_snake_name }}_id)
+
+    @route.post(
+        "",
+        response={{ model_pascal_name }}Out,
+        operation_id="create_{{ model_snake_name }}",
+        summary="Create {{ model_snake_name }}.",
+    )
+    @inject
+    def create(self, data: {{ model_pascal_name }}In, service: Annotated[{{ model_pascal_name }}Service, Inject()]):
+        return service.create(**data.model_dump())
+
+    @route.put(
+        "/{% raw %}{{% endraw %}{{ model_snake_name }}_id{% raw %}}{% endraw %}",
+        response={{ model_pascal_name }}Out,
+        operation_id="update_{{ model_snake_name }}",
+        summary="Update {{ model_snake_name }}.",
+    )
+    @inject
+    def update(
+        self,
+        {{ model_snake_name }}_id: int,
+        data: {{ model_pascal_name }}In,
+        service: Annotated[{{ model_pascal_name }}Service, Inject()],
+    ):
+        return service.update({{ model_snake_name }}_id, **data.model_dump())
+
+    @route.patch(
+        "/{% raw %}{{% endraw %}{{ model_snake_name }}_id{% raw %}}{% endraw %}",
+        response={{ model_pascal_name }}Out,
+        operation_id="partial_update_{{ model_snake_name }}",
+        summary="Partially update {{ model_snake_name }}.",
+    )
+    @inject
+    def partial_update(
+        self,
+        {{ model_snake_name }}_id: int,
+        data: {{ model_pascal_name }}PatchIn,
+        service: Annotated[{{ model_pascal_name }}Service, Inject()],
+    ):
+        return service.update({{ model_snake_name }}_id, **data.model_dump(exclude_unset=True))
+
+    @route.delete(
+        "/{% raw %}{{% endraw %}{{ model_snake_name }}_id{% raw %}}{% endraw %}",
+        response={204: None},
+        operation_id="delete_{{ model_snake_name }}",
+        summary="Delete {{ model_snake_name }}.",
+    )
+    @inject
+    def delete(self, {{ model_snake_name }}_id: int, service: Annotated[{{ model_pascal_name }}Service, Inject()]):
+        service.delete({{ model_snake_name }}_id)
+        return Status(204, None)

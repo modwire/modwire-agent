@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\{{ module_class_name }}\Domain\Models;
+
+use App\{{ module_class_name }}\Domain\Events\{{ aggregate_name }}Created;
+use App\{{ module_class_name }}\Domain\Exceptions\{{ aggregate_name }}ValidationException;
+
+final class {{ aggregate_name }}
+{
+    /** @var list<{{ aggregate_name }}Created> */
+    private array $events = [];
+
+    private function __construct(
+        public readonly string $aggregateId,
+        public readonly string $name,
+    ) {
+    }
+
+    public static function create(string $aggregateId, string $name): self
+    {
+        if ($aggregateId === '') {
+            throw new {{ aggregate_name }}ValidationException('Aggregate id cannot be empty');
+        }
+
+        if ($name === '') {
+            throw new {{ aggregate_name }}ValidationException('Aggregate name cannot be empty');
+        }
+
+        $aggregate = new self($aggregateId, $name);
+        $aggregate->events[] = new {{ aggregate_name }}Created($aggregateId, $name);
+
+        return $aggregate;
+    }
+
+    /** @return list<{{ aggregate_name }}Created> */
+    public function pullEvents(): array
+    {
+        $events = $this->events;
+        $this->events = [];
+
+        return $events;
+    }
+}
