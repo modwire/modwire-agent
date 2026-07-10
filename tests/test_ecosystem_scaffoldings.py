@@ -260,4 +260,4 @@ def test_scaffoldings_variables_and_templates_crud_and_duplicate_errors(client, 
         == "updated"
     )
     assert client.delete(f"/api/templates/{template['id']}").status_code == 204
-    assert client.get("/api/scaffoldings/not-found").status_code == 404
+    assert client.get("/api/scaffoldings/not-found").status_code == 422

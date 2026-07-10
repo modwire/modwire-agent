@@ -8,6 +8,7 @@ from wireup import Inject
 from wireup.integration.django import inject
 
 from records.api.errors import validation_error
+from shared.api_types import Slug
 
 from ...services.tag import TagService
 from .schemas import TagIn, TagOut, TagPatchIn
@@ -32,7 +33,7 @@ class TagController(ControllerBase):
         summary="Get tag.",
     )
     @inject
-    def get(self, slug: str, service: Annotated[TagService, Inject()]):
+    def get(self, slug: Slug, service: Annotated[TagService, Inject()]):
         return service.get(slug)
 
     @route.post(
@@ -57,7 +58,7 @@ class TagController(ControllerBase):
     @inject
     def update(
         self,
-        slug: str,
+        slug: Slug,
         data: TagIn,
         service: Annotated[TagService, Inject()],
     ):
@@ -75,12 +76,12 @@ class TagController(ControllerBase):
     @inject
     def partial_update(
         self,
-        slug: str,
+        slug: Slug,
         data: TagPatchIn,
         service: Annotated[TagService, Inject()],
     ):
         try:
-            return service.update(slug, **data.model_dump(exclude_unset=True))
+            return service.update(slug, **data.model_dump(exclude_unset=True, warnings=False))
         except (ValidationError, IntegrityError) as error:
             raise validation_error(error) from error
 
@@ -91,6 +92,6 @@ class TagController(ControllerBase):
         summary="Delete tag.",
     )
     @inject
-    def delete(self, slug: str, service: Annotated[TagService, Inject()]):
+    def delete(self, slug: Slug, service: Annotated[TagService, Inject()]):
         service.delete(slug)
         return Status(204, None)

@@ -8,6 +8,7 @@ from wireup import Inject
 from wireup.integration.django import inject
 
 from records.api.errors import validation_error
+from shared.api_types import Slug
 
 from ...services.section import SectionService
 from .schemas import SectionIn, SectionOut, SectionPatchIn
@@ -27,7 +28,7 @@ class SectionController(ControllerBase):
         service: Annotated[SectionService, Inject()],
         limit: int = Query(..., ge=1, le=200),
         offset: int = Query(..., ge=0),
-        tag: list[str] = Query(...),
+        tag: list[Slug] = Query(...),
     ):
         return service.list(limit=limit, offset=offset, tag_slugs=tag)
 
@@ -38,7 +39,7 @@ class SectionController(ControllerBase):
         summary="Get section.",
     )
     @inject
-    def get(self, slug: str, service: Annotated[SectionService, Inject()]):
+    def get(self, slug: Slug, service: Annotated[SectionService, Inject()]):
         return service.get(slug)
 
     @route.post(
@@ -63,7 +64,7 @@ class SectionController(ControllerBase):
     @inject
     def update(
         self,
-        slug: str,
+        slug: Slug,
         data: SectionIn,
         service: Annotated[SectionService, Inject()],
     ):
@@ -81,12 +82,12 @@ class SectionController(ControllerBase):
     @inject
     def partial_update(
         self,
-        slug: str,
+        slug: Slug,
         data: SectionPatchIn,
         service: Annotated[SectionService, Inject()],
     ):
         try:
-            return service.update(slug, **data.model_dump(exclude_unset=True))
+            return service.update(slug, **data.model_dump(exclude_unset=True, warnings=False))
         except (ValidationError, IntegrityError) as error:
             raise validation_error(error) from error
 
@@ -97,7 +98,7 @@ class SectionController(ControllerBase):
         summary="Delete section.",
     )
     @inject
-    def delete(self, slug: str, service: Annotated[SectionService, Inject()]):
+    def delete(self, slug: Slug, service: Annotated[SectionService, Inject()]):
         try:
             service.delete(slug)
         except (ValidationError, IntegrityError) as error:

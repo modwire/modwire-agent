@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..models.content_out_role import ContentOutRole
 from ..types import UNSET, Unset
-
-from typing import cast
 
 if TYPE_CHECKING:
     from ..models.record_content_out_metadata import RecordContentOutMetadata
@@ -21,13 +20,13 @@ T = TypeVar("T", bound="ContentOut")
 class ContentOut:
     """
     Attributes:
-        role (str):
+        role (ContentOutRole):
         content (str):
         language (str):
         metadata (RecordContentOutMetadata):
     """
 
-    role: str
+    role: ContentOutRole
     content: str
     language: str
     metadata: RecordContentOutMetadata
@@ -36,7 +35,7 @@ class ContentOut:
     def to_dict(self) -> dict[str, Any]:
         from ..models.record_content_out_metadata import RecordContentOutMetadata
 
-        role = self.role
+        role = self.role.value
 
         content = self.content
 
@@ -62,7 +61,7 @@ class ContentOut:
         from ..models.record_content_out_metadata import RecordContentOutMetadata
 
         d = dict(src_dict)
-        role = d.pop("role")
+        role = ContentOutRole(d.pop("role"))
 
         content = d.pop("content")
 

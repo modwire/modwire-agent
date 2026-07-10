@@ -1,23 +1,28 @@
 from ninja import Schema
+from pydantic import Field
+from pydantic_core import PydanticUndefined
+
+from shared.api_schema import StrictSchema
+from shared.api_types import Slug
 
 
-class SectionIn(Schema):
+class SectionIn(StrictSchema):
     title: str
     description: str
-    tag_slugs: list[str]
+    tag_slugs: list[Slug]
 
 
-class SectionPatchIn(Schema):
-    title: str
-    description: str
-    tag_slugs: list[str]
+class SectionPatchIn(StrictSchema):
+    title: str = Field(default_factory=lambda: PydanticUndefined)
+    description: str = Field(default_factory=lambda: PydanticUndefined)
+    tag_slugs: list[Slug] = Field(default_factory=lambda: PydanticUndefined)
 
 
 class SectionOut(Schema):
-    slug: str
+    slug: Slug
     title: str
     description: str
-    tag_slugs: list[str]
+    tag_slugs: list[Slug]
 
     @staticmethod
     def resolve_tag_slugs(obj):

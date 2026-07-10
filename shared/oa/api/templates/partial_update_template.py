@@ -4,19 +4,17 @@ from urllib.parse import quote
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.template_out import TemplateOut
-from ...models.template_patch_in_patch import TemplatePatchInPatch
-from typing import cast
+from ...models.template_patch_in import TemplatePatchIn
+from ...types import UNSET, Response
 
 
 def _get_kwargs(
     template_id: str,
     *,
-    body: TemplatePatchInPatch,
+    body: TemplatePatchIn,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
@@ -60,13 +58,13 @@ def sync_detailed(
     template_id: str,
     *,
     client: AuthenticatedClient,
-    body: TemplatePatchInPatch,
+    body: TemplatePatchIn,
 ) -> Response[TemplateOut]:
     """Partially update template.
 
     Args:
         template_id (str):
-        body (TemplatePatchInPatch):
+        body (TemplatePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -92,13 +90,13 @@ def sync(
     template_id: str,
     *,
     client: AuthenticatedClient,
-    body: TemplatePatchInPatch,
+    body: TemplatePatchIn,
 ) -> TemplateOut | None:
     """Partially update template.
 
     Args:
         template_id (str):
-        body (TemplatePatchInPatch):
+        body (TemplatePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -119,13 +117,13 @@ async def asyncio_detailed(
     template_id: str,
     *,
     client: AuthenticatedClient,
-    body: TemplatePatchInPatch,
+    body: TemplatePatchIn,
 ) -> Response[TemplateOut]:
     """Partially update template.
 
     Args:
         template_id (str):
-        body (TemplatePatchInPatch):
+        body (TemplatePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -149,13 +147,13 @@ async def asyncio(
     template_id: str,
     *,
     client: AuthenticatedClient,
-    body: TemplatePatchInPatch,
+    body: TemplatePatchIn,
 ) -> TemplateOut | None:
     """Partially update template.
 
     Args:
         template_id (str):
-        body (TemplatePatchInPatch):
+        body (TemplatePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

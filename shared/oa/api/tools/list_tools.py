@@ -4,25 +4,25 @@ from urllib.parse import quote
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
+from ...models.list_tools_role import ListToolsRole
 from ...models.tool_out import ToolOut
-from typing import cast
+from ...types import UNSET, Response
 
 
 def _get_kwargs(
     *,
     language_id: str,
-    role: str,
+    role: ListToolsRole,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
 
     params["language_id"] = language_id
 
-    params["role"] = role
+    json_role = role.value
+    params["role"] = json_role
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -65,13 +65,13 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     language_id: str,
-    role: str,
+    role: ListToolsRole,
 ) -> Response[list[ToolOut]]:
     """List tools.
 
     Args:
         language_id (str):
-        role (str):
+        role (ListToolsRole):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -97,13 +97,13 @@ def sync(
     *,
     client: AuthenticatedClient,
     language_id: str,
-    role: str,
+    role: ListToolsRole,
 ) -> list[ToolOut] | None:
     """List tools.
 
     Args:
         language_id (str):
-        role (str):
+        role (ListToolsRole):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -124,13 +124,13 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     language_id: str,
-    role: str,
+    role: ListToolsRole,
 ) -> Response[list[ToolOut]]:
     """List tools.
 
     Args:
         language_id (str):
-        role (str):
+        role (ListToolsRole):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -154,13 +154,13 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     language_id: str,
-    role: str,
+    role: ListToolsRole,
 ) -> list[ToolOut] | None:
     """List tools.
 
     Args:
         language_id (str):
-        role (str):
+        role (ListToolsRole):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

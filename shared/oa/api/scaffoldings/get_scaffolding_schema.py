@@ -4,12 +4,10 @@ from urllib.parse import quote
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
-from ...models.response import Response
-from typing import cast
+from ...client import AuthenticatedClient, Client
+from ...models.scaffolding_form_schema_out import ScaffoldingFormSchemaOut
+from ...types import UNSET, Response
 
 
 def _get_kwargs(
@@ -26,9 +24,11 @@ def _get_kwargs(
     return _kwargs
 
 
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response | None:
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> ScaffoldingFormSchemaOut | None:
     if response.status_code == 200:
-        response_200 = Response.from_dict(response.json())
+        response_200 = ScaffoldingFormSchemaOut.from_dict(response.json())
 
         return response_200
 
@@ -38,7 +38,9 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[Response]:
+def _build_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[ScaffoldingFormSchemaOut]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -51,7 +53,7 @@ def sync_detailed(
     scaffolding_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Response]:
+) -> Response[ScaffoldingFormSchemaOut]:
     """Get the scaffolding variable form schema.
 
     Args:
@@ -62,7 +64,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Response]
+        Response[ScaffoldingFormSchemaOut]
     """
 
     kwargs = _get_kwargs(
@@ -80,7 +82,7 @@ def sync(
     scaffolding_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response | None:
+) -> ScaffoldingFormSchemaOut | None:
     """Get the scaffolding variable form schema.
 
     Args:
@@ -91,7 +93,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response
+        ScaffoldingFormSchemaOut
     """
 
     return sync_detailed(
@@ -104,7 +106,7 @@ async def asyncio_detailed(
     scaffolding_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Response]:
+) -> Response[ScaffoldingFormSchemaOut]:
     """Get the scaffolding variable form schema.
 
     Args:
@@ -115,7 +117,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Response]
+        Response[ScaffoldingFormSchemaOut]
     """
 
     kwargs = _get_kwargs(
@@ -131,7 +133,7 @@ async def asyncio(
     scaffolding_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response | None:
+) -> ScaffoldingFormSchemaOut | None:
     """Get the scaffolding variable form schema.
 
     Args:
@@ -142,7 +144,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response
+        ScaffoldingFormSchemaOut
     """
 
     return (

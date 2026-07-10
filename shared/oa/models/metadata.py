@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-
-T = TypeVar("T", bound="ManifestPaths")
+T = TypeVar("T", bound="Metadata")
 
 
 @_attrs_define
-class ManifestPaths:
+class Metadata:
     """ """
 
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -28,10 +27,10 @@ class ManifestPaths:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        manifest_paths = cls()
+        metadata = cls()
 
-        manifest_paths.additional_properties = d
-        return manifest_paths
+        metadata.additional_properties = d
+        return metadata
 
     @property
     def additional_keys(self) -> list[str]:

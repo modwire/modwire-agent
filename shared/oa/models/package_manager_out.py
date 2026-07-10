@@ -1,20 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, BinaryIO, Generator, Literal, TextIO, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
-
-from ..types import UNSET, Unset
-from typing import cast
-
-if TYPE_CHECKING:
-    from ..models.lockfile_paths import LockfilePaths
-    from ..models.manifest_paths import ManifestPaths
-
 
 T = TypeVar("T", bound="PackageManagerOut")
 
@@ -23,26 +15,26 @@ T = TypeVar("T", bound="PackageManagerOut")
 class PackageManagerOut:
     """
     Attributes:
+        id (str):
         language (str):
+        manifest_paths (list[str]):
+        lockfile_paths (list[str]):
+        registry_url (Literal[''] | str):
         name (str):
         executable (str):
-        id (None | str | Unset):
-        manifest_paths (ManifestPaths | Unset):
-        lockfile_paths (LockfilePaths | Unset):
-        registry_url (str | Unset):  Default: ''.
         package_url_type (str | Unset):  Default: ''.
         version_constraint (str | Unset):  Default: ''.
         supports_workspaces (bool | Unset):  Default: False.
         commit_lockfiles (bool | Unset):  Default: True.
     """
 
+    id: str
     language: str
+    manifest_paths: list[str]
+    lockfile_paths: list[str]
+    registry_url: Literal[""] | str
     name: str
     executable: str
-    id: None | str | Unset = UNSET
-    manifest_paths: ManifestPaths | Unset = UNSET
-    lockfile_paths: LockfilePaths | Unset = UNSET
-    registry_url: str | Unset = ""
     package_url_type: str | Unset = ""
     version_constraint: str | Unset = ""
     supports_workspaces: bool | Unset = False
@@ -50,30 +42,20 @@ class PackageManagerOut:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.lockfile_paths import LockfilePaths
-        from ..models.manifest_paths import ManifestPaths
+        id = self.id
 
         language = self.language
+
+        manifest_paths = self.manifest_paths
+
+        lockfile_paths = self.lockfile_paths
+
+        registry_url: Literal[""] | str
+        registry_url = self.registry_url
 
         name = self.name
 
         executable = self.executable
-
-        id: None | str | Unset
-        if isinstance(self.id, Unset):
-            id = UNSET
-        else:
-            id = self.id
-
-        manifest_paths: dict[str, Any] | Unset = UNSET
-        if not isinstance(self.manifest_paths, Unset):
-            manifest_paths = self.manifest_paths.to_dict()
-
-        lockfile_paths: dict[str, Any] | Unset = UNSET
-        if not isinstance(self.lockfile_paths, Unset):
-            lockfile_paths = self.lockfile_paths.to_dict()
-
-        registry_url = self.registry_url
 
         package_url_type = self.package_url_type
 
@@ -87,19 +69,15 @@ class PackageManagerOut:
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
+                "id": id,
                 "language": language,
+                "manifest_paths": manifest_paths,
+                "lockfile_paths": lockfile_paths,
+                "registry_url": registry_url,
                 "name": name,
                 "executable": executable,
             }
         )
-        if id is not UNSET:
-            field_dict["id"] = id
-        if manifest_paths is not UNSET:
-            field_dict["manifest_paths"] = manifest_paths
-        if lockfile_paths is not UNSET:
-            field_dict["lockfile_paths"] = lockfile_paths
-        if registry_url is not UNSET:
-            field_dict["registry_url"] = registry_url
         if package_url_type is not UNSET:
             field_dict["package_url_type"] = package_url_type
         if version_constraint is not UNSET:
@@ -113,40 +91,27 @@ class PackageManagerOut:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.lockfile_paths import LockfilePaths
-        from ..models.manifest_paths import ManifestPaths
-
         d = dict(src_dict)
+        id = d.pop("id")
+
         language = d.pop("language")
+
+        manifest_paths = cast(list[str], d.pop("manifest_paths"))
+
+        lockfile_paths = cast(list[str], d.pop("lockfile_paths"))
+
+        def _parse_registry_url(data: object) -> Literal[""] | str:
+            registry_url_type_0 = cast(Literal[""], data)
+            if registry_url_type_0 != "":
+                raise ValueError(f"registry_url_type_0 must match const '', got '{registry_url_type_0}'")
+            return registry_url_type_0
+            return cast(Literal[""] | str, data)
+
+        registry_url = _parse_registry_url(d.pop("registry_url"))
 
         name = d.pop("name")
 
         executable = d.pop("executable")
-
-        def _parse_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        id = _parse_id(d.pop("id", UNSET))
-
-        _manifest_paths = d.pop("manifest_paths", UNSET)
-        manifest_paths: ManifestPaths | Unset
-        if isinstance(_manifest_paths, Unset):
-            manifest_paths = UNSET
-        else:
-            manifest_paths = ManifestPaths.from_dict(_manifest_paths)
-
-        _lockfile_paths = d.pop("lockfile_paths", UNSET)
-        lockfile_paths: LockfilePaths | Unset
-        if isinstance(_lockfile_paths, Unset):
-            lockfile_paths = UNSET
-        else:
-            lockfile_paths = LockfilePaths.from_dict(_lockfile_paths)
-
-        registry_url = d.pop("registry_url", UNSET)
 
         package_url_type = d.pop("package_url_type", UNSET)
 
@@ -157,13 +122,13 @@ class PackageManagerOut:
         commit_lockfiles = d.pop("commit_lockfiles", UNSET)
 
         package_manager_out = cls(
-            language=language,
-            name=name,
-            executable=executable,
             id=id,
+            language=language,
             manifest_paths=manifest_paths,
             lockfile_paths=lockfile_paths,
             registry_url=registry_url,
+            name=name,
+            executable=executable,
             package_url_type=package_url_type,
             version_constraint=version_constraint,
             supports_workspaces=supports_workspaces,

@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
-
-from ..types import UNSET, Unset
-from typing import cast
-
 
 T = TypeVar("T", bound="ScaffoldingOut")
 
@@ -19,68 +15,56 @@ T = TypeVar("T", bound="ScaffoldingOut")
 class ScaffoldingOut:
     """
     Attributes:
+        id (str):
         language (str):
         name (str):
         description (str):
-        id (None | str | Unset):
     """
 
+    id: str
     language: str
     name: str
     description: str
-    id: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
+        id = self.id
+
         language = self.language
 
         name = self.name
 
         description = self.description
 
-        id: None | str | Unset
-        if isinstance(self.id, Unset):
-            id = UNSET
-        else:
-            id = self.id
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
+                "id": id,
                 "language": language,
                 "name": name,
                 "description": description,
             }
         )
-        if id is not UNSET:
-            field_dict["id"] = id
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
+        id = d.pop("id")
+
         language = d.pop("language")
 
         name = d.pop("name")
 
         description = d.pop("description")
 
-        def _parse_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        id = _parse_id(d.pop("id", UNSET))
-
         scaffolding_out = cls(
+            id=id,
             language=language,
             name=name,
             description=description,
-            id=id,
         )
 
         scaffolding_out.additional_properties = d

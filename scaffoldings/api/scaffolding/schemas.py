@@ -1,40 +1,52 @@
-from typing import Any
+from typing import Literal
 
 from ninja import Field, ModelSchema, Schema
+from pydantic import JsonValue
+from pydantic_core import PydanticUndefined
+
+from shared.api_schema import StrictSchema
+from shared.api_types import ShortUUID
 
 from ...models.scaffolding import Scaffolding
 
 
-class ScaffoldingIn(Schema):
-    language_id: str
+class ScaffoldingIn(StrictSchema):
+    language_id: ShortUUID
     name: str
     description: str
 
 
-class ScaffoldingPatchIn(Schema):
-    name: str
-    description: str
+class ScaffoldingPatchIn(StrictSchema):
+    name: str = Field(default_factory=lambda: PydanticUndefined)
+    description: str = Field(default_factory=lambda: PydanticUndefined)
 
 
 class ScaffoldingOut(ModelSchema):
+    id: ShortUUID
+    language: ShortUUID
+
+    @staticmethod
+    def resolve_language(obj):
+        return obj.language_id
+
     class Meta:
         model = Scaffolding 
         fields = "__all__"
 
 
-class TemplateOverrideIn(Schema):
-    template_id: str
+class TemplateOverrideIn(StrictSchema):
+    template_id: ShortUUID
     relative_path: str
     file_content: str
 
 
-class ScaffoldingPreviewIn(Schema):
-    values: dict[str, Any] = Field(default_factory=dict)
+class ScaffoldingPreviewIn(StrictSchema):
+    values: dict[str, JsonValue] = Field(default_factory=dict)
     template_overrides: list[TemplateOverrideIn] = Field(default_factory=list)
 
 
 class PreviewFileOut(Schema):
-    template_id: str
+    template_id: ShortUUID
     path: str
     source: str
     html: str
@@ -46,10 +58,35 @@ class ScaffoldingPreviewOut(Schema):
 
 
 class PreviewErrorOut(Schema):
-    code: str
+    code: Literal[
+        "unknown_variable",
+        "required_variable",
+        "invalid_variable_type",
+        "invalid_template_override",
+        "duplicate_template_override",
+        "jinja_syntax",
+        "jinja_render",
+        "invalid_rendered_path",
+        "rendered_path_collision",
+        "highlighting_failed",
+    ]
     message: str
-    details: dict[str, Any] = Field(default_factory=dict)
+    details: dict[str, JsonValue] = Field(default_factory=dict)
 
 
 class ScaffoldingPreviewErrorOut(Schema):
     errors: list[PreviewErrorOut]
+
+
+class VariableFormPropertyOut(Schema):
+    type: Literal["string", "integer", "number", "boolean", "array", "object"]
+    description: str
+    default: JsonValue
+
+
+class ScaffoldingFormSchemaOut(Schema):
+    schema_uri: Literal["https://json-schema.org/draft/2020-12/schema"] = Field(alias="$schema")
+    type: Literal["object"]
+    properties: dict[str, VariableFormPropertyOut]
+    required: list[str]
+    allow_additional_properties: Literal[False] = Field(alias="additionalProperties")

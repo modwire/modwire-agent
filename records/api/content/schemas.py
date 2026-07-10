@@ -1,7 +1,11 @@
 from typing import Literal
 
 from ninja import Schema
-from pydantic import Field
+from pydantic import Field, JsonValue
+from pydantic_core import PydanticUndefined
+
+from shared.api_schema import StrictSchema
+from shared.api_types import RecordSlug
 
 type ContentRole = Literal[
     "heading",
@@ -14,31 +18,31 @@ type ContentRole = Literal[
 ]
 
 
-class ContentIn(Schema):
-    record_slug: str
+class ContentIn(StrictSchema):
+    record_slug: RecordSlug
     position: int = Field(ge=0)
     role: ContentRole
     content: str
     language: str
-    metadata: dict[str, object] = Field(title="ContentInMetadata")
+    metadata: dict[str, JsonValue] = Field(title="ContentInMetadata")
 
 
-class ContentPatchIn(Schema):
-    position: int = Field(ge=0)
-    role: ContentRole
-    content: str
-    language: str
-    metadata: dict[str, object] = Field(title="ContentPatchInMetadata")
+class ContentPatchIn(StrictSchema):
+    position: int = Field(default_factory=lambda: PydanticUndefined, ge=0)
+    role: ContentRole = Field(default_factory=lambda: PydanticUndefined)
+    content: str = Field(default_factory=lambda: PydanticUndefined)
+    language: str = Field(default_factory=lambda: PydanticUndefined)
+    metadata: dict[str, JsonValue] = Field(default_factory=lambda: PydanticUndefined)
 
 
 class ContentOut(Schema):
     id: int
-    record_slug: str
+    record_slug: RecordSlug
     position: int
-    role: str
+    role: ContentRole
     content: str
     language: str
-    metadata: dict[str, object] = Field(title="ContentOutMetadata")
+    metadata: dict[str, JsonValue] = Field(title="ContentOutMetadata")
 
     @staticmethod
     def resolve_record_slug(obj):

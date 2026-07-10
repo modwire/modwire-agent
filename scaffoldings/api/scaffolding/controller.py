@@ -6,12 +6,14 @@ from wireup import Inject
 from wireup.integration.django import inject
 
 from shared.api_errors import validated
+from shared.api_types import ShortUUID
 
 from ...services.preview import ScaffoldingPreviewService
 from ...services.preview_errors import PreviewFailed
 from ...services.scaffolding import ScaffoldingService
 from ...services.schema import ScaffoldingSchemaService
 from .schemas import (
+    ScaffoldingFormSchemaOut,
     ScaffoldingIn,
     ScaffoldingOut,
     ScaffoldingPatchIn,
@@ -40,19 +42,20 @@ class ScaffoldingController(ControllerBase):
         summary="Get scaffolding.",
     )
     @inject
-    def get(self, scaffolding_id: str, service: Annotated[ScaffoldingService, Inject()]):
+    def get(self, scaffolding_id: ShortUUID, service: Annotated[ScaffoldingService, Inject()]):
         return service.get(scaffolding_id)
 
     @route.get(
         "/{scaffolding_id}/schema",
-        response=dict,
+        response=ScaffoldingFormSchemaOut,
+        by_alias=True,
         operation_id="get_scaffolding_schema",
         summary="Get the scaffolding variable form schema.",
     )
     @inject
     def schema(
         self,
-        scaffolding_id: str,
+        scaffolding_id: ShortUUID,
         scaffoldings: Annotated[ScaffoldingService, Inject()],
         schemas: Annotated[ScaffoldingSchemaService, Inject()],
     ):
@@ -67,7 +70,7 @@ class ScaffoldingController(ControllerBase):
     @inject
     def preview(
         self,
-        scaffolding_id: str,
+        scaffolding_id: ShortUUID,
         data: ScaffoldingPreviewIn,
         service: Annotated[ScaffoldingPreviewService, Inject()],
     ):
@@ -99,7 +102,7 @@ class ScaffoldingController(ControllerBase):
     @inject
     def update(
         self,
-        scaffolding_id: str,
+        scaffolding_id: ShortUUID,
         data: ScaffoldingIn,
         service: Annotated[ScaffoldingService, Inject()],
     ):
@@ -114,11 +117,11 @@ class ScaffoldingController(ControllerBase):
     @inject
     def partial_update(
         self,
-        scaffolding_id: str,
+        scaffolding_id: ShortUUID,
         data: ScaffoldingPatchIn,
         service: Annotated[ScaffoldingService, Inject()],
     ):
-        return validated(service.update, scaffolding_id, **data.model_dump(exclude_unset=True))
+        return validated(service.update, scaffolding_id, **data.model_dump(exclude_unset=True, warnings=False))
 
     @route.delete(
         "/{scaffolding_id}",
@@ -127,6 +130,6 @@ class ScaffoldingController(ControllerBase):
         summary="Delete scaffolding.",
     )
     @inject
-    def delete(self, scaffolding_id: str, service: Annotated[ScaffoldingService, Inject()]):
+    def delete(self, scaffolding_id: ShortUUID, service: Annotated[ScaffoldingService, Inject()]):
         service.delete(scaffolding_id)
         return Status(204, None)

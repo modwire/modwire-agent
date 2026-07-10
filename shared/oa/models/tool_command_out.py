@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..models.tool_command_capability import ToolCommandCapability
 from ..types import UNSET, Unset
-
-from ..types import UNSET, Unset
-from typing import cast
-
 
 T = TypeVar("T", bound="ToolCommandOut")
 
@@ -19,68 +16,56 @@ T = TypeVar("T", bound="ToolCommandOut")
 class ToolCommandOut:
     """
     Attributes:
+        id (str):
         tool (str):
-        capability (str):
+        capability (ToolCommandCapability):
         cmd (str):
-        id (None | str | Unset):
     """
 
+    id: str
     tool: str
-    capability: str
+    capability: ToolCommandCapability
     cmd: str
-    id: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
+        id = self.id
+
         tool = self.tool
 
-        capability = self.capability
+        capability = self.capability.value
 
         cmd = self.cmd
-
-        id: None | str | Unset
-        if isinstance(self.id, Unset):
-            id = UNSET
-        else:
-            id = self.id
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
+                "id": id,
                 "tool": tool,
                 "capability": capability,
                 "cmd": cmd,
             }
         )
-        if id is not UNSET:
-            field_dict["id"] = id
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
+        id = d.pop("id")
+
         tool = d.pop("tool")
 
-        capability = d.pop("capability")
+        capability = ToolCommandCapability(d.pop("capability"))
 
         cmd = d.pop("cmd")
 
-        def _parse_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        id = _parse_id(d.pop("id", UNSET))
-
         tool_command_out = cls(
+            id=id,
             tool=tool,
             capability=capability,
             cmd=cmd,
-            id=id,
         )
 
         tool_command_out.additional_properties = d

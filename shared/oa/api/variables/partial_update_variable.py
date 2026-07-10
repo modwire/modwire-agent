@@ -4,19 +4,17 @@ from urllib.parse import quote
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.variable_out import VariableOut
-from ...models.variable_patch_in_patch import VariablePatchInPatch
-from typing import cast
+from ...models.variable_patch_in import VariablePatchIn
+from ...types import UNSET, Response
 
 
 def _get_kwargs(
     variable_id: str,
     *,
-    body: VariablePatchInPatch,
+    body: VariablePatchIn,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
@@ -60,13 +58,13 @@ def sync_detailed(
     variable_id: str,
     *,
     client: AuthenticatedClient,
-    body: VariablePatchInPatch,
+    body: VariablePatchIn,
 ) -> Response[VariableOut]:
     """Partially update variable.
 
     Args:
         variable_id (str):
-        body (VariablePatchInPatch):
+        body (VariablePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -92,13 +90,13 @@ def sync(
     variable_id: str,
     *,
     client: AuthenticatedClient,
-    body: VariablePatchInPatch,
+    body: VariablePatchIn,
 ) -> VariableOut | None:
     """Partially update variable.
 
     Args:
         variable_id (str):
-        body (VariablePatchInPatch):
+        body (VariablePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -119,13 +117,13 @@ async def asyncio_detailed(
     variable_id: str,
     *,
     client: AuthenticatedClient,
-    body: VariablePatchInPatch,
+    body: VariablePatchIn,
 ) -> Response[VariableOut]:
     """Partially update variable.
 
     Args:
         variable_id (str):
-        body (VariablePatchInPatch):
+        body (VariablePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -149,13 +147,13 @@ async def asyncio(
     variable_id: str,
     *,
     client: AuthenticatedClient,
-    body: VariablePatchInPatch,
+    body: VariablePatchIn,
 ) -> VariableOut | None:
     """Partially update variable.
 
     Args:
         variable_id (str):
-        body (VariablePatchInPatch):
+        body (VariablePatchIn):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

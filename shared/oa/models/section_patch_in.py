@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
-
-from typing import cast
-
 
 T = TypeVar("T", bound="SectionPatchIn")
 
@@ -18,43 +15,44 @@ T = TypeVar("T", bound="SectionPatchIn")
 class SectionPatchIn:
     """
     Attributes:
-        title (str):
-        description (str):
-        tag_slugs (list[str]):
+        title (str | Unset):
+        description (str | Unset):
+        tag_slugs (list[str] | Unset):
     """
 
-    title: str
-    description: str
-    tag_slugs: list[str]
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+    title: str | Unset = UNSET
+    description: str | Unset = UNSET
+    tag_slugs: list[str] | Unset = UNSET
 
     def to_dict(self) -> dict[str, Any]:
         title = self.title
 
         description = self.description
 
-        tag_slugs = self.tag_slugs
+        tag_slugs: list[str] | Unset = UNSET
+        if not isinstance(self.tag_slugs, Unset):
+            tag_slugs = self.tag_slugs
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "title": title,
-                "description": description,
-                "tag_slugs": tag_slugs,
-            }
-        )
+
+        field_dict.update({})
+        if title is not UNSET:
+            field_dict["title"] = title
+        if description is not UNSET:
+            field_dict["description"] = description
+        if tag_slugs is not UNSET:
+            field_dict["tag_slugs"] = tag_slugs
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        title = d.pop("title")
+        title = d.pop("title", UNSET)
 
-        description = d.pop("description")
+        description = d.pop("description", UNSET)
 
-        tag_slugs = cast(list[str], d.pop("tag_slugs"))
+        tag_slugs = cast(list[str], d.pop("tag_slugs", UNSET))
 
         section_patch_in = cls(
             title=title,
@@ -62,21 +60,4 @@ class SectionPatchIn:
             tag_slugs=tag_slugs,
         )
 
-        section_patch_in.additional_properties = d
         return section_patch_in
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

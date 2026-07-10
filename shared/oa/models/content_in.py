@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, BinaryIO, Generator, TextIO, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
 from ..models.content_in_role import ContentInRole
-from typing import cast
+from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.record_content_in_metadata import RecordContentInMetadata
@@ -32,7 +30,6 @@ class ContentIn:
     content: str
     language: str
     metadata: RecordContentInMetadata
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         from ..models.record_content_in_metadata import RecordContentInMetadata
@@ -46,7 +43,7 @@ class ContentIn:
         metadata = self.metadata.to_dict()
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update(
             {
                 "role": role,
@@ -78,21 +75,4 @@ class ContentIn:
             metadata=metadata,
         )
 
-        content_in.additional_properties = d
         return content_in
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

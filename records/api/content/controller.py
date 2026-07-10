@@ -80,7 +80,7 @@ class ContentController(ControllerBase):
         service: Annotated[ContentService, Inject()],
     ):
         try:
-            return service.update(content_id, **data.model_dump(exclude_unset=True))
+            return service.update(content_id, **data.model_dump(exclude_unset=True, warnings=False))
         except (ValidationError, IntegrityError) as error:
             raise validation_error(error) from error
 

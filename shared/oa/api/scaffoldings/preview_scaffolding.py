@@ -4,14 +4,12 @@ from urllib.parse import quote
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.scaffolding_preview_error_out import ScaffoldingPreviewErrorOut
 from ...models.scaffolding_preview_in import ScaffoldingPreviewIn
 from ...models.scaffolding_preview_out import ScaffoldingPreviewOut
-from typing import cast
+from ...types import UNSET, Response
 
 
 def _get_kwargs(

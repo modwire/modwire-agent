@@ -8,6 +8,7 @@ from wireup import Inject
 from wireup.integration.django import inject
 
 from records.api.errors import validation_error
+from shared.api_types import RecordSlug, Slug
 
 from ...services.record import RecordService
 from .schemas import RecordIn, RecordOut, RecordPatchIn, RecordSummaryOut, SearchIn, SearchOut
@@ -27,8 +28,8 @@ class RecordController(ControllerBase):
         service: Annotated[RecordService, Inject()],
         limit: int = Query(..., ge=1, le=200),
         offset: int = Query(..., ge=0),
-        section_slugs: list[str] = Query(...),
-        tag: list[str] = Query(...),
+        section_slugs: list[Slug] = Query(...),
+        tag: list[Slug] = Query(...),
     ):
         return service.list(limit=limit, offset=offset, section_slugs=section_slugs, tag_slugs=tag)
 
@@ -50,7 +51,7 @@ class RecordController(ControllerBase):
         summary="Get record.",
     )
     @inject
-    def get(self, record_slug: str, service: Annotated[RecordService, Inject()]):
+    def get(self, record_slug: RecordSlug, service: Annotated[RecordService, Inject()]):
         return service.get(record_slug)
 
     @route.post(
@@ -75,7 +76,7 @@ class RecordController(ControllerBase):
     @inject
     def update(
         self,
-        record_slug: str,
+        record_slug: RecordSlug,
         data: RecordIn,
         service: Annotated[RecordService, Inject()],
     ):
@@ -93,12 +94,12 @@ class RecordController(ControllerBase):
     @inject
     def partial_update(
         self,
-        record_slug: str,
+        record_slug: RecordSlug,
         data: RecordPatchIn,
         service: Annotated[RecordService, Inject()],
     ):
         try:
-            return service.update(record_slug, **data.model_dump(exclude_unset=True))
+            return service.update(record_slug, **data.model_dump(exclude_unset=True, warnings=False))
         except (ValidationError, IntegrityError) as error:
             raise validation_error(error) from error
 
@@ -109,6 +110,6 @@ class RecordController(ControllerBase):
         summary="Delete record.",
     )
     @inject
-    def delete(self, record_slug: str, service: Annotated[RecordService, Inject()]):
+    def delete(self, record_slug: RecordSlug, service: Annotated[RecordService, Inject()]):
         service.delete(record_slug)
         return Status(204, None)
