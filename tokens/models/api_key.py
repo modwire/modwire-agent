@@ -30,10 +30,7 @@ class ApiKey(models.Model):
         return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
     @classmethod
-    def authenticate(cls, key: str | None) -> "ApiKey | None":
-        if not key:
-            return None
-
+    def authenticate(cls, key: str) -> "ApiKey | None":
         api_key = cls.objects.filter(key_hash=cls.hash_key(key), is_active=True).first()
         if api_key is None:
             return None

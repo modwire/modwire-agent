@@ -1,7 +1,6 @@
 from typing import Any, ClassVar, Literal, get_args, get_origin
 
 import yaml
-
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
 
@@ -74,6 +73,8 @@ class CopierManifest(BaseModel):
 
         origin = get_origin(annotation)
 
+        # Copier calls both collection question types "yaml". Keep that
+        # implementation detail inside this adapter.
         if origin is list or origin is dict:
             return "yaml"
 

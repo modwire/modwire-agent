@@ -7,8 +7,18 @@ from wireup.integration.django import inject
 
 from shared.api_errors import validated
 
+from ...services.preview import ScaffoldingPreviewService
+from ...services.preview_errors import PreviewFailed
 from ...services.scaffolding import ScaffoldingService
-from .schemas import ScaffoldingIn, ScaffoldingOut, ScaffoldingPatchIn
+from ...services.schema import ScaffoldingSchemaService
+from .schemas import (
+    ScaffoldingIn,
+    ScaffoldingOut,
+    ScaffoldingPatchIn,
+    ScaffoldingPreviewErrorOut,
+    ScaffoldingPreviewIn,
+    ScaffoldingPreviewOut,
+)
 
 
 @api_controller("/scaffoldings", tags=["Scaffoldings"])
@@ -32,6 +42,43 @@ class ScaffoldingController(ControllerBase):
     @inject
     def get(self, scaffolding_id: str, service: Annotated[ScaffoldingService, Inject()]):
         return service.get(scaffolding_id)
+
+    @route.get(
+        "/{scaffolding_id}/schema",
+        response=dict,
+        operation_id="get_scaffolding_schema",
+        summary="Get the scaffolding variable form schema.",
+    )
+    @inject
+    def schema(
+        self,
+        scaffolding_id: str,
+        scaffoldings: Annotated[ScaffoldingService, Inject()],
+        schemas: Annotated[ScaffoldingSchemaService, Inject()],
+    ):
+        return schemas.build(scaffoldings.get(scaffolding_id))
+
+    @route.post(
+        "/{scaffolding_id}/preview",
+        response={200: ScaffoldingPreviewOut, 422: ScaffoldingPreviewErrorOut},
+        operation_id="preview_scaffolding",
+        summary="Preview a rendered scaffolding.",
+    )
+    @inject
+    def preview(
+        self,
+        scaffolding_id: str,
+        data: ScaffoldingPreviewIn,
+        service: Annotated[ScaffoldingPreviewService, Inject()],
+    ):
+        try:
+            return service.preview(
+                scaffolding_id,
+                data.values,
+                [override.model_dump(exclude_none=True) for override in data.template_overrides],
+            )
+        except PreviewFailed as error:
+            return Status(422, {"errors": [item.as_dict() for item in error.errors]})
 
     @route.post(
         "",

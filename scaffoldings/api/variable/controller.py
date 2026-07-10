@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from ninja import Status
+from ninja import PatchDict, Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
@@ -68,10 +68,10 @@ class VariableController(ControllerBase):
     def partial_update(
         self,
         variable_id: str,
-        data: VariablePatchIn,
+        data: PatchDict[VariablePatchIn],
         service: Annotated[VariableService, Inject()],
     ):
-        return validated(service.update, variable_id, **data.model_dump(exclude_unset=True))
+        return validated(service.update, variable_id, **data)
 
     @route.delete(
         "/{variable_id}",

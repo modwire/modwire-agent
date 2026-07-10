@@ -17,6 +17,7 @@ dependencies = [
     "psycopg[binary]",
     "pydantic",
     "pydantic-yaml>=1.7.0",
+    "pygments",
     "python-dotenv",
     "pyyaml",
     "scrapy",

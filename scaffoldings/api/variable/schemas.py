@@ -11,6 +11,7 @@ class VariableIn(Schema):
     type: str
     description: str
     default_value: Any
+    required: bool = False
 
 
 class VariablePatchIn(Schema):
@@ -18,6 +19,7 @@ class VariablePatchIn(Schema):
     type: str
     description: str
     default_value: Any
+    required: bool
 
 
 class VariableOut(ModelSchema):

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from shared.models import ShortUUIDModel
@@ -10,7 +11,8 @@ class VariableType(models.TextChoices):
     INT = "int"
     FLOAT = "float"
     BOOL = "bool"
-    YAML = "yaml"
+    LIST = "list"
+    DICT = "dict"
 
 
 class Variable(ShortUUIDModel):
@@ -19,6 +21,24 @@ class Variable(ShortUUIDModel):
     type = models.CharField(max_length=8, choices=VariableType.choices)
     description = models.CharField(max_length=100)
     default_value = models.JSONField(default=list)
+    required = models.BooleanField(default=False)
+
+    def clean(self):
+        super().clean()
+        expected = {
+            VariableType.STR: str,
+            VariableType.INT: int,
+            VariableType.FLOAT: float,
+            VariableType.BOOL: bool,
+            VariableType.LIST: list,
+            VariableType.DICT: dict,
+        }.get(self.type)
+        value = self.default_value
+        valid = expected is not None and type(value) is expected
+        if self.type == VariableType.FLOAT:
+            valid = type(value) in {int, float}
+        if not valid:
+            raise ValidationError({"default_value": f"Default value must match variable type '{self.type}'."})
 
     class Meta:
         ordering = ("name",)
