@@ -14,4 +14,4 @@ class PackageManagerPatchIn(Schema):
 class PackageManagerOut(ModelSchema):
     class Meta:
         model = PackageManager 
-        fields = ("id", "name", "created_at", "updated_at")
+        fields = "__all__"

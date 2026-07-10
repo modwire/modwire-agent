@@ -22,14 +22,14 @@ class ScaffoldingController(ControllerBase):
         return service.list()
 
     @route.get(
-        "/{scaffolding_id}",
+        "/{slug}",
         response=ScaffoldingOut,
         operation_id="get_scaffolding",
         summary="Get scaffolding.",
     )
     @inject
-    def get(self, scaffolding_id: int, service: Annotated[ScaffoldingService, Inject()]):
-        return service.get(scaffolding_id)
+    def get(self, slug: str, service: Annotated[ScaffoldingService, Inject()]):
+        return service.get(slug)
 
     @route.post(
         "",

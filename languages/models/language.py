@@ -7,7 +7,4 @@ class Language(models.Model):
     stable_version = models.CharField(max_length=16)
 
     class Meta:
-        ordering = ("id",)
-
-    def __str__(self):
-        return self.name
+        ordering = ("name",)

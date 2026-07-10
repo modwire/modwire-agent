@@ -14,4 +14,4 @@ class LanguagePatchIn(Schema):
 class LanguageOut(ModelSchema):
     class Meta:
         model = Language 
-        fields = ("id", "name", "created_at", "updated_at")
+        fields = "__all__"

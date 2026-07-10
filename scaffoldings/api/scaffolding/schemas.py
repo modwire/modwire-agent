@@ -4,14 +4,17 @@ from ...models.scaffolding import Scaffolding
 
 
 class ScaffoldingIn(Schema):
+    language_id: str
     name: str
+    description: str
 
 
 class ScaffoldingPatchIn(Schema):
     name: str
+    description: str
 
 
 class ScaffoldingOut(ModelSchema):
     class Meta:
         model = Scaffolding 
-        fields = ("id", "name", "created_at", "updated_at")
+        fields = "__all__"
