@@ -10,6 +10,7 @@ from .base import LanguageDefinition, PackageManagerDefinition, ToolDefinition
 class PHP(LanguageDefinition):
     name = "PHP"
     executable = "php"
+    source_extensions = (".php",)
     package_managers = (
         PackageManagerDefinition(
             name="Composer",

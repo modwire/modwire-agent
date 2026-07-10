@@ -37,8 +37,15 @@ class ToolDefinition:
 class LanguageDefinition(abc.ABC):
     name: str
     executable: str
+    source_extensions: tuple[str, ...]
     package_managers: tuple[PackageManagerDefinition, ...]
     tools: tuple[ToolDefinition, ...]
+
+    def source_id(self, path: str) -> str:
+        return next((path[: -len(suffix)] for suffix in self.source_extensions if path.endswith(suffix)), path)
+
+    def path_for_source_id(self, paths: list[str] | tuple[str, ...], source_id: str) -> str:
+        return next((path for path in paths if self.source_id(path) == source_id), source_id)
 
     @property
     @abc.abstractmethod

@@ -15,6 +15,7 @@ body { margin: 0; }
 .content-grid { display: grid; grid-template-columns: minmax(280px,380px) minmax(0,1fr); gap: 22px; align-items: start; }
 .panel { border: 1px solid #e1e5ee; border-radius: 16px !important; background: #fff; overflow: hidden; }
 .form-panel { padding: 24px; }
+.record-panel { max-width: 960px; padding: 28px; }
 .preview-panel { min-height: 540px; }
 .preview-empty { min-height: 540px; padding: 30px; box-sizing: border-box; }
 .empty-icon { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 18px; background: #eeecff; color: #4f46e5; }

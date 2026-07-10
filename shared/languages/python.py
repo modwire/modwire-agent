@@ -10,6 +10,7 @@ from .base import LanguageDefinition, PackageManagerDefinition, ToolDefinition
 class Python(LanguageDefinition):
     name = "Python"
     executable = "python"
+    source_extensions = (".py",)
     package_managers = (
         PackageManagerDefinition(
             name="UV",

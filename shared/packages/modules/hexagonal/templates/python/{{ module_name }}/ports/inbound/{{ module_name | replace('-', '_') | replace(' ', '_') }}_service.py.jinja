@@ -1,9 +1,0 @@
-from typing import Protocol
-
-from ...domain.models.{{ module_name | replace('-', '_') | replace(' ', '_') }}_aggregate import {{ aggregate_name }}
-from .create_{{ module_name | replace('-', '_') | replace(' ', '_') }} import {{ command_name }}
-
-
-class {{ service_name }}Port(Protocol):
-    def handle(self, command: {{ command_name }}) -> {{ aggregate_name }}:
-        ...

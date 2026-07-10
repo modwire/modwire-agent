@@ -10,6 +10,7 @@ from .base import LanguageDefinition, PackageManagerDefinition, ToolDefinition
 class Typescript(LanguageDefinition):
     name = "TypeScript"
     executable = "tsc"
+    source_extensions = (".tsx", ".ts", ".jsx", ".js")
     package_managers = (
         PackageManagerDefinition(
             name="NPM",

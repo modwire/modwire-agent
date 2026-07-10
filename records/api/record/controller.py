@@ -26,10 +26,10 @@ class RecordController(ControllerBase):
     def list(
         self,
         service: Annotated[RecordService, Inject()],
-        limit: int = Query(..., ge=1, le=200),
-        offset: int = Query(..., ge=0),
-        section_slugs: list[Slug] = Query(...),
-        tag: list[Slug] = Query(...),
+        limit: int = Query(200, ge=1, le=200),
+        offset: int = Query(0, ge=0),
+        section_slugs: list[Slug] = Query(default_factory=list),
+        tag: list[Slug] = Query(default_factory=list),
     ):
         return service.list(limit=limit, offset=offset, section_slugs=section_slugs, tag_slugs=tag)
 

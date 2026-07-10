@@ -1,8 +1,0 @@
-from django.contrib import admin
-
-from ..models.{{ model_snake_name }} import {{ model_pascal_name }} 
-
-
-@admin.register({{ model_pascal_name }})
-class {{ model_pascal_name }}Admin(admin.ModelAdmin):
-    list_display = ("id", "name", "created_at")

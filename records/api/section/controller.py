@@ -26,9 +26,9 @@ class SectionController(ControllerBase):
     def list(
         self,
         service: Annotated[SectionService, Inject()],
-        limit: int = Query(..., ge=1, le=200),
-        offset: int = Query(..., ge=0),
-        tag: list[Slug] = Query(...),
+        limit: int = Query(200, ge=1, le=200),
+        offset: int = Query(0, ge=0),
+        tag: list[Slug] = Query(default_factory=list),
     ):
         return service.list(limit=limit, offset=offset, tag_slugs=tag)
 

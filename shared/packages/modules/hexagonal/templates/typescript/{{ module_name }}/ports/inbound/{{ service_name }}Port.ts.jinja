@@ -1,6 +1,0 @@
-import { {{ aggregate_name }} } from "../../domain/models/{{ aggregate_name }}";
-import { {{ command_name }} } from "./{{ command_name }}";
-
-export interface {{ service_name }}Port {
-  handle(command: {{ command_name }}): {{ aggregate_name }};
-}

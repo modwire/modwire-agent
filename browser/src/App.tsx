@@ -6,6 +6,7 @@ import {
   FolderOutlined,
   Key,
   Logout,
+  MenuBookOutlined,
   Refresh,
   Search,
   Tune,
@@ -35,6 +36,10 @@ type SirenLink = { rel: string[]; href: string; title?: string };
 type SirenAction = { name: string; href: string; method: string; type?: string };
 type SirenEntity = { properties?: Properties; entities?: SirenEntity[]; links?: SirenLink[]; actions?: SirenAction[] };
 type Scaffolding = { id: string; name: string; description: string; language: string; href: string };
+type RecordSummary = { slug: string; section_slug: string; title: string; description: string; tag_slugs: string[]; href: string };
+type RecordContent = { role: string; content: string; language: string; metadata: Properties };
+type RecordResource = RecordSummary & { sources: string[]; content: RecordContent[] };
+type SectionSummary = { slug: string; title: string; description: string };
 type SchemaProperty = {
   type: "string" | "integer" | "number" | "boolean" | "array" | "object";
   description: string;
@@ -68,6 +73,13 @@ async function api<T>(href: string, apiKey: string, init?: RequestInit): Promise
 function readCollection(document: SirenEntity): Scaffolding[] {
   return (document.entities || []).map((entity) => ({
     ...(entity.properties as unknown as Omit<Scaffolding, "href">),
+    href: link(entity, "self").href,
+  }));
+}
+
+function readRecords(document: SirenEntity): RecordSummary[] {
+  return (document.entities || []).map((entity) => ({
+    ...(entity.properties as unknown as Omit<RecordSummary, "href">),
     href: link(entity, "self").href,
   }));
 }
@@ -132,6 +144,11 @@ export function App() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("modwire-api-key") || "");
   const [keyDraft, setKeyDraft] = useState(apiKey);
   const [scaffoldings, setScaffoldings] = useState<Scaffolding[]>([]);
+  const [records, setRecords] = useState<RecordSummary[]>([]);
+  const [sections, setSections] = useState<SectionSummary[]>([]);
+  const [selectedRecord, setSelectedRecord] = useState<RecordResource | null>(null);
+  const [selectedRecordSlug, setSelectedRecordSlug] = useState("");
+  const [area, setArea] = useState<"scaffoldings" | "records">("scaffoldings");
   const [selectedResource, setSelectedResource] = useState<SirenEntity | null>(null);
   const [selectedId, setSelectedId] = useState("");
   const [schema, setSchema] = useState<FormSchema | null>(null);
@@ -146,23 +163,34 @@ export function App() {
   const selected = scaffoldings.find((item) => item.id === selectedId);
   const filtered = useMemo(() => scaffoldings.filter((item) =>
     `${item.name} ${item.description}`.toLowerCase().includes(search.toLowerCase())), [scaffoldings, search]);
+  const filteredRecords = useMemo(() => records.filter((item) =>
+    `${item.title} ${item.description} ${item.tag_slugs.join(" ")}`.toLowerCase().includes(search.toLowerCase())), [records, search]);
+  const sectionTitles = useMemo(() => Object.fromEntries(sections.map((section) => [section.slug, section.title])), [sections]);
 
-  async function loadScaffoldings(key = apiKey) {
+  async function loadStudio(key = apiKey) {
     if (!key) return;
     setLoading(true); setError("");
     try {
       const root = await api<SirenEntity>(API_URL, key);
-      const collection = await api<SirenEntity>(link(root, "scaffoldings").href, key);
-      const items = readCollection(collection);
+      const [scaffoldingCollection, recordCollection, sectionCollection] = await Promise.all([
+        api<SirenEntity>(link(root, "scaffoldings").href, key),
+        api<SirenEntity>(link(root, "records").href, key),
+        api<SirenEntity>(link(root, "sections").href, key),
+      ]);
+      const items = readCollection(scaffoldingCollection);
+      const recordItems = readRecords(recordCollection);
       setScaffoldings(items);
+      setRecords(recordItems);
+      setSections((sectionCollection.entities || []).map((entity) => entity.properties as unknown as SectionSummary));
       setSelectedId((current) => items.some((item) => item.id === current) ? current : items[0]?.id || "");
+      setSelectedRecordSlug((current) => recordItems.some((item) => item.slug === current) ? current : recordItems[0]?.slug || "");
     } catch (reason) { setError(messageFrom(reason)); }
     finally { setLoading(false); }
   }
 
-  useEffect(() => { void loadScaffoldings(); }, [apiKey]);
+  useEffect(() => { void loadStudio(); }, [apiKey]);
   useEffect(() => {
-    if (!selectedId || !apiKey) { setSchema(null); setSelectedResource(null); return; }
+    if (area !== "scaffoldings" || !selectedId || !apiKey) { setSchema(null); setSelectedResource(null); return; }
     setLoading(true); setError(""); setFiles([]);
     const item = scaffoldings.find((candidate) => candidate.id === selectedId);
     if (!item) return;
@@ -176,7 +204,17 @@ export function App() {
       })
       .catch((reason) => setError(messageFrom(reason)))
       .finally(() => setLoading(false));
-  }, [selectedId, apiKey, scaffoldings]);
+  }, [area, selectedId, apiKey, scaffoldings]);
+  useEffect(() => {
+    if (area !== "records" || !selectedRecordSlug || !apiKey) { setSelectedRecord(null); return; }
+    const item = records.find((candidate) => candidate.slug === selectedRecordSlug);
+    if (!item) return;
+    setLoading(true); setError("");
+    void api<SirenEntity>(item.href, apiKey)
+      .then((resource) => setSelectedRecord({ ...item, ...(resource.properties as unknown as RecordResource) }))
+      .catch((reason) => setError(messageFrom(reason)))
+      .finally(() => setLoading(false));
+  }, [area, selectedRecordSlug, apiKey, records]);
 
   function connect(event: FormEvent) {
     event.preventDefault();
@@ -228,17 +266,19 @@ export function App() {
       </Box>
       <Box className="workspace">
         <Paper component="aside" className="sidebar" elevation={0} square>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2.5, pt: 2.5 }}><Typography variant="overline" fontWeight={800}>Scaffoldings</Typography><Tooltip title="Refresh"><IconButton size="small" onClick={() => void loadScaffoldings()}><Refresh fontSize="small" /></IconButton></Tooltip></Stack>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2.5, pt: 1.5 }}><Tabs value={area} onChange={(_, value) => { setArea(value); setSearch(""); }} variant="fullWidth"><Tab value="scaffoldings" label="Scaffolds" /><Tab value="records" label="Records" /></Tabs><Tooltip title="Refresh"><IconButton size="small" onClick={() => void loadStudio()}><Refresh fontSize="small" /></IconButton></Tooltip></Stack>
           <TextField size="small" placeholder="Search catalog" value={search} onChange={(e) => setSearch(e.target.value)} sx={{ m: 2, mt: 1.5 }} InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }} />
           <Stack className="catalog" spacing={0.75}>
-            {filtered.map((item) => <Button key={item.id} className="catalog-item" data-selected={selectedId === item.id} onClick={() => setSelectedId(item.id)}><Stack alignItems="flex-start"><Typography fontWeight={700} textTransform="none">{item.name}</Typography><Typography variant="caption" color="text.secondary" noWrap>{item.description || "No description"}</Typography></Stack></Button>)}
-            {!loading && filtered.length === 0 && <Typography color="text.secondary" variant="body2" sx={{ px: 2.5, py: 3 }}>No scaffoldings found.</Typography>}
+            {area === "scaffoldings" && filtered.map((item) => <Button key={item.id} className="catalog-item" data-selected={selectedId === item.id} onClick={() => setSelectedId(item.id)}><Stack alignItems="flex-start"><Typography fontWeight={700} textTransform="none">{item.name}</Typography><Typography variant="caption" color="text.secondary" noWrap>{item.description || "No description"}</Typography></Stack></Button>)}
+            {area === "records" && filteredRecords.map((item) => <Button key={item.slug} className="catalog-item" data-selected={selectedRecordSlug === item.slug} onClick={() => setSelectedRecordSlug(item.slug)}><Stack alignItems="flex-start"><Typography fontWeight={700} textTransform="none">{item.title}</Typography><Typography variant="caption" color="text.secondary" noWrap>{sectionTitles[item.section_slug] || item.section_slug}</Typography></Stack></Button>)}
+            {!loading && area === "scaffoldings" && filtered.length === 0 && <Typography color="text.secondary" variant="body2" sx={{ px: 2.5, py: 3 }}>No scaffoldings found.</Typography>}
+            {!loading && area === "records" && filteredRecords.length === 0 && <Typography color="text.secondary" variant="body2" sx={{ px: 2.5, py: 3 }}>No records found.</Typography>}
           </Stack>
         </Paper>
         <Box component="main" className="main-pane">
           {error && <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>{error}</Alert>}
-          {loading && !selected && <Stack alignItems="center" py={12}><CircularProgress /></Stack>}
-          {selected && <>
+          {loading && area === "scaffoldings" && !selected && <Stack alignItems="center" py={12}><CircularProgress /></Stack>}
+          {area === "scaffoldings" && selected && <>
             <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2} mb={3}>
               <Box><Chip icon={<FolderOutlined />} label="Scaffolding" size="small" variant="outlined" /><Typography component="h1" variant="h4" fontWeight={800} mt={1}>{selected.name}</Typography><Typography color="text.secondary">{selected.description}</Typography></Box>
               <Button variant="contained" size="large" disabled={previewing || loading} onClick={() => void preview()} startIcon={previewing ? <CircularProgress size={18} color="inherit" /> : <Code />}>{previewing ? "Rendering…" : "Generate preview"}</Button>
@@ -249,6 +289,21 @@ export function App() {
                 {files.length ? <><Stack direction="row" alignItems="center" justifyContent="space-between" px={2}><Tabs value={activeFile} onChange={(_, value) => setActiveFile(value)} variant="scrollable" scrollButtons="auto">{files.map((file) => <Tab key={file.path} label={file.path} />)}</Tabs><Tooltip title="Copy source"><IconButton onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Stack><Divider /><Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} /></> : <Stack className="preview-empty" alignItems="center" justifyContent="center" textAlign="center" spacing={1.5}><Box className="empty-icon"><Code /></Box><Typography variant="h6" fontWeight={700}>Your preview will appear here</Typography><Typography variant="body2" color="text.secondary" maxWidth={320}>Configure the variables, then generate a complete, syntax-highlighted project.</Typography></Stack>}
               </Paper>
             </Box>
+          </>}
+          {area === "records" && selectedRecord && <>
+            <Stack gap={1} mb={3}>
+              <Box><Chip icon={<MenuBookOutlined />} label={sectionTitles[selectedRecord.section_slug] || "Record"} size="small" variant="outlined" /><Typography component="h1" variant="h4" fontWeight={800} mt={1}>{selectedRecord.title}</Typography></Box>
+              <Typography color="text.secondary" maxWidth={900}>{selectedRecord.description}</Typography>
+              <Stack direction="row" gap={1} flexWrap="wrap">{selectedRecord.tag_slugs.map((tag) => <Chip key={tag} label={tag} size="small" />)}</Stack>
+            </Stack>
+            <Paper className="panel record-panel" elevation={0}>
+              <Stack spacing={2.5}>
+                {selectedRecord.content.map((block, index) => block.role === "list"
+                  ? <Box component="ul" key={index} sx={{ my: 0, pl: 3 }}>{block.content.split("\n").map((line) => <li key={line}><Typography>{line}</Typography></li>)}</Box>
+                  : <Typography key={index} sx={{ whiteSpace: "pre-wrap" }}>{block.content}</Typography>)}
+                {selectedRecord.sources.length > 0 && <><Divider /><Typography variant="overline" fontWeight={800}>Sources</Typography>{selectedRecord.sources.map((source) => <Typography component="a" href={source} target="_blank" rel="noreferrer" key={source} color="primary">{source}</Typography>)}</>}
+              </Stack>
+            </Paper>
           </>}
         </Box>
       </Box>

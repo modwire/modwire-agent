@@ -1,9 +1,0 @@
-from . import domain
-
-
-class {{ repository_name }}:
-    def find(self, name: str) -> domain.{{ model_name }}:
-        return domain.{{ model_name }}(name=name)
-
-
-__all__ = ["{{ repository_name }}"]
