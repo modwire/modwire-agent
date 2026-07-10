@@ -12,6 +12,14 @@ class CommandService:
     def list(self):
         return self.model.objects.select_related("package_manager").order_by("package_manager", "result")
 
+    def upsert(self, *, package_manager, result: str, cmd: str):
+        instance, _ = self.model.objects.update_or_create(
+            package_manager=package_manager,
+            result=result,
+            defaults={"cmd": cmd},
+        )
+        return instance
+
     def get(self, command_id: str):
         return get_object_or_404(self.model, id=command_id)
 

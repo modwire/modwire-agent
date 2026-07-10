@@ -9,6 +9,9 @@ from languages.models.command import Command, CommandResult
 from languages.models.language import Language
 from languages.models.package_manager import PackageManager
 from languages.services.catalog import LanguageCatalogService
+from languages.services.command import CommandService
+from languages.services.language import LanguageService
+from languages.services.package_manager import PackageManagerService
 from scaffoldings.models.scaffolding import Scaffolding
 from scaffoldings.models.template import Template
 from scaffoldings.models.variable import Variable, VariableType
@@ -179,7 +182,12 @@ def test_catalog_sync_does_not_write_when_version_fetch_fails(language, monkeypa
     monkeypatch.setattr(Typescript, "get_current_version", lambda self, timeout: "6.0.0")
 
     with pytest.raises(LanguageVersionError):
-        LanguageCatalogService((Python(), PHP(), Typescript())).sync()
+        LanguageCatalogService(
+            (Python(), PHP(), Typescript()),
+            LanguageService(),
+            PackageManagerService(),
+            CommandService(),
+        ).sync()
 
     assert list(Language.objects.values_list("name", flat=True)) == ["Python"]
 

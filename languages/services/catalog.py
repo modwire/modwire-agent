@@ -6,9 +6,9 @@ from wireup import injectable
 
 from shared.languages.base import LanguageDefinition
 
-from ..models.command import Command
-from ..models.language import Language
-from ..models.package_manager import PackageManager
+from .command import CommandService
+from .language import LanguageService
+from .package_manager import PackageManagerService
 
 
 @dataclass(frozen=True)
@@ -20,8 +20,17 @@ class CatalogSyncResult:
 
 @injectable
 class LanguageCatalogService:
-    def __init__(self, definitions: Sequence[LanguageDefinition]):
+    def __init__(
+        self,
+        definitions: Sequence[LanguageDefinition],
+        languages: LanguageService,
+        package_managers: PackageManagerService,
+        commands: CommandService,
+    ):
         self.definitions = tuple(sorted(definitions, key=lambda definition: definition.name))
+        self.languages = languages
+        self.package_managers = package_managers
+        self.commands = commands
 
     def sync(self, timeout: float = 10) -> CatalogSyncResult:
         if timeout <= 0:
@@ -50,24 +59,21 @@ class LanguageCatalogService:
             ),
         )
 
-    @staticmethod
-    def _sync_language(definition: LanguageDefinition, version: str) -> None:
-        language, _ = Language.objects.update_or_create(
+    def _sync_language(self, definition: LanguageDefinition, version: str) -> None:
+        language = self.languages.upsert(
             name=definition.name,
-            defaults={
-                "executable": definition.executable,
-                "stable_version": version,
-            },
+            executable=definition.executable,
+            stable_version=version,
         )
         for manager_definition in definition.package_managers:
-            manager, _ = PackageManager.objects.update_or_create(
+            manager = self.package_managers.upsert(
                 language=language,
                 name=manager_definition.name,
-                defaults={"executable": manager_definition.executable},
+                executable=manager_definition.executable,
             )
             for result, cmd in manager_definition.commands.items():
-                Command.objects.update_or_create(
+                self.commands.upsert(
                     package_manager=manager,
                     result=result,
-                    defaults={"cmd": cmd},
+                    cmd=cmd,
                 )
