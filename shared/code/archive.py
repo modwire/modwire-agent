@@ -1,5 +1,5 @@
-from pathlib import Path
 from inspect import getfile
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Self
 

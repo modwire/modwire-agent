@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 
+from tokens.auth import API_KEY_HEADER
 from tokens.services.api_key import ApiKeyService
 
 
@@ -9,3 +10,4 @@ class Command(BaseCommand):
     def handle(self, *args, **opts):
         api_key, key = ApiKeyService().generate("api key")
         self.stdout.write(f"key={key}")
+        self.stdout.write(f"header={API_KEY_HEADER}")

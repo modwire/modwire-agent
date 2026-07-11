@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Self
+
 from pydantic import BaseModel, field_validator
 
 

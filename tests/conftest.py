@@ -1,6 +1,6 @@
 import pytest
-from oa.client import AuthenticatedClient
 
+from shared.oa.client import AuthenticatedClient
 from tokens.models.api_key import ApiKey
 
 
