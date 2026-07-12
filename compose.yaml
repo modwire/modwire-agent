@@ -4,6 +4,7 @@ services:
   scaffolding-api:
     build:
       context: .
+    image: modwire-mcp-runtime
     environment:
       ALLOWED_HOSTS: localhost,127.0.0.1,scaffolding-api
       DATABASE_HOST: postgres
@@ -17,9 +18,47 @@ services:
       - "127.0.0.1:${SCAFFOLDING_API_PORT:-8100}:8000"
     networks:
       - records
+      - services
     restart: unless-stopped
+
+  mcp-adapter:
+    build:
+      context: .
+      dockerfile: Dockerfile.adapter
+    depends_on:
+      scaffolding-api:
+        condition: service_healthy
+    environment:
+      MCP_ADAPTER_HOST: 0.0.0.0
+      MCP_ADAPTER_PORT: "8200"
+      MCP_ADAPTER_VERSION: ${MCP_ADAPTER_VERSION:-0.1.0}
+      SCAFFOLDING_API_KEY_FILE: /run/secrets/scaffolding-api-key
+      SCAFFOLDING_API_URL: http://scaffolding-api:8000/api/
+    image: modwire-mcp-adapter
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8200/health', timeout=4).read()"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    ports:
+      - "127.0.0.1:${MCP_ADAPTER_PORT:-8200}:8200"
+    networks:
+      - services
+      - edge
+    secrets:
+      - source: scaffolding-api-key
+        target: scaffolding-api-key
+    restart: unless-stopped
+
+secrets:
+  scaffolding-api-key:
+    file: ${MCP_ADAPTER_API_KEY_FILE:-.dev/secrets/mcp-adapter-api-key}
 
 networks:
   records:
     external: true
     name: modwire-records_default
+  services:
+    internal: true
+  edge: {}
