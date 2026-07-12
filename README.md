@@ -79,6 +79,9 @@ default HTTP port remains `8000`, separate from the container runtime on
 
 ## MCP scaffolding adapter
 
+The deterministic aggregate convergence contract and operational package adoption
+deltas are documented in [docs/scaffolding-convergence.md](docs/scaffolding-convergence.md).
+
 The MCP adapter is a separate stateless service. It discovers the scaffolding
 collection from the Siren API root and executes only actions advertised by the
 canonical scaffold resource. It does not import Django or Modwire CLI modules,

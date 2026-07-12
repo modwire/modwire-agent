@@ -1,0 +1,13 @@
+files:
+  - path: .modwire/boundaries.yaml
+    write_mode: managed
+    sha256: 6334a5f8f0908175cce8bdf19822e80edfb5380f85c0be0de38ba199ed929028
+  - path: .modwire/shape.yaml
+    write_mode: managed
+    sha256: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+  - path: src/modwire/architecture/__init__.py
+    write_mode: create_if_missing
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  - path: src/modwire/shared/__init__.py
+    write_mode: create_if_missing
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

@@ -1,4 +1,3 @@
-/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
 INSTALL := uv sync
 RUN := uv run
 ADD := uv add

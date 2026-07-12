@@ -1,0 +1,84 @@
+identity: brNlYVlASiK8LKLHNCv15A
+name: Modwire Python Repository
+description: Establish the canonical Modwire repository and Python package architecture independently of package-manager scaffolding.
+variables:
+  - name: module_name
+    type: str
+    description: Initial architecture module to create.
+    default_value: ""
+    required: true
+  - name: package_name
+    type: str
+    description: Top-level Python import package owned by this repository.
+    default_value: ""
+    required: true
+templates:
+  - relative_path: .modwire/boundaries.yaml
+    write_mode: managed
+    file_content: |
+      tags:
+        - name: module
+          match: "*"
+
+        - name: shared
+          match: "shared"
+
+        - name: package-api
+          match: "__init__.py"
+
+        - name: module-api
+          match: "*/__init__.py"
+
+        - name: shared-api
+          match: "shared/__init__.py"
+
+        - name: metadata
+          match: "_version.py"
+
+      rules:
+        - source: module
+          disallow:
+            - module
+          allow:
+            - shared-api
+          allow_same_match: true
+
+        - source: shared
+          disallow:
+            - module
+
+        - source: package-api
+          allow:
+            - module-api
+            - metadata
+
+      flow:
+        module_tag: module
+        analyzers:
+          - no-cycles
+  - relative_path: .modwire/shape.yaml
+    write_mode: managed
+    file_content: |
+      {}
+  - relative_path: src/{{ package_name }}/{{ module_name }}/__init__.py
+    write_mode: create_if_missing
+    file_content: ""
+  - relative_path: src/{{ package_name }}/shared/__init__.py
+    write_mode: create_if_missing
+    file_content: ""
+targets:
+  core:
+    package_name: modwire
+    module_name: architecture
+  cli:
+    package_name: modwire_cli
+    module_name: application
+  extraction:
+    package_name: modwire_extraction
+    module_name: code
+  mermaid:
+    package_name: modwire_mermaid
+    module_name: architecture
+  siren:
+    package_name: modwire_siren
+    module_name: client

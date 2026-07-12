@@ -9,12 +9,15 @@ from shared.api.errors import validated
 from shared.api.types import ShortUUID
 
 from ...services.bundle import ScaffoldingBundleService
+from ...services.convergence import ScaffoldingConvergenceService
 from ...services.preview import ScaffoldingPreviewService
 from ...services.preview_errors import PreviewFailed
 from ...services.scaffolding import ScaffoldingService
 from ...services.schema import ScaffoldingSchemaService
 from .schemas import (
     ScaffoldingBundleOut,
+    ScaffoldingConvergenceIn,
+    ScaffoldingConvergenceOut,
     ScaffoldingFormSchemaOut,
     ScaffoldingIn,
     ScaffoldingOut,
@@ -36,6 +39,20 @@ class ScaffoldingController(ControllerBase):
     @inject
     def list(self, service: Annotated[ScaffoldingService, Inject()]):
         return service.list()
+
+    @route.post(
+        "/converge",
+        response=ScaffoldingConvergenceOut,
+        operation_id="converge_scaffolding",
+        summary="Validate or transactionally reconcile a complete scaffolding aggregate.",
+    )
+    @inject
+    def converge(
+        self,
+        data: ScaffoldingConvergenceIn,
+        service: Annotated[ScaffoldingConvergenceService, Inject()],
+    ):
+        return validated(service.converge, **data.model_dump())
 
     @route.get(
         "/{scaffolding_id}",

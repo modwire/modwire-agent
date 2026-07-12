@@ -22,6 +22,45 @@ class ScaffoldingPatchIn(StrictSchema):
     description: str = Field(default_factory=lambda: PydanticUndefined)
 
 
+class ScaffoldingConvergenceVariableIn(StrictSchema):
+    name: str
+    type: Literal["str", "int", "float", "bool", "list", "dict"]
+    description: str
+    default_value: JsonValue
+    required: bool = False
+
+
+class ScaffoldingConvergenceTemplateIn(StrictSchema):
+    relative_path: str
+    file_content: str
+    write_mode: Template.WriteMode = Template.WriteMode.MANAGED
+
+
+class ScaffoldingConvergenceIn(ScaffoldingIn):
+    variables: list[ScaffoldingConvergenceVariableIn]
+    templates: list[ScaffoldingConvergenceTemplateIn]
+    dry_run: bool = True
+
+
+class ConvergenceChangesOut(Schema):
+    create: list[str]
+    update: list[str]
+    delete: list[str]
+
+
+class ConvergencePlanOut(Schema):
+    scaffolding: Literal["create", "update", "unchanged"]
+    variables: ConvergenceChangesOut
+    templates: ConvergenceChangesOut
+
+
+class ScaffoldingConvergenceOut(Schema):
+    name: str
+    dry_run: bool
+    changed: bool
+    plan: ConvergencePlanOut
+
+
 class ScaffoldingOut(ModelSchema):
     id: ShortUUID
     language: ShortUUID
