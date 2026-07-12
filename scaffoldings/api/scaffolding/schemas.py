@@ -8,6 +8,7 @@ from shared.api.schema import StrictSchema
 from shared.api.types import ShortUUID
 
 from ...models.scaffolding import Scaffolding
+from ...models.template import Template
 
 
 class ScaffoldingIn(StrictSchema):
@@ -51,6 +52,7 @@ class PreviewFileOut(Schema):
     source: str
     html: str
     language: str
+    write_mode: Template.WriteMode
 
 
 class ScaffoldingPreviewOut(Schema):
@@ -101,8 +103,10 @@ class ScaffoldingBundleVariableOut(Schema):
 
 
 class ScaffoldingBundleTemplateOut(Schema):
+    id: ShortUUID
     relative_path: str
     file_content: str
+    write_mode: Template.WriteMode
 
 
 class ScaffoldingBundleOut(Schema):

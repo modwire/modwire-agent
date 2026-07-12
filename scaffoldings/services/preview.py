@@ -65,6 +65,7 @@ class ScaffoldingPreviewService:
                     "source": rendered_source,
                     "html": html,
                     "language": language,
+                    "write_mode": template.write_mode,
                 }
             )
         return {"files": sorted(rendered, key=lambda item: item["path"])}

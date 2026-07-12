@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, JsonValue
 from .siren import AdapterError, SirenNavigator
 
 ScaffoldingId = Annotated[str, Field(pattern=r"^[A-Za-z0-9_-]{22}$")]
+WriteMode = Literal["managed", "create_if_missing"]
 
 
 class AdapterModel(BaseModel):
@@ -50,8 +51,10 @@ class BundleVariable(AdapterModel):
 
 
 class BundleTemplate(AdapterModel):
+    id: ScaffoldingId
     relative_path: str
     file_content: str
+    write_mode: WriteMode
 
 
 class ScaffoldingBundle(AdapterModel):
@@ -59,6 +62,57 @@ class ScaffoldingBundle(AdapterModel):
     name: str
     variables: list[BundleVariable]
     templates: list[BundleTemplate]
+
+
+class ScaffoldingUpdate(AdapterModel):
+    name: str
+    description: str
+
+
+class ScaffoldingCreate(ScaffoldingUpdate):
+    language_id: ScaffoldingId
+
+
+class TemplateCreate(AdapterModel):
+    scaffolding_id: ScaffoldingId
+    relative_path: str
+    file_content: str
+    write_mode: WriteMode = "managed"
+
+
+class TemplateUpdate(AdapterModel):
+    scaffolding_id: ScaffoldingId
+    template_id: ScaffoldingId
+    relative_path: str
+    file_content: str
+    write_mode: WriteMode
+
+
+class UpdatedTemplate(AdapterModel):
+    id: ScaffoldingId
+    scaffolding: ScaffoldingId
+    relative_path: str
+    file_content: str
+    write_mode: WriteMode
+
+
+class VariableCreate(AdapterModel):
+    scaffolding_id: ScaffoldingId
+    name: str
+    type: Literal["str", "int", "float", "bool", "list", "dict"]
+    description: str
+    default_value: JsonValue
+    required: bool = False
+
+
+class CreatedVariable(AdapterModel):
+    id: ScaffoldingId
+    scaffolding: ScaffoldingId
+    name: str
+    type: Literal["str", "int", "float", "bool", "list", "dict"]
+    description: str
+    default_value: JsonValue
+    required: bool
 
 
 class TemplateOverride(AdapterModel):
@@ -73,6 +127,7 @@ class PreviewFile(AdapterModel):
     source: str
     html: str
     language: str
+    write_mode: WriteMode
 
 
 class ScaffoldingPreview(AdapterModel):
@@ -85,6 +140,8 @@ class ScaffoldingCapabilities:
         "get_scaffolding_schema",
         "get_scaffolding_bundle",
         "preview_scaffolding",
+        "update_scaffolding",
+        "update_scaffolding_template",
     )
 
     def __init__(
@@ -136,6 +193,72 @@ class ScaffoldingCapabilities:
         )
         return ScaffoldingPreview.model_validate(document.get("properties", {}))
 
+    async def update(
+        self,
+        scaffolding_id: ScaffoldingId,
+        update: ScaffoldingUpdate,
+    ) -> ScaffoldingSummary:
+        async with self._navigator() as navigator:
+            collection = await self._collection(navigator)
+            item = await self._item(navigator, collection, scaffolding_id)
+            properties = item.get("properties", {})
+            if not isinstance(properties, dict) or not isinstance(properties.get("language"), str):
+                raise AdapterError({"kind": "invalid-siren-contract", "detail": "Scaffolding language is missing."})
+            document = await navigator.execute(
+                item,
+                "update_scaffolding",
+                {"language_id": properties["language"], **update.model_dump()},
+            )
+        return ScaffoldingSummary.model_validate(document.get("properties", {}))
+
+    async def create(self, create: ScaffoldingCreate) -> ScaffoldingSummary:
+        document = await self._create("scaffoldings", "create_scaffolding", create.model_dump())
+        return ScaffoldingSummary.model_validate(document.get("properties", {}))
+
+    async def create_template(self, create: TemplateCreate) -> UpdatedTemplate:
+        document = await self._create("templates", "create_template", create.model_dump())
+        return UpdatedTemplate.model_validate(document.get("properties", {}))
+
+    async def create_variable(self, create: VariableCreate) -> CreatedVariable:
+        document = await self._create("variables", "create_variable", create.model_dump())
+        return CreatedVariable.model_validate(document.get("properties", {}))
+
+    async def update_template(self, update: TemplateUpdate) -> UpdatedTemplate:
+        async with self._navigator() as navigator:
+            collection = await navigator.follow(await navigator.root(), "templates")
+            item = await self._collection_item(navigator, collection, update.template_id)
+            properties = item.get("properties", {})
+            if not isinstance(properties, dict) or properties.get("scaffolding") != update.scaffolding_id:
+                raise AdapterError(
+                    {
+                        "kind": "template-scaffolding-mismatch",
+                        "detail": "The template does not belong to the requested scaffolding.",
+                        "scaffolding_id": update.scaffolding_id,
+                        "template_id": update.template_id,
+                    }
+                )
+            document = await navigator.execute(
+                item,
+                "update_template",
+                {
+                    "scaffolding_id": update.scaffolding_id,
+                    "relative_path": update.relative_path,
+                    "file_content": update.file_content,
+                    "write_mode": update.write_mode,
+                },
+            )
+        return UpdatedTemplate.model_validate(document.get("properties", {}))
+
+    async def _create(
+        self,
+        relation: str,
+        action_name: str,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        async with self._navigator() as navigator:
+            collection = await navigator.follow(await navigator.root(), relation)
+            return await navigator.execute(collection, action_name, payload)
+
     async def advertised_capabilities(self) -> list[str]:
         async with self._navigator() as navigator:
             collection = await self._collection(navigator)
@@ -148,10 +271,7 @@ class ScaffoldingCapabilities:
             return ["list_scaffoldings"] + [
                 action_name
                 for action_name in self.action_names[1:]
-                if any(
-                    isinstance(action, dict) and action.get("name") == action_name
-                    for action in advertised
-                )
+                if any(isinstance(action, dict) and action.get("name") == action_name for action in advertised)
             ]
 
     async def _execute(
@@ -185,6 +305,26 @@ class ScaffoldingCapabilities:
                 "kind": "scaffolding-not-advertised",
                 "detail": f"Scaffolding '{scaffolding_id}' is not in the advertised collection.",
                 "scaffolding_id": scaffolding_id,
+            }
+        )
+
+    async def _collection_item(
+        self,
+        navigator: SirenNavigator,
+        collection: dict[str, Any],
+        item_id: str,
+    ) -> dict[str, Any]:
+        entities = collection.get("entities", [])
+        if not isinstance(entities, list):
+            raise AdapterError({"kind": "invalid-siren-contract", "detail": "Entities are not a list"})
+        for entity in entities:
+            if isinstance(entity, dict) and self._entity_id(entity) == item_id:
+                return await navigator.follow(entity, "self")
+        raise AdapterError(
+            {
+                "kind": "template-not-advertised",
+                "detail": f"Template '{item_id}' is not in the advertised collection.",
+                "template_id": item_id,
             }
         )
 
