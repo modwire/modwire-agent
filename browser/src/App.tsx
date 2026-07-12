@@ -5,6 +5,7 @@ import {
   Code,
   ContentCopy,
   DeleteOutline,
+  DescriptionOutlined,
   FolderOutlined,
   Key,
   Logout,
@@ -54,6 +55,7 @@ type SchemaProperty = {
 };
 type FormSchema = { properties: Record<string, SchemaProperty>; required: string[] };
 type PreviewFile = { template_id: string; path: string; source: string; html: string; language: string };
+type TemplateSource = { id: string; scaffolding: string; relative_path: string; file_content: string; write_mode: string };
 
 const API_URL = (import.meta.env.VITE_API_URL || "/api/").replace(/\/?$/, "/");
 
@@ -89,6 +91,10 @@ function readRecords(document: SirenEntity): RecordSummary[] {
     ...(entity.properties as unknown as Omit<RecordSummary, "href">),
     href: link(entity, "self").href,
   }));
+}
+
+function readTemplates(document: SirenEntity): TemplateSource[] {
+  return (document.entities || []).map((entity) => entity.properties as unknown as TemplateSource);
 }
 
 function link(document: SirenEntity, relation: string): SirenLink {
@@ -193,6 +199,54 @@ function MermaidPreview({ source }: { source: string }) {
   return <Box className="mermaid-view" dangerouslySetInnerHTML={{ __html: svg }} />;
 }
 
+type TreeNode = { name: string; path: string; fileIndex?: number; children: TreeNode[] };
+
+function fileTree(files: PreviewFile[]): TreeNode[] {
+  const root: TreeNode[] = [];
+  files.forEach((file, fileIndex) => {
+    let level = root;
+    let currentPath = "";
+    file.path.split("/").forEach((name, index, parts) => {
+      currentPath = currentPath ? `${currentPath}/${name}` : name;
+      let node = level.find((item) => item.name === name);
+      if (!node) {
+        node = { name, path: currentPath, children: [] };
+        level.push(node);
+      }
+      if (index === parts.length - 1) node.fileIndex = fileIndex;
+      level = node.children;
+    });
+  });
+  const sort = (nodes: TreeNode[]) => nodes.sort((a, b) => {
+    const aFolder = a.fileIndex === undefined;
+    const bFolder = b.fileIndex === undefined;
+    return aFolder === bFolder ? a.name.localeCompare(b.name) : aFolder ? -1 : 1;
+  }).forEach((node) => sort(node.children));
+  sort(root);
+  return root;
+}
+
+function FileTree({ files, activeFile, onSelect }: { files: PreviewFile[]; activeFile: number; onSelect: (index: number) => void }) {
+  const nodes = useMemo(() => fileTree(files), [files]);
+  const render = (items: TreeNode[], depth = 0): React.ReactNode => items.map((node) => {
+    const folder = node.fileIndex === undefined;
+    return <Box key={node.path}>
+      <button
+        className="tree-row"
+        data-selected={!folder && node.fileIndex === activeFile}
+        disabled={folder}
+        style={{ paddingLeft: 12 + depth * 16 }}
+        onClick={() => node.fileIndex !== undefined && onSelect(node.fileIndex)}
+      >
+        {folder ? <FolderOutlined fontSize="inherit" /> : <DescriptionOutlined fontSize="inherit" />}
+        <span>{node.name}</span>
+      </button>
+      {node.children.length > 0 && render(node.children, depth + 1)}
+    </Box>;
+  });
+  return <Box className="file-tree" aria-label="Rendered files">{render(nodes)}</Box>;
+}
+
 function Field({ name, property, required, value, onChange }: {
   name: string;
   property: SchemaProperty;
@@ -252,7 +306,10 @@ export function App() {
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [files, setFiles] = useState<PreviewFile[]>([]);
+  const [templates, setTemplates] = useState<TemplateSource[]>([]);
   const [activeFile, setActiveFile] = useState(0);
+  const [activeTemplate, setActiveTemplate] = useState(0);
+  const [mode, setMode] = useState<"build" | "preview">("preview");
   const [showMermaidSource, setShowMermaidSource] = useState(false);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -289,6 +346,7 @@ export function App() {
       setScaffoldingCollection(nextScaffoldingCollection);
       setVariableCollection(nextVariableCollection);
       setTemplateCollection(nextTemplateCollection);
+      setTemplates(readTemplates(nextTemplateCollection));
       const languageItems = (languageCollection.entities || []).map((entity) => entity.properties as unknown as Language);
       setLanguages(languageItems);
       setNewScaffolding((current) => ({ ...current, language_id: current.language_id || languageItems[0]?.id || "" }));
@@ -318,6 +376,7 @@ export function App() {
       .catch((reason) => setError(messageFrom(reason)))
       .finally(() => setLoading(false));
   }, [area, selectedId, apiKey, scaffoldings]);
+  useEffect(() => { setActiveTemplate(0); }, [selectedId]);
   useEffect(() => {
     if (area !== "records" || !selectedRecordSlug || !apiKey) { setSelectedRecord(null); return; }
     const item = records.find((candidate) => candidate.slug === selectedRecordSlug);
@@ -349,6 +408,9 @@ export function App() {
     } catch (reason) { setError(messageFrom(reason)); }
     finally { setPreviewing(false); }
   }
+
+  const selectedTemplates = templates.filter((template) => template.scaffolding === selectedId);
+  const selectedTemplate = selectedTemplates[activeTemplate];
 
   async function createScaffolding() {
     if (!scaffoldingCollection || !templateCollection) return;
@@ -433,16 +495,23 @@ export function App() {
           {error && <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>{error}</Alert>}
           {loading && area === "scaffoldings" && !selected && <Stack alignItems="center" py={12}><CircularProgress /></Stack>}
           {area === "scaffoldings" && selected && <>
-            <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2} mb={3}>
+            <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2} mb={2}>
               <Box><Chip icon={<FolderOutlined />} label="Scaffolding" size="small" variant="outlined" /><Typography component="h1" variant="h5" fontWeight={800} mt={1}>{selected.name}</Typography></Box>
-              <Button variant="contained" disabled={previewing || loading} onClick={() => void preview()} startIcon={previewing ? <CircularProgress size={18} color="inherit" /> : <Code />}>{previewing ? "Rendering…" : "Preview"}</Button>
+              <Tabs value={mode} onChange={(_, value) => setMode(value)} aria-label="Scaffolding mode"><Tab value="preview" label="Preview" /><Tab value="build" label="Build" /></Tabs>
             </Stack>
-            <Box className="content-grid">
-              <Paper className="panel form-panel" elevation={0}><Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}><Stack direction="row" spacing={1} alignItems="center"><Tune color="primary" fontSize="small" /><Typography variant="subtitle1" fontWeight={750}>Variables</Typography></Stack><Button size="small" startIcon={<Add />} onClick={() => setNewVariableOpen(true)}>Add</Button></Stack><Stack spacing={2}>{schema && Object.entries(schema.properties).map(([name, property]) => <Field key={name} name={name} property={property} required={schema.required.includes(name)} value={values[name]} onChange={(value) => setValues((current) => ({ ...current, [name]: value }))} />)}</Stack></Paper>
-              <Paper className="panel preview-panel" elevation={0}>
-                {files.length ? <><Box className="preview-toolbar"><label className="file-select"><span>File</span><select aria-label="Preview file" value={activeFile} onChange={(event) => { setActiveFile(Number(event.target.value)); setShowMermaidSource(false); }}>{files.map((file, index) => <option value={index} key={file.path}>{file.path}</option>)}</select></label><Stack direction="row" spacing={0.5}>{files[activeFile].path.endsWith(".mermaid") && <Button size="small" onClick={() => setShowMermaidSource((current) => !current)}>{showMermaidSource ? "Diagram" : "Source"}</Button>}<Tooltip title="Copy source"><IconButton onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Stack></Box><Divider />{files[activeFile].path.endsWith(".mermaid") && !showMermaidSource ? <MermaidPreview source={files[activeFile].source} /> : <Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} />}</> : <Box className="preview-empty"><Code fontSize="small" /></Box>}
+            {mode === "preview" ? <Box className="browser-grid">
+              <Paper component="aside" className="panel tree-panel" elevation={0}>
+                <Box className="panel-heading"><Typography variant="subtitle2">Files</Typography><Typography variant="caption" color="text.secondary">{files.length}</Typography></Box>
+                {files.length ? <FileTree files={files} activeFile={activeFile} onSelect={(index) => { setActiveFile(index); setShowMermaidSource(false); }} /> : <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>Render the scaffolding to browse its files.</Typography>}
               </Paper>
-            </Box>
+              <Paper className="panel preview-panel" elevation={0}>
+                {files.length ? <><Box className="preview-toolbar"><Typography variant="body2" fontWeight={650} noWrap>{files[activeFile].path}</Typography><Stack direction="row" spacing={0.5}>{files[activeFile].path.endsWith(".mermaid") && <Button size="small" onClick={() => setShowMermaidSource((current) => !current)}>{showMermaidSource ? "Diagram" : "Source"}</Button>}<Tooltip title="Copy source"><IconButton aria-label="Copy source" onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Stack></Box><Divider />{files[activeFile].path.endsWith(".mermaid") && !showMermaidSource ? <MermaidPreview source={files[activeFile].source} /> : <Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} />}</> : <Box className="preview-empty"><Button variant="contained" disabled={previewing || loading} onClick={() => void preview()}>{previewing ? "Rendering…" : "Render preview"}</Button></Box>}
+              </Paper>
+            </Box> : <Box className="content-grid">
+              <Paper className="panel form-panel" elevation={0}><Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}><Typography variant="subtitle1" fontWeight={700}>Variables</Typography><Button size="small" startIcon={<Add />} onClick={() => setNewVariableOpen(true)}>Add</Button></Stack><Stack spacing={2}>{schema && Object.entries(schema.properties).map(([name, property]) => <Field key={name} name={name} property={property} required={schema.required.includes(name)} value={values[name]} onChange={(value) => setValues((current) => ({ ...current, [name]: value }))} />)}</Stack></Paper>
+              <Paper className="panel template-panel" elevation={0}>{selectedTemplate ? <><Box className="preview-toolbar"><label className="file-select"><span>Template</span><select aria-label="Template file" value={activeTemplate} onChange={(event) => setActiveTemplate(Number(event.target.value))}>{selectedTemplates.map((template, index) => <option value={index} key={template.id}>{template.relative_path}</option>)}</select></label></Box><Divider /><Box component="pre" className="template-view">{selectedTemplate.file_content}</Box></> : <Box className="preview-empty"><Typography variant="body2" color="text.secondary">No templates in this scaffolding.</Typography></Box>}</Paper>
+            </Box>}
+            {mode === "preview" && files.length > 0 && <Button className="render-again" size="small" disabled={previewing || loading} onClick={() => void preview()}>{previewing ? "Rendering…" : "Render again"}</Button>}
           </>}
           {area === "records" && selectedRecord && <>
             <Stack gap={1} mb={3}>

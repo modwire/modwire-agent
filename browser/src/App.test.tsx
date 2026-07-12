@@ -47,9 +47,8 @@ describe("App", () => {
       .mockResolvedValueOnce(new Response(JSON.stringify({ properties: { files: [{ template_id: "1", path: "src/main.tsx", source: "hello", html: "<pre>hello</pre>", language: "tsx" }] } }), { status: 200 }));
     render(<App />);
     expect(await screen.findByRole("heading", { name: "React app" })).toBeInTheDocument();
-    expect(await screen.findByLabelText(/Project name/)).toHaveValue("demo");
-    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
-    expect(await screen.findByRole("combobox", { name: "Preview file" })).toHaveValue("0");
+    fireEvent.click(await screen.findByRole("button", { name: "Render preview" }));
+    expect(await screen.findByRole("button", { name: "main.tsx" })).toBeInTheDocument();
     await waitFor(() => expect(fetch).toHaveBeenLastCalledWith(expect.objectContaining({ href: "http://api.test/render/react" }), expect.objectContaining({ method: "POST" })));
   });
 
@@ -92,6 +91,7 @@ describe("App", () => {
       return new Response(JSON.stringify(body), { status: 200 });
     });
     render(<App />);
+    fireEvent.click(await screen.findByRole("tab", { name: "Build" }));
     expect(await screen.findByLabelText("Id")).toHaveValue("input");
     expect(screen.getByLabelText("Label")).toHaveValue("Input");
     fireEvent.click(screen.getByRole("button", { name: "New scaffolding" }));
