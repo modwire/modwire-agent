@@ -98,7 +98,14 @@ def test_openapi_exposes_strict_objects_and_all_finite_options():
     ]
     assert components["ContentBlock"]["allOf"][0]["if"]["properties"]["role"]["const"] == Content.Role.LIST
     assert components["ContentBlock"]["properties"]["language"]["minLength"] == 1
-    assert set(components["ContentMetadata"]["properties"]) == {"source", "source_url", "alt", "title"}
+    assert set(components["ContentMetadata"]["properties"]) == {
+        "source",
+        "source_url",
+        "alt",
+        "title",
+        "format",
+        "accepted_on",
+    }
 
 
 def test_content_blocks_enforce_role_specific_content_shapes():
@@ -127,6 +134,15 @@ def test_content_blocks_enforce_role_specific_content_shapes():
         }
     )
     assert resource.content == ["One", "Two"]
+    accepted = adapter.validate_python(
+        {
+            "role": Content.Role.PARAGRAPH,
+            "content": "Accepted governance",
+            "language": "en",
+            "metadata": {"source": "owner-directive", "accepted_on": "2026-07-12"},
+        }
+    )
+    assert accepted.metadata.accepted_on == "2026-07-12"
 
 
 def test_persistence_contract_rejects_role_content_mismatches():
@@ -212,3 +228,16 @@ def test_browser_content_roles_are_generated_from_the_model_enum():
     generated = root / "browser/src/models/recordContent.generated.ts"
 
     assert generated.read_text() == generator["render"]()
+
+
+def test_public_json_schemas_are_generated_with_github_ids():
+    root = Path(__file__).resolve().parents[1]
+    generator = runpy.run_path(str(root / "scripts/generate-json-schemas.py"))
+
+    for name, expected in generator["render"]().items():
+        schema = json.loads(expected)
+        assert schema["$id"] == (
+            f"https://raw.githubusercontent.com/modwire/modwire-mcp/main/schemas/{name}"
+        )
+        assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+        assert (root / "schemas" / name).read_text() == expected

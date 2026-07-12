@@ -3,17 +3,41 @@ from pydantic import ConfigDict, Field, model_validator
 from records.models.content import Content
 from shared.api.schema import StrictSchema
 
+SCHEMA_ROOT = "https://raw.githubusercontent.com/modwire/modwire-mcp/main/schemas"
+SCHEMA_IDS = {
+    "ContentBlock": f"{SCHEMA_ROOT}/content-block.schema.json",
+    "ContentIn": f"{SCHEMA_ROOT}/content-in.schema.json",
+    "ContentOut": f"{SCHEMA_ROOT}/content-out.schema.json",
+}
+
 
 class ContentMetadata(StrictSchema):
     """Supported provenance, accessibility, and presentation metadata."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "$id": f"{SCHEMA_ROOT}/content-metadata.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+        },
+    )
 
     source: str = Field(default="", description="Name of the system that supplied the block.")
     source_url: str = Field(default="", description="Canonical URL from which the block was collected.")
     alt: str = Field(default="", description="Accessible alternative text for image content.")
     title: str = Field(default="", description="Optional image title or caption.")
+    format: str = Field(default="", description="Source-specific content format when one is known.")
+    accepted_on: str = Field(
+        default="",
+        pattern=r"^$|^\d{4}-\d{2}-\d{2}$",
+        description="Owner acceptance date in ISO 8601 calendar-date form when applicable.",
+    )
 
 
 def _content_contract_schema(schema: dict) -> None:
+    if schema_id := SCHEMA_IDS.get(schema.get("title", "")):
+        schema["$id"] = schema_id
+        schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     list_role = Content.Role.LIST.value
     schema["allOf"] = [
         {

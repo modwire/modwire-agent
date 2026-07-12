@@ -1,7 +1,7 @@
-from pydantic import Field
+from pydantic import ConfigDict, Field
 from pydantic_core import PydanticUndefined
 
-from records.api.schemas.content import ContentBlock, ContentMetadata
+from records.api.schemas.content import SCHEMA_ROOT, ContentBlock, ContentMetadata
 from records.models.content import Content
 from shared.api.schema import StrictSchema
 from shared.api.types import RecordSlug
@@ -13,6 +13,14 @@ class ContentIn(ContentBlock):
 
 
 class ContentPatchIn(StrictSchema):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "$id": f"{SCHEMA_ROOT}/content-patch-in.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+        },
+    )
+
     position: int = Field(default_factory=lambda: PydanticUndefined, ge=0)
     role: Content.Role = Field(
         default_factory=lambda: PydanticUndefined,

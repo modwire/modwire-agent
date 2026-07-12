@@ -6,7 +6,7 @@ OA_SCHEMA ?= .dev/openapi.json
 MODWIRE_REPORT ?= .dev/modwire-health.json
 PORT ?= 8000
 
-.PHONY: init dev m mm mz oa browser-content-roles add remove modwire gen runtime-config runtime-up runtime-build-up runtime-down runtime-db-prepare runtime-db-migrate mcp-up mcp-build-up mcp-health mcp-check mcp-install mcp-diagnose mcp-uninstall
+.PHONY: init dev m mm mz oa schemas browser-content-roles add remove modwire gen runtime-config runtime-up runtime-build-up runtime-down runtime-db-prepare runtime-db-migrate mcp-up mcp-build-up mcp-health mcp-check mcp-install mcp-diagnose mcp-uninstall
 
 init:
 	mkdir -p .dev shared
@@ -38,6 +38,10 @@ oa:
 	rm -rf shared/oa
 	$(RUN) openapi-python-client generate --path $(OA_SCHEMA) --config openapi-python-client.yml --output-path shared/oa --overwrite --meta none
 	$(RUN) python scripts/generate-browser-content-roles.py
+	$(RUN) python scripts/generate-json-schemas.py
+
+schemas:
+	$(RUN) python scripts/generate-json-schemas.py
 
 browser-content-roles:
 	$(RUN) python scripts/generate-browser-content-roles.py

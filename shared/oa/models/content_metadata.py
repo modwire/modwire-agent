@@ -19,12 +19,16 @@ class ContentMetadata:
         source_url (str | Unset): Canonical URL from which the block was collected. Default: ''.
         alt (str | Unset): Accessible alternative text for image content. Default: ''.
         title (str | Unset): Optional image title or caption. Default: ''.
+        format_ (str | Unset): Source-specific content format when one is known. Default: ''.
+        accepted_on (str | Unset): Owner acceptance date in ISO 8601 calendar-date form when applicable. Default: ''.
     """
 
     source: str | Unset = ""
     source_url: str | Unset = ""
     alt: str | Unset = ""
     title: str | Unset = ""
+    format_: str | Unset = ""
+    accepted_on: str | Unset = ""
 
     def to_dict(self) -> dict[str, Any]:
         source = self.source
@@ -34,6 +38,10 @@ class ContentMetadata:
         alt = self.alt
 
         title = self.title
+
+        format_ = self.format_
+
+        accepted_on = self.accepted_on
 
         field_dict: dict[str, Any] = {}
 
@@ -46,6 +54,10 @@ class ContentMetadata:
             field_dict["alt"] = alt
         if title is not UNSET:
             field_dict["title"] = title
+        if format_ is not UNSET:
+            field_dict["format"] = format_
+        if accepted_on is not UNSET:
+            field_dict["accepted_on"] = accepted_on
 
         return field_dict
 
@@ -60,11 +72,17 @@ class ContentMetadata:
 
         title = d.pop("title", UNSET)
 
+        format_ = d.pop("format", UNSET)
+
+        accepted_on = d.pop("accepted_on", UNSET)
+
         content_metadata = cls(
             source=source,
             source_url=source_url,
             alt=alt,
             title=title,
+            format_=format_,
+            accepted_on=accepted_on,
         )
 
         return content_metadata
