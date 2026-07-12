@@ -12,6 +12,8 @@ def test_patch_fields_are_omittable_but_not_nullable():
     assert TemplatePatchIn().model_dump(exclude_unset=True, warnings=False) == {}
     with pytest.raises(ValidationError):
         TemplatePatchIn(relative_path=None)
+    with pytest.raises(ValidationError):
+        TemplatePatchIn(write_mode="overwrite")
 
 
 def test_request_objects_reject_unknown_fields_and_enum_values():
@@ -39,6 +41,10 @@ def test_openapi_exposes_strict_objects_and_all_finite_options():
     assert '"type": "null"' not in serialized
     assert '"additionalProperties": true' not in serialized
     assert components["VariableType"]["enum"] == ["str", "int", "float", "bool", "list", "dict"]
+    assert components["WriteMode"]["enum"] == [
+        "managed",
+        "create_if_missing",
+    ]
     assert components["CommandResult"]["enum"] == [
         "init",
         "install",

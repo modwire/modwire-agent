@@ -78,6 +78,11 @@ typed tools:
 - `get_scaffolding_schema`
 - `get_scaffolding_bundle`
 - `preview_scaffolding`
+- `update_scaffolding`
+- `update_scaffolding_template`
+- `create_scaffolding`
+- `create_scaffolding_variable`
+- `create_scaffolding_template`
 
 The `services` Docker network is internal. `mcp-adapter` uses it to reach the
 API and joins a separate edge bridge for its loopback-published MCP port.
