@@ -23,6 +23,7 @@ class TemplatePatchIn(StrictSchema):
 class TemplateOut(ModelSchema):
     id: ShortUUID
     scaffolding: ShortUUID
+    file_content: str
 
     @staticmethod
     def resolve_scaffolding(obj):

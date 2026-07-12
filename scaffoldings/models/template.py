@@ -12,7 +12,7 @@ class Template(ShortUUIDModel):
 
     scaffolding = models.ForeignKey(Scaffolding, on_delete=models.CASCADE, related_name="templates")
     relative_path = models.CharField(max_length=255)
-    file_content = models.TextField()
+    file_content = models.TextField(blank=True)
     write_mode = models.CharField(
         max_length=20,
         choices=WriteMode.choices,
