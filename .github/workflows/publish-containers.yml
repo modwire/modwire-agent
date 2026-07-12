@@ -59,7 +59,7 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.image }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=min,scope=${{ matrix.image }},timeout=2m,ignore-error=true
           provenance: mode=max
           sbom: true
 

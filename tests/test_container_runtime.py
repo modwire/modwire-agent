@@ -83,6 +83,9 @@ def test_release_publishes_both_images_for_intel_and_arm_hosts():
     assert build["with"]["platforms"] == "linux/amd64,linux/arm64"
     assert build["with"]["push"] == "true"
     assert build["with"]["sbom"] == "true"
+    assert build["with"]["cache-to"] == (
+        "type=gha,mode=min,scope=${{ matrix.image }},timeout=2m,ignore-error=true"
+    )
     assert build["with"]["build-args"] == (
         "MODWIRE_MCP_VERSION=${{ steps.metadata.outputs.version }}"
     )
@@ -117,6 +120,16 @@ def test_adapter_image_contains_only_the_adapter_source():
     assert "--only-group mcp-adapter" in dockerfile
     assert "COPY mcp_adapter ./mcp_adapter" in dockerfile
     assert "COPY . ." not in dockerfile
+
+
+def test_build_caches_are_kept_outside_both_runtime_copy_roots():
+    api_dockerfile = (ROOT / "Dockerfile").read_text()
+    adapter_dockerfile = (ROOT / "Dockerfile.adapter").read_text()
+
+    assert "UV_CACHE_DIR=/tmp/uv-cache" in api_dockerfile
+    assert "UV_CACHE_DIR=/tmp/uv-cache" in adapter_dockerfile
+    assert "COPY --from=builder /app /app" in api_dockerfile
+    assert "COPY --from=builder /app /app" in adapter_dockerfile
 
 
 def test_release_version_is_embedded_in_both_runtime_images():
