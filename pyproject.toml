@@ -28,10 +28,14 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    { include-group = "mcp-adapter" },
     "openapi-python-client",
     "pytest",
     "pytest-django",
     "ruff",
+]
+mcp-adapter = [
+    "mcp>=1.28.1",
 ]
 
 [tool.uv]

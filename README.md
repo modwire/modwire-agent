@@ -50,6 +50,40 @@ the host-side PostgreSQL port) with the original `uv run` commands above. Its
 default HTTP port remains `8000`, separate from the container runtime on
 `8100`.
 
+## MCP scaffolding adapter
+
+The MCP adapter is a separate stateless service. It discovers the scaffolding
+collection from the Siren API root and executes only actions advertised by the
+canonical scaffold resource. It does not import Django or Modwire CLI modules,
+mount a workspace, connect to PostgreSQL, or construct scaffolding routes.
+Its image uses a separate dependency group and contains neither the Django
+application nor its database dependencies.
+
+Place a dedicated API key in the ignored file configured by
+`MCP_ADAPTER_API_KEY_FILE` (the default is
+`.dev/secrets/mcp-adapter-api-key`), then start both isolated services:
+
+```sh
+make mcp-up
+make mcp-health
+make mcp-check
+```
+
+The Streamable HTTP endpoint is `http://127.0.0.1:8200/mcp`. The health
+endpoint reports the adapter version, API reachability, and the Siren actions
+currently advertised without returning the API key. The adapter exposes four
+typed tools:
+
+- `list_scaffoldings`
+- `get_scaffolding_schema`
+- `get_scaffolding_bundle`
+- `preview_scaffolding`
+
+The `services` Docker network is internal. `mcp-adapter` uses it to reach the
+API and joins a separate edge bridge for its loopback-published MCP port.
+`scaffolding-api` alone bridges the internal service network to the external
+PostgreSQL network, so the adapter has no database route.
+
 ## Hypermedia API browser
 
 The authenticated API entry point is `GET /api/`. Successful API responses use
