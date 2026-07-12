@@ -1,4 +1,3 @@
-/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
 from pathlib import Path
 
 import yaml
@@ -84,6 +83,9 @@ def test_release_publishes_both_images_for_intel_and_arm_hosts():
     assert build["with"]["platforms"] == "linux/amd64,linux/arm64"
     assert build["with"]["push"] == "true"
     assert build["with"]["sbom"] == "true"
+    assert build["with"]["build-args"] == (
+        "MODWIRE_MCP_VERSION=${{ steps.metadata.outputs.version }}"
+    )
     metadata = next(
         step
         for step in publish["steps"]
@@ -92,12 +94,39 @@ def test_release_publishes_both_images_for_intel_and_arm_hosts():
     assert "value=${{ github.event.release.tag_name }}" in metadata["with"]["tags"]
 
 
+def test_release_deploys_the_latest_runtime_after_every_image_is_published():
+    workflow = yaml.load(
+        (ROOT / ".github" / "workflows" / "publish-containers.yml").read_text(),
+        Loader=yaml.BaseLoader,
+    )
+    deploy = workflow["jobs"]["deploy-scaffolding-api"]
+
+    assert deploy["needs"] == "publish"
+    assert deploy["if"] == "${{ !github.event.release.prerelease }}"
+    notify = deploy["steps"][0]
+    assert notify["env"] == {
+        "COOLIFY_DEPLOY_TOKEN": "${{ secrets.COOLIFY_DEPLOY_TOKEN }}",
+        "COOLIFY_DEPLOY_URL": "${{ secrets.COOLIFY_DEPLOY_URL }}",
+    }
+    assert "curl --fail-with-body --retry 3" in notify["run"]
+
+
 def test_adapter_image_contains_only_the_adapter_source():
     dockerfile = (ROOT / "Dockerfile.adapter").read_text()
 
     assert "--only-group mcp-adapter" in dockerfile
     assert "COPY mcp_adapter ./mcp_adapter" in dockerfile
     assert "COPY . ." not in dockerfile
+
+
+def test_release_version_is_embedded_in_both_runtime_images():
+    api_dockerfile = (ROOT / "Dockerfile").read_text()
+    adapter_dockerfile = (ROOT / "Dockerfile.adapter").read_text()
+
+    assert "ARG MODWIRE_MCP_VERSION=0.0.0+dev" in api_dockerfile
+    assert 'MODWIRE_MCP_VERSION="$MODWIRE_MCP_VERSION"' in api_dockerfile
+    assert "ARG MODWIRE_MCP_VERSION=0.0.0+dev" in adapter_dockerfile
+    assert 'MCP_ADAPTER_VERSION="$MODWIRE_MCP_VERSION"' in adapter_dockerfile
 
 
 def test_image_build_excludes_local_secrets_and_database_artifacts():

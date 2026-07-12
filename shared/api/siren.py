@@ -113,6 +113,8 @@ def _openapi():
 
 def api_root_document(request) -> dict:
     """Build API discovery links from the generated OpenAPI document."""
+    from django.conf import settings
+
     paths, _ = _openapi()
     collections = {}
     for path, path_item in paths.items():
@@ -125,7 +127,7 @@ def api_root_document(request) -> dict:
     absolute = request.build_absolute_uri
     return {
         "class": ["api", "entry-point"],
-        "properties": {"title": "Modwire API", "version": "1.0.0"},
+        "properties": {"title": "Modwire API", "version": settings.RELEASE_VERSION},
         "links": [
             _link("self", absolute("/api/")),
             *(

@@ -13,6 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
 DEBUG = os.getenv("DEBUG", "0") == "1"
 ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
+RELEASE_VERSION = os.getenv("MODWIRE_MCP_VERSION", "0.0.0+dev")
 
 def local_apps():
     return sorted(p.name for p in BASE_DIR.iterdir() if (p / "apps.py").is_file())

@@ -3,6 +3,7 @@ from inspect import isclass
 from pkgutil import walk_packages
 
 from django.apps import apps
+from django.conf import settings
 from ninja_extra import NinjaExtraAPI
 
 from tokens.auth import ApiKeyAuth
@@ -102,7 +103,7 @@ class SirenAPI(NinjaExtraAPI):
         return schema
 
 
-api = SirenAPI(title="Modwire Siren API", version="1.0.0", auth=ApiKeyAuth())
+api = SirenAPI(title="Modwire Siren API", version=settings.RELEASE_VERSION, auth=ApiKeyAuth())
 
 
 def _import(name, root):
