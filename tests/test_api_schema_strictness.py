@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from core.api import api
 from scaffoldings.api.template.schemas import TemplateIn, TemplatePatchIn
 from scaffoldings.api.variable.schemas import VariableIn
+from scaffoldings.models.variable import Variable
 
 
 def test_patch_fields_are_omittable_but_not_nullable():
@@ -24,6 +25,14 @@ def test_request_objects_reject_unknown_fields_and_enum_values():
             file_content="content",
             unknown=True,
         )
+
+
+def test_variable_model_accepts_empty_defaults_before_type_validation():
+    field = Variable._meta.get_field("default_value")
+
+    assert field.clean("", None) == ""
+    assert field.clean([], None) == []
+    assert field.clean({}, None) == {}
     with pytest.raises(ValidationError):
         VariableIn(
             scaffolding_id="scaffolding",
