@@ -1,42 +1,38 @@
-import {
-  Add,
-  ArrowForward,
-  CheckCircleOutline,
-  Code,
-  ContentCopy,
-  DeleteOutline,
-  DescriptionOutlined,
-  FolderOutlined,
-  Key,
-  Logout,
-  MenuBookOutlined,
-  Refresh,
-  Search,
-  Tune,
-} from "@mui/icons-material";
-import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import { FormEvent, useEffect, useId, useMemo, useState } from "react";
+import Add from "@mui/icons-material/Add";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
+import Code from "@mui/icons-material/Code";
+import ContentCopy from "@mui/icons-material/ContentCopy";
+import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import DescriptionOutlined from "@mui/icons-material/DescriptionOutlined";
+import FolderOutlined from "@mui/icons-material/FolderOutlined";
+import Key from "@mui/icons-material/Key";
+import Logout from "@mui/icons-material/Logout";
+import MenuBookOutlined from "@mui/icons-material/MenuBookOutlined";
+import Refresh from "@mui/icons-material/Refresh";
+import Search from "@mui/icons-material/Search";
+import Tune from "@mui/icons-material/Tune";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import Container from "@mui/material/Container";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Properties = Record<string, unknown>;
 type SirenLink = { rel: string[]; href: string; title?: string };
@@ -64,9 +60,19 @@ function messageFrom(error: unknown) {
   return "Something went wrong. Please try again.";
 }
 
+export function resolveApiUrl(href: string, currentHref = window.location.href) {
+  const current = new URL(currentHref);
+  const target = new URL(href, new URL(API_URL, current));
+  if (current.protocol === "https:" && target.protocol === "http:" && target.host === current.host) target.protocol = "https:";
+  return target;
+}
+
+function aborted(error: unknown) {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
 async function api<T>(href: string, apiKey: string, init?: RequestInit): Promise<T> {
-  const apiRoot = new URL(API_URL, window.location.origin);
-  const response = await fetch(new URL(href, apiRoot), {
+  const response = await fetch(resolveApiUrl(href), {
     ...init,
     headers: { apikey: apiKey, "Content-Type": "application/json", ...init?.headers },
   });
@@ -180,25 +186,6 @@ function ObjectEditor({ name, value, onChange }: { name: string; value: unknown;
   );
 }
 
-function MermaidPreview({ source }: { source: string }) {
-  const id = `mermaid-${useId().replaceAll(":", "")}`;
-  const [svg, setSvg] = useState("");
-  const [renderError, setRenderError] = useState("");
-  useEffect(() => {
-    let current = true;
-    setSvg(""); setRenderError("");
-    void import("mermaid").then(async ({ default: mermaid }) => {
-      mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "neutral" });
-      const result = await mermaid.render(id, source);
-      if (current) setSvg(result.svg);
-    }).catch((reason) => { if (current) setRenderError(messageFrom(reason)); });
-    return () => { current = false; };
-  }, [id, source]);
-  if (renderError) return <Alert severity="error">{renderError}</Alert>;
-  if (!svg) return <Stack alignItems="center" py={8}><CircularProgress size={24} /></Stack>;
-  return <Box className="mermaid-view" dangerouslySetInnerHTML={{ __html: svg }} />;
-}
-
 type TreeNode = { name: string; path: string; fileIndex?: number; children: TreeNode[] };
 
 function fileTree(files: PreviewFile[]): TreeNode[] {
@@ -310,7 +297,6 @@ export function App() {
   const [activeFile, setActiveFile] = useState(0);
   const [activeTemplate, setActiveTemplate] = useState(0);
   const [mode, setMode] = useState<"build" | "preview">("preview");
-  const [showMermaidSource, setShowMermaidSource] = useState(false);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [previewing, setPreviewing] = useState(false);
@@ -320,6 +306,7 @@ export function App() {
   const [newVariableOpen, setNewVariableOpen] = useState(false);
   const [newVariable, setNewVariable] = useState<{ name: string; type: "str" | "int" | "float" | "bool" | "list" | "dict"; description: string; default_value: unknown; required: boolean }>({ name: "", type: "str", description: "", default_value: "", required: false });
   const [saving, setSaving] = useState(false);
+  const previewController = useRef<AbortController | null>(null);
 
   const selected = scaffoldings.find((item) => item.id === selectedId);
   const filtered = useMemo(() => scaffoldings.filter((item) =>
@@ -328,18 +315,18 @@ export function App() {
     `${item.title} ${item.description} ${item.tag_slugs.join(" ")}`.toLowerCase().includes(search.toLowerCase())), [records, search]);
   const sectionTitles = useMemo(() => Object.fromEntries(sections.map((section) => [section.slug, section.title])), [sections]);
 
-  async function loadStudio(key = apiKey) {
+  async function loadStudio(key = apiKey, signal?: AbortSignal) {
     if (!key) return;
     setLoading(true); setError("");
     try {
-      const root = await api<SirenEntity>(API_URL, key);
+      const root = await api<SirenEntity>(API_URL, key, { signal });
       const [nextScaffoldingCollection, recordCollection, sectionCollection, languageCollection, nextVariableCollection, nextTemplateCollection] = await Promise.all([
-        api<SirenEntity>(link(root, "scaffoldings").href, key),
-        api<SirenEntity>(link(root, "records").href, key),
-        api<SirenEntity>(link(root, "sections").href, key),
-        api<SirenEntity>(link(root, "languages").href, key),
-        api<SirenEntity>(link(root, "variables").href, key),
-        api<SirenEntity>(link(root, "templates").href, key),
+        api<SirenEntity>(link(root, "scaffoldings").href, key, { signal }),
+        api<SirenEntity>(link(root, "records").href, key, { signal }),
+        api<SirenEntity>(link(root, "sections").href, key, { signal }),
+        api<SirenEntity>(link(root, "languages").href, key, { signal }),
+        api<SirenEntity>(link(root, "variables").href, key, { signal }),
+        api<SirenEntity>(link(root, "templates").href, key, { signal }),
       ]);
       const items = readCollection(nextScaffoldingCollection);
       const recordItems = readRecords(recordCollection);
@@ -355,38 +342,52 @@ export function App() {
       setSections((sectionCollection.entities || []).map((entity) => entity.properties as unknown as SectionSummary));
       setSelectedId((current) => items.some((item) => item.id === current) ? current : items[0]?.id || "");
       setSelectedRecordSlug((current) => recordItems.some((item) => item.slug === current) ? current : recordItems[0]?.slug || "");
-    } catch (reason) { setError(messageFrom(reason)); }
-    finally { setLoading(false); }
+    } catch (reason) { if (!aborted(reason)) setError(messageFrom(reason)); }
+    finally { if (!signal?.aborted) setLoading(false); }
   }
 
-  useEffect(() => { void loadStudio(); }, [apiKey]);
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadStudio(apiKey, controller.signal);
+    return () => controller.abort();
+  }, [apiKey]);
   useEffect(() => {
     if (area !== "scaffoldings" || !selectedId || !apiKey) { setSchema(null); setSelectedResource(null); return; }
+    const controller = new AbortController();
     setLoading(true); setError(""); setFiles([]);
     const item = scaffoldings.find((candidate) => candidate.id === selectedId);
-    if (!item) return;
-    void api<SirenEntity>(item.href, apiKey)
+    if (!item) return () => controller.abort();
+    void api<SirenEntity>(item.href, apiKey, { signal: controller.signal })
       .then(async (resource) => {
         setSelectedResource(resource);
-        const document = await api<SirenEntity>(action(resource, "get_scaffolding_schema").href, apiKey);
+        const document = await api<SirenEntity>(action(resource, "get_scaffolding_schema").href, apiKey, { signal: controller.signal });
         const next = document.properties as unknown as FormSchema;
         setSchema(next);
         setValues(Object.fromEntries(Object.entries(next.properties).map(([name, property]) => [name, property.default])));
       })
-      .catch((reason) => setError(messageFrom(reason)))
-      .finally(() => setLoading(false));
+      .catch((reason) => { if (!aborted(reason)) setError(messageFrom(reason)); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
   }, [area, selectedId, apiKey, scaffoldings]);
-  useEffect(() => { setActiveTemplate(0); }, [selectedId]);
+  useEffect(() => {
+    previewController.current?.abort();
+    previewController.current = null;
+    setPreviewing(false);
+    setActiveTemplate(0);
+  }, [selectedId]);
   useEffect(() => {
     if (area !== "records" || !selectedRecordSlug || !apiKey) { setSelectedRecord(null); return; }
     const item = records.find((candidate) => candidate.slug === selectedRecordSlug);
     if (!item) return;
+    const controller = new AbortController();
     setLoading(true); setError("");
-    void api<SirenEntity>(item.href, apiKey)
+    void api<SirenEntity>(item.href, apiKey, { signal: controller.signal })
       .then((resource) => setSelectedRecord({ ...item, ...(resource.properties as unknown as RecordResource) }))
-      .catch((reason) => setError(messageFrom(reason)))
-      .finally(() => setLoading(false));
+      .catch((reason) => { if (!aborted(reason)) setError(messageFrom(reason)); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
   }, [area, selectedRecordSlug, apiKey, records]);
+  useEffect(() => () => previewController.current?.abort(), []);
 
   function connect(event: FormEvent) {
     event.preventDefault();
@@ -397,16 +398,24 @@ export function App() {
 
   async function preview() {
     if (!selectedResource) return;
+    previewController.current?.abort();
+    const controller = new AbortController();
+    previewController.current = controller;
     setPreviewing(true); setError("");
     try {
       const operation = action(selectedResource, "preview_scaffolding");
       const result = await api<SirenEntity>(operation.href, apiKey, {
-        method: operation.method, body: JSON.stringify({ values, template_overrides: [] }),
+        method: operation.method, body: JSON.stringify({ values, template_overrides: [] }), signal: controller.signal,
       });
       const next = (result.properties?.files || []) as PreviewFile[];
-      setFiles(next); setActiveFile(0); setShowMermaidSource(false);
-    } catch (reason) { setError(messageFrom(reason)); }
-    finally { setPreviewing(false); }
+      setFiles(next); setActiveFile(0);
+    } catch (reason) { if (!aborted(reason)) setError(messageFrom(reason)); }
+    finally {
+      if (previewController.current === controller) {
+        previewController.current = null;
+        setPreviewing(false);
+      }
+    }
   }
 
   const selectedTemplates = templates.filter((template) => template.scaffolding === selectedId);
@@ -502,10 +511,10 @@ export function App() {
             {mode === "preview" ? <Box className="browser-grid">
               <Paper component="aside" className="panel tree-panel" elevation={0}>
                 <Box className="panel-heading"><Typography variant="subtitle2">Files</Typography><Typography variant="caption" color="text.secondary">{files.length}</Typography></Box>
-                {files.length ? <FileTree files={files} activeFile={activeFile} onSelect={(index) => { setActiveFile(index); setShowMermaidSource(false); }} /> : <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>Render the scaffolding to browse its files.</Typography>}
+                {files.length ? <FileTree files={files} activeFile={activeFile} onSelect={setActiveFile} /> : <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>Render the scaffolding to browse its files.</Typography>}
               </Paper>
               <Paper className="panel preview-panel" elevation={0}>
-                {files.length ? <><Box className="preview-toolbar"><Typography variant="body2" fontWeight={650} noWrap>{files[activeFile].path}</Typography><Stack direction="row" spacing={0.5}>{files[activeFile].path.endsWith(".mermaid") && <Button size="small" onClick={() => setShowMermaidSource((current) => !current)}>{showMermaidSource ? "Diagram" : "Source"}</Button>}<Tooltip title="Copy source"><IconButton aria-label="Copy source" onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Stack></Box><Divider />{files[activeFile].path.endsWith(".mermaid") && !showMermaidSource ? <MermaidPreview source={files[activeFile].source} /> : <Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} />}</> : <Box className="preview-empty"><Button variant="contained" disabled={previewing || loading} onClick={() => void preview()}>{previewing ? "Rendering…" : "Render preview"}</Button></Box>}
+                {files.length ? <><Box className="preview-toolbar"><Typography variant="body2" fontWeight={650} noWrap>{files[activeFile].path}</Typography><Tooltip title="Copy source"><IconButton aria-label="Copy source" onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Box><Divider /><Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} /></> : <Box className="preview-empty"><Button variant="contained" disabled={previewing || loading} onClick={() => void preview()}>{previewing ? "Rendering…" : "Render preview"}</Button></Box>}
               </Paper>
             </Box> : <Box className="content-grid">
               <Paper className="panel form-panel" elevation={0}><Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}><Typography variant="subtitle1" fontWeight={700}>Variables</Typography><Button size="small" startIcon={<Add />} onClick={() => setNewVariableOpen(true)}>Add</Button></Stack><Stack spacing={2}>{schema && Object.entries(schema.properties).map(([name, property]) => <Field key={name} name={name} property={property} required={schema.required.includes(name)} value={values[name]} onChange={(value) => setValues((current) => ({ ...current, [name]: value }))} />)}</Stack></Paper>

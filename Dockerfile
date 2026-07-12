@@ -1,4 +1,4 @@
-FROM node:22-alpine AS browser-builder
+FROM --platform=$BUILDPLATFORM node:22-alpine AS browser-builder
 WORKDIR /app/browser
 COPY browser/package.json browser/package-lock.json ./
 RUN npm ci

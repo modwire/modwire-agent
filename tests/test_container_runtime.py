@@ -84,7 +84,7 @@ def test_release_publishes_both_images_for_intel_and_arm_hosts():
     assert build["with"]["push"] == "true"
     assert build["with"]["sbom"] == "true"
     assert build["with"]["cache-to"] == (
-        "type=gha,mode=min,scope=${{ matrix.image }},timeout=2m,ignore-error=true"
+        "type=gha,mode=max,scope=${{ matrix.image }},timeout=2m,ignore-error=true"
     )
     assert build["with"]["build-args"] == (
         "MODWIRE_MCP_VERSION=${{ steps.metadata.outputs.version }}"
@@ -130,6 +130,12 @@ def test_build_caches_are_kept_outside_both_runtime_copy_roots():
     assert "UV_CACHE_DIR=/tmp/uv-cache" in adapter_dockerfile
     assert "COPY --from=builder /app /app" in api_dockerfile
     assert "COPY --from=builder /app /app" in adapter_dockerfile
+
+
+def test_browser_builder_runs_once_on_the_native_build_platform():
+    dockerfile = (ROOT / "Dockerfile").read_text()
+
+    assert "FROM --platform=$BUILDPLATFORM node:22-alpine AS browser-builder" in dockerfile
 
 
 def test_release_version_is_embedded_in_both_runtime_images():

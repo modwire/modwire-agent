@@ -39,8 +39,6 @@ body { margin: 0; }
 .structured-row:has(> .MuiTextField-root + .MuiTextField-root) { grid-template-columns: minmax(110px,.55fr) minmax(0,1fr) auto; }
 .structured-columns { display: grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 8px; min-width: 0; }
 .add-empty { border: 1px dashed #cbd1dc !important; }
-.mermaid-view { min-height: 480px; padding: 24px; box-sizing: border-box; display: grid; place-items: center; overflow: auto; background: #fff; }
-.mermaid-view svg { max-width: 100%; height: auto; }
 .MuiDialogTitle-root { font-size: 1.1rem !important; font-weight: 750 !important; }
 .code-view .hll { background-color: #374151; }
 .code-view .k,.code-view .kd,.code-view .kn { color: #c4b5fd; }.code-view .s,.code-view .s1,.code-view .s2 { color:#86efac; }.code-view .c,.code-view .c1 { color:#6b7280; }.code-view .nf,.code-view .nc { color:#93c5fd; }.code-view .mi,.code-view .mf { color:#fca5a5; }

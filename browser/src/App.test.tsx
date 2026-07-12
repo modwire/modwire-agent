@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { App } from "./App";
+import { App, resolveApiUrl } from "./App";
 
 const root = { links: [
   { rel: ["scaffoldings"], href: "http://api.test/catalog" },
@@ -25,6 +25,28 @@ const schema = { properties: { properties: { project_name: { type: "string", des
 describe("App", () => {
   beforeEach(() => { localStorage.clear(); vi.restoreAllMocks(); });
   afterEach(cleanup);
+
+  it("upgrades same-host API links on an HTTPS page", () => {
+    expect(resolveApiUrl("http://modwire.example/api/scaffoldings", "https://modwire.example/browser/").href)
+      .toBe("https://modwire.example/api/scaffoldings");
+    expect(resolveApiUrl("http://other.example/api/scaffoldings", "https://modwire.example/browser/").href)
+      .toBe("http://other.example/api/scaffoldings");
+  });
+
+  it("aborts in-flight API work when the browser unmounts", async () => {
+    localStorage.setItem("modwire-api-key", "secret");
+    let signal: AbortSignal | null = null;
+    vi.spyOn(globalThis, "fetch").mockImplementation((_, init) => {
+      signal = init?.signal as AbortSignal;
+      return new Promise<Response>(() => undefined);
+    });
+
+    const view = render(<App />);
+    await waitFor(() => expect(signal).not.toBeNull());
+    view.unmount();
+
+    expect(signal!.aborted).toBe(true);
+  });
 
   it("asks for an API key before showing the workspace", () => {
     render(<App />);

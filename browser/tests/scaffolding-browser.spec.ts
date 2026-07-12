@@ -43,6 +43,7 @@ async function openBrowser(page: Page) {
       const name = request.values.project_name;
       body = { properties: { files: [
         { template_id: "readme", path: "README.md", source: `# ${name}`, html: `<pre># ${name}</pre>`, language: "markdown" },
+        { template_id: "diagram", path: "architecture.mermaid", source: "flowchart LR; api-->db", html: "<svg aria-label='Backend diagram'><text>Backend-rendered diagram</text></svg>", language: "mermaid" },
         { template_id: "main", path: "src/main.tsx", source: `export const name = '${name}';`, html: `<pre>export const name = '${name}';</pre>`, language: "tsx" },
         { template_id: "test", path: "src/__tests__/main.test.tsx", source: `test('${name}')`, html: `<pre>test('${name}')</pre>`, language: "tsx" },
       ] } };
@@ -87,7 +88,7 @@ test("renders a nested, sorted file tree and selects the first file", async ({ p
   });
 
   const tree = page.getByLabel("Rendered files");
-  await expect(tree.getByRole("button")).toHaveText(["src", "__tests__", "main.test.tsx", "main.tsx", "README.md"]);
+  await expect(tree.getByRole("button")).toHaveText(["src", "__tests__", "main.test.tsx", "main.tsx", "architecture.mermaid", "README.md"]);
   await expect(tree.getByRole("button", { name: "src" })).toBeDisabled();
   await expect(tree.getByRole("button", { name: "__tests__" })).toBeDisabled();
   await expect(tree.getByRole("button", { name: "README.md" })).toHaveAttribute("data-selected", "true");
@@ -110,6 +111,15 @@ test("switches the rendered result when a tree file is selected", async ({ page 
   await expect(page.getByText("src/main.tsx", { exact: true })).toBeVisible();
   await expect(page.getByText("export const name = 'demo';", { exact: true })).toBeVisible();
   await expect(page.getByText("test('demo')", { exact: true })).toBeHidden();
+});
+
+test("shows Mermaid output supplied by the backend without client rendering", async ({ page }) => {
+  await page.getByRole("button", { name: "Render preview" }).click();
+  await page.getByLabel("Rendered files").getByRole("button", { name: "architecture.mermaid" }).click();
+
+  await expect(page.getByLabel("Backend diagram")).toBeVisible();
+  await expect(page.getByText("Backend-rendered diagram")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Diagram|Source/ })).toHaveCount(0);
 });
 
 test("shows variables and switches raw template sources in Build mode", async ({ page }) => {
