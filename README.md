@@ -1,3 +1,4 @@
+/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
 # New Project
 
 Django API scaffold with JSON logs, dotenv settings, health checks, and auto-discovered Django Ninja Extra controllers.
@@ -21,7 +22,15 @@ Released runtime images are pulled from GHCR. The default is `latest`; pin both
 services to one immutable release with `MODWIRE_MCP_VERSION`, for example:
 
 ```sh
-MODWIRE_MCP_VERSION=0.2.0 make mcp-up
+MODWIRE_MCP_VERSION=0.2.1 make mcp-up
+```
+
+The packages are private. Authenticate GitHub CLI once with `read:packages`;
+runtime commands then use its token through a temporary Docker configuration
+that is deleted immediately after the pull:
+
+```sh
+gh auth refresh -h github.com -s read:packages
 ```
 
 Each GitHub release publishes `linux/amd64` and `linux/arm64` variants of
@@ -125,8 +134,9 @@ Run the host installer from this checkout:
 make mcp-install
 ```
 
-The installer verifies the existing PostgreSQL container and network, pulls
-and starts the released runtime images, creates a dedicated API key only when
+The installer verifies GitHub package access plus the existing PostgreSQL
+container and network, securely pulls and starts the released runtime images,
+creates a dedicated API key only when
 the ignored local secret is missing or invalid, runs the complete MCP smoke
 workflow, and registers one global Codex entry named `modwire` at
 `http://127.0.0.1:8200/mcp`. The key value is redirected directly into a

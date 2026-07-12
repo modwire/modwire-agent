@@ -1,3 +1,4 @@
+/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
 #!/bin/sh
 set -eu
 
@@ -9,11 +10,12 @@ secret_path="${MCP_ADAPTER_API_KEY_FILE:-.dev/secrets/mcp-adapter-api-key}"
 command -v codex >/dev/null
 command -v curl >/dev/null
 command -v docker >/dev/null
+command -v gh >/dev/null
 
 docker inspect modwire-records-postgres-1 >/dev/null
 docker network inspect modwire-records_default >/dev/null
 docker compose config --quiet
-docker compose pull scaffolding-api mcp-adapter
+./scripts/pull-private-images.sh scaffolding-api mcp-adapter
 docker compose up --detach --wait scaffolding-api
 
 mkdir -p "$(dirname "${secret_path}")"

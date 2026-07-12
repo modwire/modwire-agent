@@ -1,3 +1,4 @@
+/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
 from pathlib import Path
 
 import yaml
@@ -114,9 +115,23 @@ def test_local_installer_keeps_the_api_key_out_of_output():
     assert '>"${temporary_secret}"' in installer
     assert "chmod 600" in installer
     assert 'codex mcp add "${server_name}" --url "${server_url}"' in installer
-    assert "docker compose pull scaffolding-api mcp-adapter" in installer
+    assert "./scripts/pull-private-images.sh scaffolding-api mcp-adapter" in installer
     assert "docker compose build" not in installer
     assert "--build" not in installer
+
+
+def test_private_image_pull_uses_disposable_docker_credentials():
+    puller = (ROOT / "scripts" / "pull-private-images.sh").read_text()
+
+    assert "gh auth token" in puller
+    assert 'DOCKER_CONFIG="${registry_config}"' in puller
+    assert "docker login ghcr.io" in puller
+    assert 'docker compose config --images "$@"' in puller
+    assert "docker context inspect" in puller
+    assert 'DOCKER_HOST="${docker_host}"' in puller
+    assert 'docker pull "${image}"' in puller
+    assert "mktemp -d" in puller
+    assert "rm -rf" in puller
 
 
 def test_local_uninstaller_never_removes_volumes():

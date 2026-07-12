@@ -1,3 +1,4 @@
+/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
 #!/bin/sh
 set -eu
 
@@ -16,7 +17,7 @@ docker exec "${database_container}" sh -c \
   'exec pg_dump --format=custom --username="$POSTGRES_USER" --dbname="$POSTGRES_DB"' \
   >"${backup_path}"
 
-docker compose pull scaffolding-api
+./scripts/pull-private-images.sh scaffolding-api
 docker compose run --rm scaffolding-api python manage.py migrate --plan \
   >"${plan_path}"
 

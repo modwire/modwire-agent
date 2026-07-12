@@ -1,3 +1,4 @@
+/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
 INSTALL := uv sync
 RUN := uv run
 ADD := uv add
@@ -61,7 +62,7 @@ runtime-config:
 	docker compose config --quiet
 
 runtime-up: runtime-config
-	docker compose pull scaffolding-api
+	./scripts/pull-private-images.sh scaffolding-api
 	docker compose up --detach scaffolding-api
 
 runtime-build-up: runtime-config
@@ -77,7 +78,7 @@ runtime-db-migrate: runtime-config
 	./scripts/migrate-existing-database.sh
 
 mcp-up: runtime-config
-	docker compose pull scaffolding-api mcp-adapter
+	./scripts/pull-private-images.sh scaffolding-api mcp-adapter
 	docker compose up --detach scaffolding-api mcp-adapter
 
 mcp-build-up: runtime-config
