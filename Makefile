@@ -6,7 +6,7 @@ OA_SCHEMA ?= .dev/openapi.json
 MODWIRE_REPORT ?= .dev/modwire-health.json
 PORT ?= 8000
 
-.PHONY: init dev m mm mz oa add remove modwire gen runtime-config runtime-up runtime-down runtime-db-prepare runtime-db-migrate mcp-up mcp-health mcp-check
+.PHONY: init dev m mm mz oa add remove modwire gen runtime-config runtime-up runtime-down runtime-db-prepare runtime-db-migrate mcp-up mcp-health mcp-check mcp-install mcp-diagnose mcp-uninstall
 
 init:
 	mkdir -p .dev shared
@@ -80,3 +80,12 @@ mcp-health:
 
 mcp-check:
 	$(RUN) python scripts/check-mcp-adapter.py
+
+mcp-install:
+	./scripts/install-local-mcp.sh
+
+mcp-diagnose:
+	./scripts/diagnose-local-mcp.sh
+
+mcp-uninstall:
+	./scripts/uninstall-local-mcp.sh
