@@ -12,6 +12,7 @@ from mcp_adapter.scaffoldings import (
     TemplateCreate,
     TemplateUpdate,
     VariableCreate,
+    VariableUpdate,
 )
 from mcp_adapter.server import create_server
 from mcp_adapter.settings import AdapterSettings
@@ -20,6 +21,7 @@ from mcp_adapter.siren import AdapterError
 SCAFFOLDING_ID = "brNlYVlASiK8LKLHNCv15A"
 LANGUAGE_ID = "2lURS3VRR-SRV5ye7CGTzA"
 TEMPLATE_ID = "t3mPLatE00000000000000"
+VARIABLE_ID = "var1ab1e00000000000000"
 
 
 def test_adapter_traverses_advertised_links_and_actions():
@@ -394,6 +396,94 @@ def test_adapter_creates_complete_scaffolding_through_collection_actions():
         "http://api.test/variables",
         "http://api.test/templates",
     )
+
+
+def test_adapter_updates_variable_through_its_advertised_action():
+    def handler(request: httpx.Request):
+        url = str(request.url)
+        if url == "http://api.test/root":
+            return httpx.Response(
+                200,
+                json={"links": [{"rel": ["variables"], "href": "http://api.test/variables"}]},
+            )
+        if url == "http://api.test/variables":
+            return httpx.Response(
+                200,
+                json={
+                    "entities": [
+                        {
+                            "properties": {"id": VARIABLE_ID},
+                            "links": [
+                                {
+                                    "rel": ["self"],
+                                    "href": "http://api.test/variables/package-name",
+                                }
+                            ],
+                        }
+                    ]
+                },
+            )
+        if request.method == "GET":
+            return httpx.Response(
+                200,
+                json={
+                    "properties": {
+                        "id": VARIABLE_ID,
+                        "scaffolding": SCAFFOLDING_ID,
+                    },
+                    "actions": [
+                        {
+                            "name": "update_variable",
+                            "method": "PUT",
+                            "href": "http://api.test/variables/package-name",
+                        }
+                    ],
+                },
+            )
+        assert json.loads(request.content) == {
+            "scaffolding_id": SCAFFOLDING_ID,
+            "name": "package_name",
+            "type": "str",
+            "description": "Top-level Python import package.",
+            "default_value": "",
+            "required": True,
+        }
+        return httpx.Response(
+            200,
+            json={
+                    "properties": {
+                        "id": VARIABLE_ID,
+                        "scaffolding": SCAFFOLDING_ID,
+                        **{
+                            key: value
+                            for key, value in json.loads(request.content).items()
+                            if key != "scaffolding_id"
+                        },
+                    }
+            },
+        )
+
+    capabilities = ScaffoldingCapabilities(
+        "http://api.test/root",
+        "secret",
+        transport_factory=lambda: httpx.MockTransport(handler),
+    )
+
+    variable = asyncio.run(
+        capabilities.update_variable(
+            VariableUpdate(
+                scaffolding_id=SCAFFOLDING_ID,
+                variable_id=VARIABLE_ID,
+                name="package_name",
+                type="str",
+                description="Top-level Python import package.",
+                default_value="",
+                required=True,
+            )
+        )
+    )
+
+    assert variable.description == "Top-level Python import package."
 
 
 def test_server_exposes_only_typed_scaffolding_tools(tmp_path):

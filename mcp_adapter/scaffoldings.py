@@ -105,6 +105,10 @@ class VariableCreate(AdapterModel):
     required: bool = False
 
 
+class VariableUpdate(VariableCreate):
+    variable_id: ScaffoldingId
+
+
 class CreatedVariable(AdapterModel):
     id: ScaffoldingId
     scaffolding: ScaffoldingId
@@ -224,30 +228,49 @@ class ScaffoldingCapabilities:
         return CreatedVariable.model_validate(document.get("properties", {}))
 
     async def update_template(self, update: TemplateUpdate) -> UpdatedTemplate:
+        document = await self._update_owned(
+            relation="templates",
+            item_id=update.template_id,
+            scaffolding_id=update.scaffolding_id,
+            action_name="update_template",
+            payload=update.model_dump(exclude={"template_id"}),
+        )
+        return UpdatedTemplate.model_validate(document.get("properties", {}))
+
+    async def update_variable(self, update: VariableUpdate) -> CreatedVariable:
+        document = await self._update_owned(
+            relation="variables",
+            item_id=update.variable_id,
+            scaffolding_id=update.scaffolding_id,
+            action_name="update_variable",
+            payload=update.model_dump(exclude={"variable_id"}),
+        )
+        return CreatedVariable.model_validate(document.get("properties", {}))
+
+    async def _update_owned(
+        self,
+        *,
+        relation: str,
+        item_id: str,
+        scaffolding_id: str,
+        action_name: str,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        resource = relation.removesuffix("s")
         async with self._navigator() as navigator:
-            collection = await navigator.follow(await navigator.root(), "templates")
-            item = await self._collection_item(navigator, collection, update.template_id)
+            collection = await navigator.follow(await navigator.root(), relation)
+            item = await self._collection_item(navigator, collection, item_id, resource)
             properties = item.get("properties", {})
-            if not isinstance(properties, dict) or properties.get("scaffolding") != update.scaffolding_id:
+            if not isinstance(properties, dict) or properties.get("scaffolding") != scaffolding_id:
                 raise AdapterError(
                     {
-                        "kind": "template-scaffolding-mismatch",
-                        "detail": "The template does not belong to the requested scaffolding.",
-                        "scaffolding_id": update.scaffolding_id,
-                        "template_id": update.template_id,
+                        "kind": f"{resource}-scaffolding-mismatch",
+                        "detail": f"The {resource} does not belong to the requested scaffolding.",
+                        "scaffolding_id": scaffolding_id,
+                        f"{resource}_id": item_id,
                     }
                 )
-            document = await navigator.execute(
-                item,
-                "update_template",
-                {
-                    "scaffolding_id": update.scaffolding_id,
-                    "relative_path": update.relative_path,
-                    "file_content": update.file_content,
-                    "write_mode": update.write_mode,
-                },
-            )
-        return UpdatedTemplate.model_validate(document.get("properties", {}))
+            return await navigator.execute(item, action_name, payload)
 
     async def _create(
         self,
@@ -313,6 +336,7 @@ class ScaffoldingCapabilities:
         navigator: SirenNavigator,
         collection: dict[str, Any],
         item_id: str,
+        resource: str,
     ) -> dict[str, Any]:
         entities = collection.get("entities", [])
         if not isinstance(entities, list):
@@ -322,9 +346,9 @@ class ScaffoldingCapabilities:
                 return await navigator.follow(entity, "self")
         raise AdapterError(
             {
-                "kind": "template-not-advertised",
-                "detail": f"Template '{item_id}' is not in the advertised collection.",
-                "template_id": item_id,
+                "kind": f"{resource}-not-advertised",
+                "detail": f"{resource.title()} '{item_id}' is not in the advertised collection.",
+                f"{resource}_id": item_id,
             }
         )
 

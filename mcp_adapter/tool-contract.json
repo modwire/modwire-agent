@@ -7,5 +7,6 @@
   "list_scaffoldings",
   "preview_scaffolding",
   "update_scaffolding",
-  "update_scaffolding_template"
+  "update_scaffolding_template",
+  "update_scaffolding_variable"
 ]
