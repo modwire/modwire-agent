@@ -2,9 +2,7 @@ import Add from "@mui/icons-material/Add";
 import ArrowForward from "@mui/icons-material/ArrowForward";
 import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
 import Code from "@mui/icons-material/Code";
-import ContentCopy from "@mui/icons-material/ContentCopy";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
-import DescriptionOutlined from "@mui/icons-material/DescriptionOutlined";
 import FolderOutlined from "@mui/icons-material/FolderOutlined";
 import Key from "@mui/icons-material/Key";
 import Logout from "@mui/icons-material/Logout";
@@ -33,6 +31,10 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { EditorPanels } from "./components/EditorPanels";
+import { FileTree, PreviewFile } from "./components/FileTree";
+import { PreviewPane } from "./components/PreviewPane";
+import { TemplatePane, TemplateSource } from "./components/TemplatePane";
 
 type Properties = Record<string, unknown>;
 type SirenLink = { rel: string[]; href: string; title?: string };
@@ -50,8 +52,6 @@ type SchemaProperty = {
   default: unknown;
 };
 type FormSchema = { properties: Record<string, SchemaProperty>; required: string[] };
-type PreviewFile = { template_id: string; path: string; source: string; html: string; language: string };
-type TemplateSource = { id: string; scaffolding: string; relative_path: string; file_content: string; write_mode: string };
 
 const API_URL = (import.meta.env.VITE_API_URL || "/api/").replace(/\/?$/, "/");
 
@@ -184,54 +184,6 @@ function ObjectEditor({ name, value, onChange }: { name: string; value: unknown;
       </Box>)}</Stack>
     </Box>
   );
-}
-
-type TreeNode = { name: string; path: string; fileIndex?: number; children: TreeNode[] };
-
-function fileTree(files: PreviewFile[]): TreeNode[] {
-  const root: TreeNode[] = [];
-  files.forEach((file, fileIndex) => {
-    let level = root;
-    let currentPath = "";
-    file.path.split("/").forEach((name, index, parts) => {
-      currentPath = currentPath ? `${currentPath}/${name}` : name;
-      let node = level.find((item) => item.name === name);
-      if (!node) {
-        node = { name, path: currentPath, children: [] };
-        level.push(node);
-      }
-      if (index === parts.length - 1) node.fileIndex = fileIndex;
-      level = node.children;
-    });
-  });
-  const sort = (nodes: TreeNode[]) => nodes.sort((a, b) => {
-    const aFolder = a.fileIndex === undefined;
-    const bFolder = b.fileIndex === undefined;
-    return aFolder === bFolder ? a.name.localeCompare(b.name) : aFolder ? -1 : 1;
-  }).forEach((node) => sort(node.children));
-  sort(root);
-  return root;
-}
-
-function FileTree({ files, activeFile, onSelect }: { files: PreviewFile[]; activeFile: number; onSelect: (index: number) => void }) {
-  const nodes = useMemo(() => fileTree(files), [files]);
-  const render = (items: TreeNode[], depth = 0): React.ReactNode => items.map((node) => {
-    const folder = node.fileIndex === undefined;
-    return <Box key={node.path}>
-      <button
-        className="tree-row"
-        data-selected={!folder && node.fileIndex === activeFile}
-        disabled={folder}
-        style={{ paddingLeft: 12 + depth * 16 }}
-        onClick={() => node.fileIndex !== undefined && onSelect(node.fileIndex)}
-      >
-        {folder ? <FolderOutlined fontSize="inherit" /> : <DescriptionOutlined fontSize="inherit" />}
-        <span>{node.name}</span>
-      </button>
-      {node.children.length > 0 && render(node.children, depth + 1)}
-    </Box>;
-  });
-  return <Box className="file-tree" aria-label="Rendered files">{render(nodes)}</Box>;
 }
 
 function Field({ name, property, required, value, onChange }: {
@@ -419,7 +371,6 @@ export function App() {
   }
 
   const selectedTemplates = templates.filter((template) => template.scaffolding === selectedId);
-  const selectedTemplate = selectedTemplates[activeTemplate];
 
   async function createScaffolding() {
     if (!scaffoldingCollection || !templateCollection) return;
@@ -503,25 +454,16 @@ export function App() {
         <Box component="main" className="main-pane">
           {error && <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>{error}</Alert>}
           {loading && area === "scaffoldings" && !selected && <Stack alignItems="center" py={12}><CircularProgress /></Stack>}
-          {area === "scaffoldings" && selected && <>
+          {area === "scaffoldings" && selected && <Box className="scaffolding-studio">
             <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2} mb={2}>
               <Box><Chip icon={<FolderOutlined />} label="Scaffolding" size="small" variant="outlined" /><Typography component="h1" variant="h5" fontWeight={800} mt={1}>{selected.name}</Typography></Box>
               <Tabs value={mode} onChange={(_, value) => setMode(value)} aria-label="Scaffolding mode"><Tab value="preview" label="Preview" /><Tab value="build" label="Build" /></Tabs>
             </Stack>
-            {mode === "preview" ? <Box className="browser-grid">
-              <Paper component="aside" className="panel tree-panel" elevation={0}>
+            {mode === "preview" ? <EditorPanels id="preview-panels" label="Preview panels" primary={<Paper component="aside" className="panel tree-panel" elevation={0}>
                 <Box className="panel-heading"><Typography variant="subtitle2">Files</Typography><Typography variant="caption" color="text.secondary">{files.length}</Typography></Box>
                 {files.length ? <FileTree files={files} activeFile={activeFile} onSelect={setActiveFile} /> : <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>Render the scaffolding to browse its files.</Typography>}
-              </Paper>
-              <Paper className="panel preview-panel" elevation={0}>
-                {files.length ? <><Box className="preview-toolbar"><Typography variant="body2" fontWeight={650} noWrap>{files[activeFile].path}</Typography><Tooltip title="Copy source"><IconButton aria-label="Copy source" onClick={() => void navigator.clipboard.writeText(files[activeFile].source)}><ContentCopy fontSize="small" /></IconButton></Tooltip></Box><Divider /><Box className="code-view" dangerouslySetInnerHTML={{ __html: files[activeFile].html }} /></> : <Box className="preview-empty"><Button variant="contained" disabled={previewing || loading} onClick={() => void preview()}>{previewing ? "Rendering…" : "Render preview"}</Button></Box>}
-              </Paper>
-            </Box> : <Box className="content-grid">
-              <Paper className="panel form-panel" elevation={0}><Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}><Typography variant="subtitle1" fontWeight={700}>Variables</Typography><Button size="small" startIcon={<Add />} onClick={() => setNewVariableOpen(true)}>Add</Button></Stack><Stack spacing={2}>{schema && Object.entries(schema.properties).map(([name, property]) => <Field key={name} name={name} property={property} required={schema.required.includes(name)} value={values[name]} onChange={(value) => setValues((current) => ({ ...current, [name]: value }))} />)}</Stack></Paper>
-              <Paper className="panel template-panel" elevation={0}>{selectedTemplate ? <><Box className="preview-toolbar"><label className="file-select"><span>Template</span><select aria-label="Template file" value={activeTemplate} onChange={(event) => setActiveTemplate(Number(event.target.value))}>{selectedTemplates.map((template, index) => <option value={index} key={template.id}>{template.relative_path}</option>)}</select></label></Box><Divider /><Box component="pre" className="template-view">{selectedTemplate.file_content}</Box></> : <Box className="preview-empty"><Typography variant="body2" color="text.secondary">No templates in this scaffolding.</Typography></Box>}</Paper>
-            </Box>}
-            {mode === "preview" && files.length > 0 && <Button className="render-again" size="small" disabled={previewing || loading} onClick={() => void preview()}>{previewing ? "Rendering…" : "Render again"}</Button>}
-          </>}
+              </Paper>} secondary={<PreviewPane file={files[activeFile]} loading={loading} previewing={previewing} onPreview={() => void preview()} />} /> : <EditorPanels id="build-panels" label="Build panels" primarySize="46%" primaryMinSize="360px" primary={<Paper className="panel form-panel" elevation={0}><Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}><Typography variant="subtitle1" fontWeight={700}>Variables</Typography><Button size="small" startIcon={<Add />} onClick={() => setNewVariableOpen(true)}>Add</Button></Stack><Stack spacing={2}>{schema && Object.entries(schema.properties).map(([name, property]) => <Field key={name} name={name} property={property} required={schema.required.includes(name)} value={values[name]} onChange={(value) => setValues((current) => ({ ...current, [name]: value }))} />)}</Stack></Paper>} secondary={<TemplatePane templates={selectedTemplates} activeTemplate={activeTemplate} onSelect={setActiveTemplate} />} />}
+          </Box>}
           {area === "records" && selectedRecord && <>
             <Stack gap={1} mb={3}>
               <Box><Chip icon={<MenuBookOutlined />} label={sectionTitles[selectedRecord.section_slug] || "Record"} size="small" variant="outlined" /><Typography component="h1" variant="h5" fontWeight={800} mt={1}>{selectedRecord.title}</Typography></Box>

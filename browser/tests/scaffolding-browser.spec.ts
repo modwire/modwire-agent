@@ -44,7 +44,7 @@ async function openBrowser(page: Page) {
       body = { properties: { files: [
         { template_id: "readme", path: "README.md", source: `# ${name}`, html: `<pre># ${name}</pre>`, language: "markdown" },
         { template_id: "diagram", path: "architecture.mermaid", source: "flowchart LR; api-->db", html: "<svg aria-label='Backend diagram'><text>Backend-rendered diagram</text></svg>", language: "mermaid" },
-        { template_id: "main", path: "src/main.tsx", source: `export const name = '${name}';`, html: `<pre>export const name = '${name}';</pre>`, language: "tsx" },
+        { template_id: "main", path: "src/main.tsx", source: `export const name = '${name}';\n\nexport default name;`, html: `<span class="k">export</span> const name = '${name}';\n\n<span class="k">export default</span> name;`, language: "tsx" },
         { template_id: "test", path: "src/__tests__/main.test.tsx", source: `test('${name}')`, html: `<pre>test('${name}')</pre>`, language: "tsx" },
       ] } };
     }
@@ -109,8 +109,39 @@ test("switches the rendered result when a tree file is selected", async ({ page 
 
   await tree.getByRole("button", { name: "main.tsx", exact: true }).click();
   await expect(page.getByText("src/main.tsx", { exact: true })).toBeVisible();
-  await expect(page.getByText("export const name = 'demo';", { exact: true })).toBeVisible();
+  await expect(page.locator(".code-view")).toContainText("export const name = 'demo';");
   await expect(page.getByText("test('demo')", { exact: true })).toBeHidden();
+});
+
+test("preserves blank lines in backend-highlighted HTML", async ({ page }) => {
+  await page.getByRole("button", { name: "Render preview" }).click();
+  await page.getByLabel("Rendered files").getByRole("button", { name: "main.tsx", exact: true }).click();
+
+  const code = page.locator(".code-view");
+  await expect(code).toHaveText("export const name = 'demo';\n\nexport default name;");
+  await expect(code).toHaveCSS("white-space", "pre");
+});
+
+test("uses the same full-height resizable and scrollable panels in both modes", async ({ page }) => {
+  const assertPanels = async (label: string) => {
+    const group = page.getByLabel(label);
+    const panels = group.locator("[data-panel]");
+    await expect(panels).toHaveCount(2);
+    const heights = await panels.evaluateAll((items) => items.map((item) => item.getBoundingClientRect().height));
+    expect(Math.abs(heights[0] - heights[1])).toBeLessThan(1);
+    expect(heights[0]).toBeGreaterThan(500);
+    await expect(page.getByRole("separator", { name: `Resize ${label}` })).toBeVisible();
+  };
+
+  await page.getByRole("button", { name: "Render preview" }).click();
+  await assertPanels("Preview panels");
+  await expect(page.getByLabel("Rendered files")).toHaveCSS("overflow", "auto");
+  await expect(page.locator(".code-view")).toHaveCSS("overflow", "auto");
+
+  await page.getByRole("tab", { name: "Build" }).click();
+  await assertPanels("Build panels");
+  await expect(page.locator(".form-panel")).toHaveCSS("overflow", "auto");
+  await expect(page.locator(".template-view")).toHaveCSS("overflow", "auto");
 });
 
 test("shows Mermaid output supplied by the backend without client rendering", async ({ page }) => {
