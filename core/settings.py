@@ -71,9 +71,12 @@ TEMPLATES = [{
     ]},
 }]
 WSGI_APPLICATION = "core.wsgi.application"
-DATABASES = {
-    "default": dj_database_url.config(default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"))
-}
+database = dj_database_url.config(default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"))
+if database_host := os.getenv("DATABASE_HOST"):
+    database["HOST"] = database_host
+if database_port := os.getenv("DATABASE_PORT"):
+    database["PORT"] = database_port
+DATABASES = {"default": database}
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = USE_TZ = True

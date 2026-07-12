@@ -1,0 +1,25 @@
+name: modwire-mcp
+
+services:
+  scaffolding-api:
+    build:
+      context: .
+    environment:
+      ALLOWED_HOSTS: localhost,127.0.0.1,scaffolding-api
+      DATABASE_HOST: postgres
+      DATABASE_PORT: "5432"
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL for the existing PostgreSQL database}
+      DEBUG: "0"
+      RECORDS_EMBEDDINGS_ENABLED: ${RECORDS_EMBEDDINGS_ENABLED:-1}
+      RECORDS_EMBEDDING_PROVIDER: ${RECORDS_EMBEDDING_PROVIDER:-deterministic}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY}
+    ports:
+      - "127.0.0.1:${SCAFFOLDING_API_PORT:-8100}:8000"
+    networks:
+      - records
+    restart: unless-stopped
+
+networks:
+  records:
+    external: true
+    name: modwire-records_default
