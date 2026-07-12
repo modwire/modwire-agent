@@ -4,6 +4,7 @@ import json
 import httpx
 import pytest
 
+from mcp_adapter.contracts import MCP_TOOL_NAMES
 from mcp_adapter.scaffoldings import (
     ScaffoldingCapabilities,
     ScaffoldingCreate,
@@ -407,17 +408,7 @@ def test_server_exposes_only_typed_scaffolding_tools(tmp_path):
 
     tools = {tool.name: tool for tool in asyncio.run(server.list_tools())}
 
-    assert set(tools) == {
-        "list_scaffoldings",
-        "get_scaffolding_schema",
-        "get_scaffolding_bundle",
-        "preview_scaffolding",
-        "update_scaffolding",
-        "update_scaffolding_template",
-        "create_scaffolding",
-        "create_scaffolding_variable",
-        "create_scaffolding_template",
-    }
+    assert set(tools) == MCP_TOOL_NAMES
     preview_schema = tools["preview_scaffolding"].inputSchema
     assert set(preview_schema["properties"]) == {
         "scaffolding_id",

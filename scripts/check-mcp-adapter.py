@@ -1,16 +1,16 @@
 import asyncio
 import json
 import os
+from pathlib import Path
 
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
-EXPECTED_TOOLS = {
-    "list_scaffoldings",
-    "get_scaffolding_schema",
-    "get_scaffolding_bundle",
-    "preview_scaffolding",
-}
+MCP_TOOL_NAMES = frozenset(
+    json.loads(
+        (Path(__file__).resolve().parents[1] / "mcp_adapter" / "tool-contract.json").read_text()
+    )
+)
 
 
 async def check():
@@ -20,7 +20,7 @@ async def check():
             await session.initialize()
             available = await session.list_tools()
             tool_names = {tool.name for tool in available.tools}
-            if tool_names != EXPECTED_TOOLS:
+            if tool_names != MCP_TOOL_NAMES:
                 raise RuntimeError(f"Unexpected MCP tools: {sorted(tool_names)}")
 
             listed = await session.call_tool("list_scaffoldings")
