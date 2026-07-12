@@ -54,3 +54,19 @@ def test_image_build_excludes_local_secrets_and_database_artifacts():
     assert ".env" in ignored
     assert ".env.*" in ignored
     assert ".dev" in ignored
+
+
+def test_local_installer_keeps_the_api_key_out_of_output():
+    installer = (ROOT / "scripts" / "install-local-mcp.sh").read_text()
+
+    assert "shell --no-imports" in installer
+    assert '>"${temporary_secret}"' in installer
+    assert "chmod 600" in installer
+    assert 'codex mcp add "${server_name}" --url "${server_url}"' in installer
+
+
+def test_local_uninstaller_never_removes_volumes():
+    uninstaller = (ROOT / "scripts" / "uninstall-local-mcp.sh").read_text()
+
+    assert "docker compose down --remove-orphans" in uninstaller
+    assert "--volumes" not in uninstaller

@@ -84,6 +84,50 @@ API and joins a separate edge bridge for its loopback-published MCP port.
 `scaffolding-api` alone bridges the internal service network to the external
 PostgreSQL network, so the adapter has no database route.
 
+### Install for Codex
+
+Run the host installer from this checkout:
+
+```sh
+make mcp-install
+```
+
+The installer verifies the existing PostgreSQL container and network, starts
+the immutable runtime images, creates a dedicated API key only when the ignored
+local secret is missing or invalid, runs the complete MCP smoke workflow, and
+registers one global Codex entry named `modwire` at
+`http://127.0.0.1:8200/mcp`. The key value is redirected directly into a
+mode-600 ignored file and is not printed. Re-running the installer preserves
+the same API identity while the secret remains valid.
+
+Codex loads MCP configuration when a session starts. Open a new session after
+installation, then use the four scaffolding tools directly. Diagnose each
+runtime layer independently with:
+
+```sh
+make mcp-diagnose
+```
+
+Uninstall only the Codex entry and these runtime containers with:
+
+```sh
+make mcp-uninstall
+```
+
+Uninstall never passes Docker's `--volumes` option. It preserves
+`modwire-records-postgres-1`, `modwire-records_default`,
+`modwire-records_postgres_data`, all scaffolding records, and the dedicated API
+identity for a later reinstall.
+
+### Future CLI runner
+
+Workspace mutation is intentionally absent from this installation. A future
+optional `cli-runner` profile will package `modwire-cli` separately and mount
+only an explicitly selected workspace. The MCP adapter will call that
+capability through its contract; it will not import CLI internals or gain a
+workspace mount itself. Scaffolding discovery, bundles, and previews do not
+depend on the CLI runner.
+
 ## Hypermedia API browser
 
 The authenticated API entry point is `GET /api/`. Successful API responses use
