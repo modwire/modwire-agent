@@ -26,7 +26,7 @@ curl --fail --silent --output /dev/null http://127.0.0.1:8200/health
 printf '%s\n' 'siren-adapter: API traversal and capability discovery are healthy'
 
 uv run python scripts/check-mcp-adapter.py >/dev/null
-printf '%s\n' 'mcp-transport: all four tools pass the protocol smoke workflow'
+printf '%s\n' 'mcp-transport: the stable Modwire tool passes discovery and execution smoke checks'
 
 codex mcp get "${MODWIRE_MCP_SERVER_NAME:-modwire}" --json >/dev/null
 printf '%s\n' 'codex-config: Modwire MCP server is registered'

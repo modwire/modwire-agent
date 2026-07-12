@@ -1,12 +1,3 @@
 [
-  "create_scaffolding",
-  "create_scaffolding_template",
-  "create_scaffolding_variable",
-  "get_scaffolding_bundle",
-  "get_scaffolding_schema",
-  "list_scaffoldings",
-  "preview_scaffolding",
-  "update_scaffolding",
-  "update_scaffolding_template",
-  "update_scaffolding_variable"
+  "modwire"
 ]

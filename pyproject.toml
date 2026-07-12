@@ -35,7 +35,9 @@ dev = [
     "ruff",
 ]
 mcp-adapter = [
+    "httpx>=0.28",
     "mcp>=1.28.1",
+    "modwire-siren>=1.1,<2",
 ]
 
 [tool.uv]

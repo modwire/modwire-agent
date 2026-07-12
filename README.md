@@ -70,20 +70,29 @@ make mcp-check
 ```
 
 The Streamable HTTP endpoint is `http://127.0.0.1:8200/mcp`. The health
-endpoint reports the adapter version, API reachability, and the Siren actions
-currently advertised without returning the API key. The adapter exposes four
-typed tools:
+endpoint reports the adapter version, API reachability, and the number of
+relations and actions advertised at the Siren root without returning the API
+key. The adapter exposes one stable tool, `modwire`, with two operations:
 
-- `list_scaffoldings`
-- `get_scaffolding_schema`
-- `get_scaffolding_bundle`
-- `preview_scaffolding`
-- `update_scaffolding`
-- `update_scaffolding_template`
-- `update_scaffolding_variable`
-- `create_scaffolding`
-- `create_scaffolding_variable`
-- `create_scaffolding_template`
+- `inspect` follows a path of advertised Siren relations and collection items;
+- `execute` follows the same kind of path and submits values to an action
+  advertised by the selected resource.
+
+For example, inspect the scaffolding collection with:
+
+```json
+{
+  "request": {
+    "kind": "inspect",
+    "path": [{"kind": "relation", "relation": "scaffoldings"}]
+  }
+}
+```
+
+The returned Siren document supplies item identities, links, actions, and
+runtime field schemas. Clients inspect those controls before choosing the next
+step. Adding an API capability therefore does not alter the MCP tool catalog or
+require another MCP client restart or tool-schema discovery cycle.
 
 The `services` Docker network is internal. `mcp-adapter` uses it to reach the
 API and joins a separate edge bridge for its loopback-published MCP port.
@@ -106,9 +115,10 @@ registers one global Codex entry named `modwire` at
 mode-600 ignored file and is not printed. Re-running the installer preserves
 the same API identity while the secret remains valid.
 
-Codex loads MCP configuration when a session starts. Open a new session after
-installation, then use the four scaffolding tools directly. Diagnose each
-runtime layer independently with:
+Codex loads MCP configuration when a session starts. Open a new session once
+after installing this one-tool adapter; subsequent API capability additions are
+discovered through Siren without another session restart. Diagnose each runtime
+layer independently with:
 
 ```sh
 make mcp-diagnose

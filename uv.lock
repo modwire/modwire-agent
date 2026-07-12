@@ -974,14 +974,18 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "httpx" },
     { name = "mcp" },
+    { name = "modwire-siren" },
     { name = "openapi-python-client" },
     { name = "pytest" },
     { name = "pytest-django" },
     { name = "ruff" },
 ]
 mcp-adapter = [
+    { name = "httpx" },
     { name = "mcp" },
+    { name = "modwire-siren" },
 ]
 
 [package.metadata]
@@ -1009,13 +1013,31 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "httpx", specifier = ">=0.28" },
     { name = "mcp", specifier = ">=1.28.1" },
+    { name = "modwire-siren", specifier = ">=1.1,<2" },
     { name = "openapi-python-client" },
     { name = "pytest" },
     { name = "pytest-django" },
     { name = "ruff" },
 ]
-mcp-adapter = [{ name = "mcp", specifier = ">=1.28.1" }]
+mcp-adapter = [
+    { name = "httpx", specifier = ">=0.28" },
+    { name = "mcp", specifier = ">=1.28.1" },
+    { name = "modwire-siren", specifier = ">=1.1,<2" },
+]
+
+[[package]]
+name = "modwire-siren"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7e/47/7527e31e046523f7961579f21c70a0bd876806bbc1059e7c113fd44b24f1/modwire_siren-1.1.0.tar.gz", hash = "sha256:ec210e13fd6bbe3058760927794a6cc66faa8a3c7834d261bb6bfc0724cddfaf", size = 18344, upload-time = "2026-07-12T03:07:33.56Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/12/97cd25e9783311853c745ba3fa74dc65983a63502e98da26729df6f49d95/modwire_siren-1.1.0-py3-none-any.whl", hash = "sha256:09297c86813bcf95e580d1d6155594bef8c532ecd0cc8f3ed1c98d7f98c74395", size = 24622, upload-time = "2026-07-12T03:07:32.331Z" },
+]
 
 [[package]]
 name = "openapi-python-client"
