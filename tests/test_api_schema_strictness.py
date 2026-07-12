@@ -45,6 +45,7 @@ def test_openapi_exposes_strict_objects_and_all_finite_options():
         "managed",
         "create_if_missing",
     ]
+    assert "id" in components["ScaffoldingBundleVariableOut"]["required"]
     assert components["CommandResult"]["enum"] == [
         "init",
         "install",

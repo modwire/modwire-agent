@@ -95,6 +95,7 @@ class ScaffoldingFormSchemaOut(Schema):
 
 
 class ScaffoldingBundleVariableOut(Schema):
+    id: ShortUUID
     name: str
     type: Literal["str", "int", "float", "bool", "list", "dict"]
     description: str
