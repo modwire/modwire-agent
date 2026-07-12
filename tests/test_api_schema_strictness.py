@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from core.api import api
 from scaffoldings.api.template.schemas import TemplateIn, TemplatePatchIn
 from scaffoldings.api.variable.schemas import VariableIn
+from scaffoldings.models.template import Template
 from scaffoldings.models.variable import Variable
 
 
@@ -33,6 +34,12 @@ def test_variable_model_accepts_empty_defaults_before_type_validation():
     assert field.clean("", None) == ""
     assert field.clean([], None) == []
     assert field.clean({}, None) == {}
+
+
+def test_template_model_accepts_empty_initializer_content():
+    field = Template._meta.get_field("file_content")
+
+    assert field.clean("", None) == ""
     with pytest.raises(ValidationError):
         VariableIn(
             scaffolding_id="scaffolding",
