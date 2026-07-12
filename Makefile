@@ -6,7 +6,7 @@ OA_SCHEMA ?= .dev/openapi.json
 MODWIRE_REPORT ?= .dev/modwire-health.json
 PORT ?= 8000
 
-.PHONY: init dev m mm mz oa add remove modwire gen
+.PHONY: init dev m mm mz oa add remove modwire gen runtime-config runtime-up runtime-down runtime-db-prepare runtime-db-migrate
 
 init:
 	mkdir -p .dev shared
@@ -56,3 +56,18 @@ gen:
 		${app} \
 		--data app_name=${app} \
 		--data model_name=${model}
+
+runtime-config:
+	docker compose config --quiet
+
+runtime-up: runtime-config
+	docker compose up --build --detach scaffolding-api
+
+runtime-down:
+	docker compose down
+
+runtime-db-prepare: runtime-config
+	./scripts/prepare-existing-database.sh
+
+runtime-db-migrate: runtime-config
+	./scripts/migrate-existing-database.sh
