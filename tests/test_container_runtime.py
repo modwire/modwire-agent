@@ -24,9 +24,14 @@ def test_compose_reuses_the_external_database_runtime():
     assert compose["services"]["mcp-adapter"]["networks"] == ["services", "edge"]
     assert "records" not in compose["services"]["mcp-adapter"]["networks"]
     assert "volumes" not in compose["services"]["mcp-adapter"]
-    assert compose["services"]["mcp-adapter"]["image"] == "modwire-mcp-adapter"
-    assert compose["services"]["scaffolding-api"]["image"] == "modwire-mcp-runtime"
-    assert compose["services"]["mcp-adapter"]["build"]["dockerfile"] == "Dockerfile.adapter"
+    assert compose["services"]["mcp-adapter"]["image"] == (
+        "ghcr.io/modwire/modwire-mcp-adapter:${MODWIRE_MCP_VERSION:-latest}"
+    )
+    assert compose["services"]["scaffolding-api"]["image"] == (
+        "ghcr.io/modwire/modwire-mcp-runtime:${MODWIRE_MCP_VERSION:-latest}"
+    )
+    assert "build" not in compose["services"]["mcp-adapter"]
+    assert "build" not in compose["services"]["scaffolding-api"]
     assert compose["services"]["mcp-adapter"]["ports"] == [
         "127.0.0.1:${MCP_ADAPTER_PORT:-8200}:8200",
     ]
@@ -38,6 +43,51 @@ def test_api_image_startup_does_not_apply_migrations():
 
     assert "gunicorn" in runtime_command
     assert "migrate" not in runtime_command
+
+
+def test_local_image_builds_require_the_explicit_override():
+    compose = yaml.safe_load((ROOT / "compose.build.yaml").read_text())
+
+    assert compose["services"]["scaffolding-api"]["build"] == {"context": "."}
+    assert compose["services"]["mcp-adapter"]["build"] == {
+        "context": ".",
+        "dockerfile": "Dockerfile.adapter",
+    }
+
+
+def test_release_publishes_both_images_for_intel_and_arm_hosts():
+    workflow = yaml.load(
+        (ROOT / ".github" / "workflows" / "publish-containers.yml").read_text(),
+        Loader=yaml.BaseLoader,
+    )
+    publish = workflow["jobs"]["publish"]
+
+    assert workflow["on"]["release"]["types"] == ["published"]
+    assert workflow["permissions"] == {
+        "contents": "read",
+        "packages": "write",
+        "attestations": "write",
+        "id-token": "write",
+    }
+    assert publish["strategy"]["matrix"]["include"] == [
+        {"dockerfile": "Dockerfile", "image": "modwire-mcp-runtime"},
+        {
+            "dockerfile": "Dockerfile.adapter",
+            "image": "modwire-mcp-adapter",
+        },
+    ]
+    build = next(
+        step for step in publish["steps"] if step["name"] == "Build and push image"
+    )
+    assert build["with"]["platforms"] == "linux/amd64,linux/arm64"
+    assert build["with"]["push"] == "true"
+    assert build["with"]["sbom"] == "true"
+    metadata = next(
+        step
+        for step in publish["steps"]
+        if step["name"] == "Derive release tags and labels"
+    )
+    assert "value=${{ github.event.release.tag_name }}" in metadata["with"]["tags"]
 
 
 def test_adapter_image_contains_only_the_adapter_source():
@@ -63,6 +113,9 @@ def test_local_installer_keeps_the_api_key_out_of_output():
     assert '>"${temporary_secret}"' in installer
     assert "chmod 600" in installer
     assert 'codex mcp add "${server_name}" --url "${server_url}"' in installer
+    assert "docker compose pull scaffolding-api mcp-adapter" in installer
+    assert "docker compose build" not in installer
+    assert "--build" not in installer
 
 
 def test_local_uninstaller_never_removes_volumes():

@@ -16,7 +16,7 @@ docker exec "${database_container}" sh -c \
   'exec pg_dump --format=custom --username="$POSTGRES_USER" --dbname="$POSTGRES_DB"' \
   >"${backup_path}"
 
-docker compose build scaffolding-api
+docker compose pull scaffolding-api
 docker compose run --rm scaffolding-api python manage.py migrate --plan \
   >"${plan_path}"
 

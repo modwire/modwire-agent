@@ -13,7 +13,8 @@ command -v docker >/dev/null
 docker inspect modwire-records-postgres-1 >/dev/null
 docker network inspect modwire-records_default >/dev/null
 docker compose config --quiet
-docker compose up --build --detach --wait scaffolding-api
+docker compose pull scaffolding-api mcp-adapter
+docker compose up --detach --wait scaffolding-api
 
 mkdir -p "$(dirname "${secret_path}")"
 if ! test -s "${secret_path}" || ! curl --fail --silent --output /dev/null \
@@ -32,7 +33,6 @@ if ! test -s "${secret_path}" || ! curl --fail --silent --output /dev/null \
 fi
 
 chmod 600 "${secret_path}"
-docker compose build mcp-adapter
 docker compose up --detach --wait mcp-adapter
 uv run python scripts/check-mcp-adapter.py >/dev/null
 

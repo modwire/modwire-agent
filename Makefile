@@ -6,7 +6,7 @@ OA_SCHEMA ?= .dev/openapi.json
 MODWIRE_REPORT ?= .dev/modwire-health.json
 PORT ?= 8000
 
-.PHONY: init dev m mm mz oa add remove modwire gen runtime-config runtime-up runtime-down runtime-db-prepare runtime-db-migrate mcp-up mcp-health mcp-check mcp-install mcp-diagnose mcp-uninstall
+.PHONY: init dev m mm mz oa add remove modwire gen runtime-config runtime-up runtime-build-up runtime-down runtime-db-prepare runtime-db-migrate mcp-up mcp-build-up mcp-health mcp-check mcp-install mcp-diagnose mcp-uninstall
 
 init:
 	mkdir -p .dev shared
@@ -61,7 +61,11 @@ runtime-config:
 	docker compose config --quiet
 
 runtime-up: runtime-config
-	docker compose up --build --detach scaffolding-api
+	docker compose pull scaffolding-api
+	docker compose up --detach scaffolding-api
+
+runtime-build-up: runtime-config
+	docker compose -f compose.yaml -f compose.build.yaml up --build --detach scaffolding-api
 
 runtime-down:
 	docker compose down
@@ -73,7 +77,11 @@ runtime-db-migrate: runtime-config
 	./scripts/migrate-existing-database.sh
 
 mcp-up: runtime-config
-	docker compose up --build --detach scaffolding-api mcp-adapter
+	docker compose pull scaffolding-api mcp-adapter
+	docker compose up --detach scaffolding-api mcp-adapter
+
+mcp-build-up: runtime-config
+	docker compose -f compose.yaml -f compose.build.yaml up --build --detach scaffolding-api mcp-adapter
 
 mcp-health:
 	curl --fail http://127.0.0.1:$${MCP_ADAPTER_PORT:-8200}/health

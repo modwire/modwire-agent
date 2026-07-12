@@ -17,6 +17,24 @@ in the ignored `.env` file. Compose overrides only its network address to
 `modwire-records_default` Docker network. The host configuration remains on
 `localhost:5433`; credentials have one source of truth.
 
+Released runtime images are pulled from GHCR. The default is `latest`; pin both
+services to one immutable release with `MODWIRE_MCP_VERSION`, for example:
+
+```sh
+MODWIRE_MCP_VERSION=0.2.0 make mcp-up
+```
+
+Each GitHub release publishes `linux/amd64` and `linux/arm64` variants of
+`ghcr.io/modwire/modwire-mcp-runtime` and
+`ghcr.io/modwire/modwire-mcp-adapter`. Docker selects the matching image on
+Intel Linux, Intel macOS, or Apple Silicon macOS hosts. Local image builds are
+an explicit development mode and never occur during normal installation:
+
+```sh
+make runtime-build-up
+make mcp-build-up
+```
+
 Validate and start only the API:
 
 ```sh
@@ -107,10 +125,10 @@ Run the host installer from this checkout:
 make mcp-install
 ```
 
-The installer verifies the existing PostgreSQL container and network, starts
-the immutable runtime images, creates a dedicated API key only when the ignored
-local secret is missing or invalid, runs the complete MCP smoke workflow, and
-registers one global Codex entry named `modwire` at
+The installer verifies the existing PostgreSQL container and network, pulls
+and starts the released runtime images, creates a dedicated API key only when
+the ignored local secret is missing or invalid, runs the complete MCP smoke
+workflow, and registers one global Codex entry named `modwire` at
 `http://127.0.0.1:8200/mcp`. The key value is redirected directly into a
 mode-600 ignored file and is not printed. Re-running the installer preserves
 the same API identity while the secret remains valid.
