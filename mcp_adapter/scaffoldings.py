@@ -43,6 +43,7 @@ class ScaffoldingSchema(AdapterModel):
 
 
 class BundleVariable(AdapterModel):
+    id: ScaffoldingId
     name: str
     type: Literal["str", "int", "float", "bool", "list", "dict"]
     description: str

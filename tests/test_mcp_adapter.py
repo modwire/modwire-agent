@@ -6,6 +6,7 @@ import pytest
 
 from mcp_adapter.contracts import MCP_TOOL_NAMES
 from mcp_adapter.scaffoldings import (
+    ScaffoldingBundle,
     ScaffoldingCapabilities,
     ScaffoldingCreate,
     ScaffoldingUpdate,
@@ -22,6 +23,28 @@ SCAFFOLDING_ID = "brNlYVlASiK8LKLHNCv15A"
 LANGUAGE_ID = "2lURS3VRR-SRV5ye7CGTzA"
 TEMPLATE_ID = "t3mPLatE00000000000000"
 VARIABLE_ID = "var1ab1e00000000000000"
+
+
+def test_bundle_variables_expose_ids_for_follow_up_mutations():
+    bundle = ScaffoldingBundle.model_validate(
+        {
+            "id": SCAFFOLDING_ID,
+            "name": "Modwire Python Repository",
+            "variables": [
+                {
+                    "id": VARIABLE_ID,
+                    "name": "package_name",
+                    "type": "str",
+                    "description": "Top-level Python import package.",
+                    "default_value": "",
+                    "required": True,
+                }
+            ],
+            "templates": [],
+        }
+    )
+
+    assert bundle.variables[0].id == VARIABLE_ID
 
 
 def test_adapter_traverses_advertised_links_and_actions():
