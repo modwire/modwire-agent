@@ -20,7 +20,7 @@ class Variable(ShortUUIDModel):
     name = models.CharField(max_length=120)
     type = models.CharField(max_length=8, choices=VariableType.choices)
     description = models.CharField(max_length=100)
-    default_value = models.JSONField(default=list)
+    default_value = models.JSONField(default=list, blank=True)
     required = models.BooleanField(default=False)
 
     def clean(self):
