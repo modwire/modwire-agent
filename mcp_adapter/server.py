@@ -21,6 +21,7 @@ from .scaffoldings import (
     TemplateUpdate,
     UpdatedTemplate,
     VariableCreate,
+    VariableUpdate,
 )
 from .settings import AdapterSettings
 from .siren import AdapterError
@@ -107,6 +108,11 @@ def create_server(settings: AdapterSettings) -> FastMCP:
     async def create_scaffolding_variable(variable: VariableCreate) -> CreatedVariable:
         """Create a typed variable for a scaffolding through its advertised collection."""
         return await _call(capabilities.create_variable(variable))
+
+    @server.tool()
+    async def update_scaffolding_variable(variable: VariableUpdate) -> CreatedVariable:
+        """Replace an advertised variable owned by a scaffolding."""
+        return await _call(capabilities.update_variable(variable))
 
     @server.tool()
     async def create_scaffolding_template(template: TemplateCreate) -> UpdatedTemplate:

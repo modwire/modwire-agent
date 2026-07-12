@@ -80,6 +80,7 @@ typed tools:
 - `preview_scaffolding`
 - `update_scaffolding`
 - `update_scaffolding_template`
+- `update_scaffolding_variable`
 - `create_scaffolding`
 - `create_scaffolding_variable`
 - `create_scaffolding_template`
