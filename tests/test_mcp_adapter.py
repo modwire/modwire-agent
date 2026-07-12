@@ -150,6 +150,27 @@ def test_http_transport_rejects_non_object_json():
     assert raised.value.kind == "invalid-transport-response"
 
 
+def test_http_transport_represents_successful_no_content_response():
+    transport = HttpxSirenTransport(
+        "secret",
+        transport=httpx.MockTransport(lambda _: httpx.Response(204)),
+    )
+
+    async def request():
+        async with transport:
+            return await transport.request("DELETE", "http://api.test/widgets/example")
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 204
+    assert response.document == {
+        "class": ["result"],
+        "properties": {"status": 204},
+        "links": [],
+        "actions": [],
+    }
+
+
 def test_server_exposes_one_stable_discriminated_tool(tmp_path):
     key_file = tmp_path / "api-key"
     key_file.write_text("secret")

@@ -50,6 +50,17 @@ class HttpxSirenTransport:
                 href=href,
             ) from error
 
+        if response.status_code == 204:
+            return SirenResponse(
+                status_code=response.status_code,
+                document={
+                    "class": ["result"],
+                    "properties": {"status": response.status_code},
+                    "links": [],
+                    "actions": [],
+                },
+            )
+
         try:
             document = response.json()
         except ValueError as error:
