@@ -1,112 +1,123 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
-from attrs import field as _attrs_field
 
+from ..models.content_role import ContentRole
 from ..types import UNSET, Unset
 
-from ..models.content_out_role import ContentOutRole
-from typing import cast
-
 if TYPE_CHECKING:
-  from ..models.record_content_out_metadata import RecordContentOutMetadata
-
-
-
+    from ..models.content_metadata import ContentMetadata
 
 
 T = TypeVar("T", bound="ContentOut")
 
 
-
 @_attrs_define
 class ContentOut:
-    """ 
-        Attributes:
-            role (ContentOutRole):
-            content (str):
-            language (str):
-            metadata (RecordContentOutMetadata):
-     """
+    """
+    Attributes:
+        role (ContentRole):
+        content (list[str] | str): An array of plain strings for lists; a string for every other role.
+        language (str): Natural language for prose and lists; syntax identifier for snippets.
+        id (int):
+        record_slug (str):
+        position (int):
+        metadata (ContentMetadata | Unset): Supported provenance, accessibility, and presentation metadata.
+    """
 
-    role: ContentOutRole
-    content: str
+    role: ContentRole
+    content: list[str] | str
     language: str
-    metadata: RecordContentOutMetadata
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
+    id: int
+    record_slug: str
+    position: int
+    metadata: ContentMetadata | Unset = UNSET
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.record_content_out_metadata import RecordContentOutMetadata
         role = self.role.value
 
-        content = self.content
+        content: list[str] | str
+        if isinstance(self.content, list):
+            content = self.content
+
+        else:
+            content = self.content
 
         language = self.language
 
-        metadata = self.metadata.to_dict()
+        id = self.id
 
+        record_slug = self.record_slug
+
+        position = self.position
+
+        metadata: dict[str, Any] | Unset = UNSET
+        if not isinstance(self.metadata, Unset):
+            metadata = self.metadata.to_dict()
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
-        field_dict.update({
-            "role": role,
-            "content": content,
-            "language": language,
-            "metadata": metadata,
-        })
+
+        field_dict.update(
+            {
+                "role": role,
+                "content": content,
+                "language": language,
+                "id": id,
+                "record_slug": record_slug,
+                "position": position,
+            }
+        )
+        if metadata is not UNSET:
+            field_dict["metadata"] = metadata
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.record_content_out_metadata import RecordContentOutMetadata
+        from ..models.content_metadata import ContentMetadata
+
         d = dict(src_dict)
-        role = ContentOutRole(d.pop("role"))
+        role = ContentRole(d.pop("role"))
 
+        def _parse_content(data: object) -> list[str] | str:
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                content_type_1 = cast(list[str], data)
 
+                return content_type_1
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[str] | str, data)
 
-
-        content = d.pop("content")
+        content = _parse_content(d.pop("content"))
 
         language = d.pop("language")
 
-        metadata = RecordContentOutMetadata.from_dict(d.pop("metadata"))
+        id = d.pop("id")
 
+        record_slug = d.pop("record_slug")
 
+        position = d.pop("position")
 
+        _metadata = d.pop("metadata", UNSET)
+        metadata: ContentMetadata | Unset
+        if isinstance(_metadata, Unset):
+            metadata = UNSET
+        else:
+            metadata = ContentMetadata.from_dict(_metadata)
 
         content_out = cls(
             role=role,
             content=content,
             language=language,
+            id=id,
+            record_slug=record_slug,
+            position=position,
             metadata=metadata,
         )
 
-
-        content_out.additional_properties = d
         return content_out
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

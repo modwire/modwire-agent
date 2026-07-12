@@ -1,39 +1,31 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-from typing import cast
-
 if TYPE_CHECKING:
-  from ..models.content_out import ContentOut
-
-
-
+    from ..models.content_block import ContentBlock
 
 
 T = TypeVar("T", bound="RecordOut")
 
 
-
 @_attrs_define
 class RecordOut:
-    """ 
-        Attributes:
-            slug (str):
-            local_slug (str):
-            section_slug (str):
-            title (str):
-            description (str):
-            sources (list[str]):
-            tag_slugs (list[str]):
-            content (list[ContentOut]):
-     """
+    """
+    Attributes:
+        slug (str):
+        local_slug (str):
+        section_slug (str):
+        title (str):
+        description (str):
+        sources (list[str]):
+        tag_slugs (list[str]):
+        content (list[ContentBlock]):
+    """
 
     slug: str
     local_slug: str
@@ -42,15 +34,10 @@ class RecordOut:
     description: str
     sources: list[str]
     tag_slugs: list[str]
-    content: list[ContentOut]
+    content: list[ContentBlock]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
-        from ..models.content_out import ContentOut
         slug = self.slug
 
         local_slug = self.local_slug
@@ -63,40 +50,34 @@ class RecordOut:
 
         sources = self.sources
 
-
-
         tag_slugs = self.tag_slugs
-
-
 
         content = []
         for content_item_data in self.content:
             content_item = content_item_data.to_dict()
             content.append(content_item)
 
-
-
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "slug": slug,
-            "local_slug": local_slug,
-            "section_slug": section_slug,
-            "title": title,
-            "description": description,
-            "sources": sources,
-            "tag_slugs": tag_slugs,
-            "content": content,
-        })
+        field_dict.update(
+            {
+                "slug": slug,
+                "local_slug": local_slug,
+                "section_slug": section_slug,
+                "title": title,
+                "description": description,
+                "sources": sources,
+                "tag_slugs": tag_slugs,
+                "content": content,
+            }
+        )
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.content_out import ContentOut
+        from ..models.content_block import ContentBlock
+
         d = dict(src_dict)
         slug = d.pop("slug")
 
@@ -110,19 +91,14 @@ class RecordOut:
 
         sources = cast(list[str], d.pop("sources"))
 
-
         tag_slugs = cast(list[str], d.pop("tag_slugs"))
-
 
         content = []
         _content = d.pop("content")
-        for content_item_data in (_content):
-            content_item = ContentOut.from_dict(content_item_data)
-
-
+        for content_item_data in _content:
+            content_item = ContentBlock.from_dict(content_item_data)
 
             content.append(content_item)
-
 
         record_out = cls(
             slug=slug,
@@ -134,7 +110,6 @@ class RecordOut:
             tag_slugs=tag_slugs,
             content=content,
         )
-
 
         record_out.additional_properties = d
         return record_out

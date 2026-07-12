@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App, resolveApiUrl } from "./App";
+import { CONTENT_ROLE } from "./models/recordContent.generated";
 
 const root = { links: [
   { rel: ["scaffoldings"], href: "http://api.test/catalog" },
@@ -84,7 +85,7 @@ describe("App", () => {
         : href.endsWith("/languages") ? languages
         : href.endsWith("/variables") ? variables
         : href.endsWith("/templates") ? templates
-        : href.includes("/records/architecture/aggregates") ? { properties: { ...records.entities[0].properties, sources: ["https://example.test"], content: [{ role: "paragraph", content: "An aggregate owns consistency.", language: "text", metadata: {} }] } }
+        : href.includes("/records/architecture/aggregates") ? { properties: { ...records.entities[0].properties, sources: ["https://example.test"], content: [{ role: CONTENT_ROLE.PARAGRAPH, content: "An aggregate owns consistency.", language: "text", metadata: {} }] } }
         : href.endsWith("/catalog/react") ? resource
         : href.includes("/forms/react") ? schema
         : root;
@@ -95,6 +96,42 @@ describe("App", () => {
     expect(await screen.findByRole("heading", { name: "Aggregates" })).toBeInTheDocument();
     expect(screen.getByText("An aggregate owns consistency.")).toBeInTheDocument();
     expect(screen.getAllByText("Architecture")).toHaveLength(2);
+  });
+
+  it("renders typed list, snippet, and image record blocks", async () => {
+    localStorage.setItem("modwire-api-key", "secret");
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const href = String(input);
+      const body = href.includes("/catalog") ? collection
+        : href.endsWith("/records") ? records
+        : href.endsWith("/sections") ? sections
+        : href.endsWith("/languages") ? languages
+        : href.endsWith("/variables") ? variables
+        : href.endsWith("/templates") ? templates
+        : href.includes("/records/architecture/aggregates") ? { properties: {
+          ...records.entities[0].properties,
+          sources: [],
+          content: [
+            { role: CONTENT_ROLE.SUBHEADING, content: "Rules", language: "en", metadata: {} },
+            { role: CONTENT_ROLE.LIST, content: ["Keep boundaries explicit", "Protect invariants"], language: "en", metadata: {} },
+            { role: CONTENT_ROLE.SNIPPET, content: "class Aggregate: pass", language: "python", metadata: {} },
+            { role: CONTENT_ROLE.IMAGE, content: "https://example.test/aggregate.png", language: "url", metadata: { alt: "Aggregate boundary", title: "Boundary" } },
+          ],
+        } }
+        : href.includes("/forms/react") ? schema
+        : root;
+      return new Response(JSON.stringify(body), { status: 200 });
+    });
+    render(<App />);
+    fireEvent.click(await screen.findByRole("tab", { name: "Records" }));
+
+    expect(await screen.findByRole("heading", { name: "Rules" })).toBeInTheDocument();
+    expect(screen.getByRole("list")).toHaveTextContent("Keep boundaries explicitProtect invariants");
+    const snippet = document.querySelector("code.language-python");
+    expect(snippet).toHaveTextContent("class Aggregate: pass");
+    expect(snippet?.querySelector(".hljs-keyword")).toHaveTextContent("class");
+    expect(screen.getByRole("img", { name: "Aggregate boundary" })).toHaveAttribute("src", "https://example.test/aggregate.png");
+    expect(screen.getByText("Boundary")).toBeInTheDocument();
   });
 
   it("opens API-backed scaffolding and structured variable forms", async () => {

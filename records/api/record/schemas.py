@@ -1,25 +1,12 @@
 from typing import Literal
 
 from ninja import Schema
-from pydantic import Field, JsonValue
+from pydantic import Field
 from pydantic_core import PydanticUndefined
 
+from records.api.schemas.content import ContentBlock
 from shared.api.schema import StrictSchema
 from shared.api.types import RecordSlug, Slug
-
-
-class ContentIn(StrictSchema):
-    role: Literal["heading", "subheading", "paragraph", "list", "markdown", "snippet", "image"]
-    content: str
-    language: str
-    metadata: dict[str, JsonValue] = Field(title="RecordContentInMetadata")
-
-
-class ContentOut(Schema):
-    role: Literal["heading", "subheading", "paragraph", "list", "markdown", "snippet", "image"]
-    content: str
-    language: str
-    metadata: dict[str, JsonValue] = Field(title="RecordContentOutMetadata")
 
 
 class RecordIn(StrictSchema):
@@ -28,7 +15,9 @@ class RecordIn(StrictSchema):
     description: str
     sources: list[str]
     tag_slugs: list[Slug]
-    content: list[ContentIn]
+    content: list[ContentBlock] = Field(
+        description="Ordered record body blocks, discriminated by the role property."
+    )
 
 
 class RecordPatchIn(StrictSchema):
@@ -36,7 +25,7 @@ class RecordPatchIn(StrictSchema):
     description: str = Field(default_factory=lambda: PydanticUndefined)
     sources: list[str] = Field(default_factory=lambda: PydanticUndefined)
     tag_slugs: list[Slug] = Field(default_factory=lambda: PydanticUndefined)
-    content: list[ContentIn] = Field(default_factory=lambda: PydanticUndefined)
+    content: list[ContentBlock] = Field(default_factory=lambda: PydanticUndefined)
 
 
 class RecordOut(Schema):
@@ -47,7 +36,7 @@ class RecordOut(Schema):
     description: str
     sources: list[str]
     tag_slugs: list[Slug]
-    content: list[ContentOut]
+    content: list[ContentBlock]
 
     @staticmethod
     def resolve_section_slug(obj):

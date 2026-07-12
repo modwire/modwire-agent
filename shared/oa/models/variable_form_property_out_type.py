@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class VariableFormPropertyOutType(str, Enum):
     ARRAY = "array"
     BOOLEAN = "boolean"

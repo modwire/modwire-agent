@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class PreviewErrorOutCode(str, Enum):
     DUPLICATE_TEMPLATE_OVERRIDE = "duplicate_template_override"
     HIGHLIGHTING_FAILED = "highlighting_failed"

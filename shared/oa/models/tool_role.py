@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ToolRole(str, Enum):
     BUILD = "build"
     COVERAGE = "coverage"

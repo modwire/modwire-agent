@@ -1,28 +1,20 @@
 from http import HTTPStatus
-from typing import Any, cast
-from urllib.parse import quote
+from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.siren_entity import SirenEntity
-from typing import cast
-
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
     *,
-    limit: int,
-    offset: int,
-    tag: list[str],
-
+    limit: int | Unset = 200,
+    offset: int | Unset = 0,
+    tag: list[str] | Unset = UNSET,
 ) -> dict[str, Any]:
-    
-
-    
 
     params: dict[str, Any] = {}
 
@@ -30,14 +22,13 @@ def _get_kwargs(
 
     params["offset"] = offset
 
-    json_tag = tag
-
+    json_tag: list[str] | Unset = UNSET
+    if not isinstance(tag, Unset):
+        json_tag = tag
 
     params["tag"] = json_tag
 
-
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
-
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -45,16 +36,12 @@ def _get_kwargs(
         "params": params,
     }
 
-
     return _kwargs
-
 
 
 def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
         response_200 = SirenEntity.from_dict(response.json())
-
-
 
         return response_200
 
@@ -76,17 +63,16 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    limit: int,
-    offset: int,
-    tag: list[str],
-
+    limit: int | Unset = 200,
+    offset: int | Unset = 0,
+    tag: list[str] | Unset = UNSET,
 ) -> Response[SirenEntity]:
-    """ List sections.
+    """List sections.
 
     Args:
-        limit (int):
-        offset (int):
-        tag (list[str]):
+        limit (int | Unset):  Default: 200.
+        offset (int | Unset):  Default: 0.
+        tag (list[str] | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -94,14 +80,12 @@ def sync_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         limit=limit,
-offset=offset,
-tag=tag,
-
+        offset=offset,
+        tag=tag,
     )
 
     response = client.get_httpx_client().request(
@@ -110,20 +94,20 @@ tag=tag,
 
     return _build_response(client=client, response=response)
 
+
 def sync(
     *,
     client: AuthenticatedClient,
-    limit: int,
-    offset: int,
-    tag: list[str],
-
+    limit: int | Unset = 200,
+    offset: int | Unset = 0,
+    tag: list[str] | Unset = UNSET,
 ) -> SirenEntity | None:
-    """ List sections.
+    """List sections.
 
     Args:
-        limit (int):
-        offset (int):
-        tag (list[str]):
+        limit (int | Unset):  Default: 200.
+        offset (int | Unset):  Default: 0.
+        tag (list[str] | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -131,31 +115,29 @@ def sync(
 
     Returns:
         SirenEntity
-     """
-
+    """
 
     return sync_detailed(
         client=client,
-limit=limit,
-offset=offset,
-tag=tag,
-
+        limit=limit,
+        offset=offset,
+        tag=tag,
     ).parsed
+
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    limit: int,
-    offset: int,
-    tag: list[str],
-
+    limit: int | Unset = 200,
+    offset: int | Unset = 0,
+    tag: list[str] | Unset = UNSET,
 ) -> Response[SirenEntity]:
-    """ List sections.
+    """List sections.
 
     Args:
-        limit (int):
-        offset (int):
-        tag (list[str]):
+        limit (int | Unset):  Default: 200.
+        offset (int | Unset):  Default: 0.
+        tag (list[str] | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -163,36 +145,32 @@ async def asyncio_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         limit=limit,
-offset=offset,
-tag=tag,
-
+        offset=offset,
+        tag=tag,
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    limit: int,
-    offset: int,
-    tag: list[str],
-
+    limit: int | Unset = 200,
+    offset: int | Unset = 0,
+    tag: list[str] | Unset = UNSET,
 ) -> SirenEntity | None:
-    """ List sections.
+    """List sections.
 
     Args:
-        limit (int):
-        offset (int):
-        tag (list[str]):
+        limit (int | Unset):  Default: 200.
+        offset (int | Unset):  Default: 0.
+        tag (list[str] | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -200,13 +178,13 @@ async def asyncio(
 
     Returns:
         SirenEntity
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        client=client,
-limit=limit,
-offset=offset,
-tag=tag,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            client=client,
+            limit=limit,
+            offset=offset,
+            tag=tag,
+        )
+    ).parsed

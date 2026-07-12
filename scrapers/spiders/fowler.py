@@ -8,6 +8,7 @@ from urllib.parse import urlparse, urlunparse
 from scrapy import Spider
 from scrapy.http import TextResponse
 
+from records.models.content import Content
 from scrapers.items import ScrapedContent, ScrapedRecord
 
 ARCHITECTURE_URL = "https://martinfowler.com/architecture/"
@@ -86,7 +87,7 @@ class FowlerSpider(Spider):
         if meta_description:
             return clean_text(meta_description)
         for block in content:
-            if block.role in {"paragraph", "list"}:
+            if block.role in {Content.Role.PARAGRAPH, Content.Role.LIST}:
                 return block.content.splitlines()[0]
         return self.title(response)
 
@@ -98,7 +99,7 @@ class FowlerSpider(Spider):
         ]
 
     def content_blocks(self, response: TextResponse) -> list[ScrapedContent]:
-        blocks = [ScrapedContent("heading", self.title(response), "text", {"source_url": response.url})]
+        blocks = [ScrapedContent(Content.Role.HEADING, self.title(response), "text", {"source_url": response.url})]
         roots = response.xpath(
             "//main//*[contains(concat(' ', normalize-space(@class), ' '), ' paperBody ') "
             "or contains(concat(' ', normalize-space(@class), ' '), ' appendix ')]"
@@ -116,23 +117,27 @@ class FowlerSpider(Spider):
         tag = element.root.tag.lower()
         text = clean_text(" ".join(element.xpath(".//text()").getall()))
         if tag in {"h2", "h3", "h4"} and text:
-            return [ScrapedContent("subheading", text, "text", {"source_url": response.url})]
+            return [ScrapedContent(Content.Role.SUBHEADING, text, "text", {"source_url": response.url})]
         if tag == "p" and text:
-            return [ScrapedContent("paragraph", text, "text", {"source_url": response.url})]
+            return [ScrapedContent(Content.Role.PARAGRAPH, text, "text", {"source_url": response.url})]
         if tag in {"ul", "ol"}:
             items = [clean_text(" ".join(item.xpath(".//text()").getall())) for item in element.xpath("./li")]
-            content = "\n".join(item for item in items if item)
-            return [ScrapedContent("list", content, "text", {"source_url": response.url})] if content else []
+            content = [item for item in items if item]
+            return [ScrapedContent(Content.Role.LIST, content, "text", {"source_url": response.url})] if content else []
         if tag == "pre":
             source = "\n".join(element.xpath(".//text()").getall()).strip()
-            return [ScrapedContent("snippet", source, "text", {"source_url": response.url})] if source else []
+            return (
+                [ScrapedContent(Content.Role.SNIPPET, source, "text", {"source_url": response.url})]
+                if source
+                else []
+            )
         if tag == "img" and self.include_images:
             src = element.attrib.get("src")
             if src:
                 url = response.urljoin(src)
                 return [
                     ScrapedContent(
-                        "image",
+                        Content.Role.IMAGE,
                         url,
                         "url",
                         {"source_url": url, "alt": clean_text(element.attrib.get("alt", ""))},

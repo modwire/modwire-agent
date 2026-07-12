@@ -1,43 +1,29 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, Literal, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-from typing import Literal, cast
-
-
-
-
-
-
 T = TypeVar("T", bound="SectionSearchResultOut")
-
 
 
 @_attrs_define
 class SectionSearchResultOut:
-    """ 
-        Attributes:
-            kind (Literal['section']):
-            slug (str):
-            score (float):
-            title (str):
-     """
+    """
+    Attributes:
+        kind (Literal['section']):
+        slug (str):
+        score (float):
+        title (str):
+    """
 
-    kind: Literal['section']
+    kind: Literal["section"]
     slug: str
     score: float
     title: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         kind = self.kind
@@ -48,25 +34,24 @@ class SectionSearchResultOut:
 
         title = self.title
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "kind": kind,
-            "slug": slug,
-            "score": score,
-            "title": title,
-        })
+        field_dict.update(
+            {
+                "kind": kind,
+                "slug": slug,
+                "score": score,
+                "title": title,
+            }
+        )
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        kind = cast(Literal['section'] , d.pop("kind"))
-        if kind != 'section':
+        kind = cast(Literal["section"], d.pop("kind"))
+        if kind != "section":
             raise ValueError(f"kind must match const 'section', got '{kind}'")
 
         slug = d.pop("slug")
@@ -81,7 +66,6 @@ class SectionSearchResultOut:
             score=score,
             title=title,
         )
-
 
         section_search_result_out.additional_properties = d
         return section_search_result_out

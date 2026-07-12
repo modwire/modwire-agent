@@ -1,35 +1,25 @@
 from __future__ import annotations
 
+import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-from typing import cast
-import datetime
-
-
-
-
-
-
 T = TypeVar("T", bound="ApiKeyCreatedOut")
-
 
 
 @_attrs_define
 class ApiKeyCreatedOut:
-    """ 
-        Attributes:
-            id (int):
-            name (str):
-            created_at (datetime.datetime):
-            updated_at (datetime.datetime):
-            key (str):
-     """
+    """
+    Attributes:
+        id (int):
+        name (str):
+        created_at (datetime.datetime):
+        updated_at (datetime.datetime):
+        key (str):
+    """
 
     id: int
     name: str
@@ -37,10 +27,6 @@ class ApiKeyCreatedOut:
     updated_at: datetime.datetime
     key: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         id = self.id
@@ -53,20 +39,19 @@ class ApiKeyCreatedOut:
 
         key = self.key
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "id": id,
-            "name": name,
-            "created_at": created_at,
-            "updated_at": updated_at,
-            "key": key,
-        })
+        field_dict.update(
+            {
+                "id": id,
+                "name": name,
+                "created_at": created_at,
+                "updated_at": updated_at,
+                "key": key,
+            }
+        )
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -77,13 +62,7 @@ class ApiKeyCreatedOut:
 
         created_at = datetime.datetime.fromisoformat(d.pop("created_at"))
 
-
-
-
         updated_at = datetime.datetime.fromisoformat(d.pop("updated_at"))
-
-
-
 
         key = d.pop("key")
 
@@ -94,7 +73,6 @@ class ApiKeyCreatedOut:
             updated_at=updated_at,
             key=key,
         )
-
 
         api_key_created_out.additional_properties = d
         return api_key_created_out

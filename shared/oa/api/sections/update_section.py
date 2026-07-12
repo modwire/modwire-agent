@@ -1,35 +1,28 @@
 from http import HTTPStatus
-from typing import Any, cast
+from typing import Any
 from urllib.parse import quote
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.section_in import SectionIn
 from ...models.siren_entity import SirenEntity
-from typing import cast
-
+from ...types import Response
 
 
 def _get_kwargs(
     slug: str,
     *,
     body: SectionIn,
-
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
-
-    
-
-    
-
     _kwargs: dict[str, Any] = {
         "method": "put",
-        "url": "/api/sections/{slug}".format(slug=quote(str(slug), safe=""),),
+        "url": "/api/sections/{slug}".format(
+            slug=quote(str(slug), safe=""),
+        ),
     }
 
     _kwargs["json"] = body.to_dict()
@@ -40,12 +33,9 @@ def _get_kwargs(
     return _kwargs
 
 
-
 def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
         response_200 = SirenEntity.from_dict(response.json())
-
-
 
         return response_200
 
@@ -69,9 +59,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: SectionIn,
-
 ) -> Response[SirenEntity]:
-    """ Update section.
+    """Update section.
 
     Args:
         slug (str):
@@ -83,13 +72,11 @@ def sync_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         slug=slug,
-body=body,
-
+        body=body,
     )
 
     response = client.get_httpx_client().request(
@@ -98,14 +85,14 @@ body=body,
 
     return _build_response(client=client, response=response)
 
+
 def sync(
     slug: str,
     *,
     client: AuthenticatedClient,
     body: SectionIn,
-
 ) -> SirenEntity | None:
-    """ Update section.
+    """Update section.
 
     Args:
         slug (str):
@@ -117,24 +104,22 @@ def sync(
 
     Returns:
         SirenEntity
-     """
-
+    """
 
     return sync_detailed(
         slug=slug,
-client=client,
-body=body,
-
+        client=client,
+        body=body,
     ).parsed
+
 
 async def asyncio_detailed(
     slug: str,
     *,
     client: AuthenticatedClient,
     body: SectionIn,
-
 ) -> Response[SirenEntity]:
-    """ Update section.
+    """Update section.
 
     Args:
         slug (str):
@@ -146,29 +131,25 @@ async def asyncio_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         slug=slug,
-body=body,
-
+        body=body,
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     slug: str,
     *,
     client: AuthenticatedClient,
     body: SectionIn,
-
 ) -> SirenEntity | None:
-    """ Update section.
+    """Update section.
 
     Args:
         slug (str):
@@ -180,12 +161,12 @@ async def asyncio(
 
     Returns:
         SirenEntity
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        slug=slug,
-client=client,
-body=body,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            slug=slug,
+            client=client,
+            body=body,
+        )
+    ).parsed

@@ -3,11 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from records.models.content import Content
+
 
 @dataclass(frozen=True)
 class ScrapedContent:
-    role: str
-    content: str
+    role: Content.Role
+    content: str | list[str]
     language: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
 

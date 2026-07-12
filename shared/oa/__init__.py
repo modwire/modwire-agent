@@ -1,5 +1,5 @@
+"""A client library for accessing Modwire Siren API"""
 
-""" A client library for accessing Modwire Siren API """
 from .client import AuthenticatedClient, Client
 
 __all__ = (

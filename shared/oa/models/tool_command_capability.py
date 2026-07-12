@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ToolCommandCapability(str, Enum):
     AUDIT = "audit"
     BUILD = "build"

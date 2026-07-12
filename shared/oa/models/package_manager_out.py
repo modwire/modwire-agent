@@ -1,59 +1,45 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, Literal, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..types import UNSET, Unset
-from typing import cast
-from typing import Literal, cast
-
-
-
-
-
-
 T = TypeVar("T", bound="PackageManagerOut")
-
 
 
 @_attrs_define
 class PackageManagerOut:
-    """ 
-        Attributes:
-            id (str):
-            language (str):
-            manifest_paths (list[str]):
-            lockfile_paths (list[str]):
-            registry_url (Literal[''] | str):
-            name (str):
-            executable (str):
-            package_url_type (str | Unset):  Default: ''.
-            version_constraint (str | Unset):  Default: ''.
-            supports_workspaces (bool | Unset):  Default: False.
-            commit_lockfiles (bool | Unset):  Default: True.
-     """
+    """
+    Attributes:
+        id (str):
+        language (str):
+        manifest_paths (list[str]):
+        lockfile_paths (list[str]):
+        registry_url (Literal[''] | str):
+        name (str):
+        executable (str):
+        package_url_type (str | Unset):  Default: ''.
+        version_constraint (str | Unset):  Default: ''.
+        supports_workspaces (bool | Unset):  Default: False.
+        commit_lockfiles (bool | Unset):  Default: True.
+    """
 
     id: str
     language: str
     manifest_paths: list[str]
     lockfile_paths: list[str]
-    registry_url: Literal[''] | str
+    registry_url: Literal[""] | str
     name: str
     executable: str
-    package_url_type: str | Unset = ''
-    version_constraint: str | Unset = ''
+    package_url_type: str | Unset = ""
+    version_constraint: str | Unset = ""
     supports_workspaces: bool | Unset = False
     commit_lockfiles: bool | Unset = True
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         id = self.id
@@ -62,13 +48,9 @@ class PackageManagerOut:
 
         manifest_paths = self.manifest_paths
 
-
-
         lockfile_paths = self.lockfile_paths
 
-
-
-        registry_url: Literal[''] | str
+        registry_url: Literal[""] | str
         registry_url = self.registry_url
 
         name = self.name
@@ -83,18 +65,19 @@ class PackageManagerOut:
 
         commit_lockfiles = self.commit_lockfiles
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "id": id,
-            "language": language,
-            "manifest_paths": manifest_paths,
-            "lockfile_paths": lockfile_paths,
-            "registry_url": registry_url,
-            "name": name,
-            "executable": executable,
-        })
+        field_dict.update(
+            {
+                "id": id,
+                "language": language,
+                "manifest_paths": manifest_paths,
+                "lockfile_paths": lockfile_paths,
+                "registry_url": registry_url,
+                "name": name,
+                "executable": executable,
+            }
+        )
         if package_url_type is not UNSET:
             field_dict["package_url_type"] = package_url_type
         if version_constraint is not UNSET:
@@ -106,8 +89,6 @@ class PackageManagerOut:
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
@@ -117,19 +98,16 @@ class PackageManagerOut:
 
         manifest_paths = cast(list[str], d.pop("manifest_paths"))
 
-
         lockfile_paths = cast(list[str], d.pop("lockfile_paths"))
 
-
-        def _parse_registry_url(data: object) -> Literal[''] | str:
-            registry_url_type_0 = cast(Literal[''] , data)
-            if registry_url_type_0 != '':
+        def _parse_registry_url(data: object) -> Literal[""] | str:
+            registry_url_type_0 = cast(Literal[""], data)
+            if registry_url_type_0 != "":
                 raise ValueError(f"registry_url_type_0 must match const '', got '{registry_url_type_0}'")
             return registry_url_type_0
-            return cast(Literal[''] | str, data)
+            return cast(Literal[""] | str, data)
 
         registry_url = _parse_registry_url(d.pop("registry_url"))
-
 
         name = d.pop("name")
 
@@ -156,7 +134,6 @@ class PackageManagerOut:
             supports_workspaces=supports_workspaces,
             commit_lockfiles=commit_lockfiles,
         )
-
 
         package_manager_out.additional_properties = d
         return package_manager_out

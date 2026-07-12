@@ -116,7 +116,10 @@ class RecordService:
 
     def search_text(self, record: Record, tag_slugs: tuple[str, ...] = ()) -> str:
         tags = list(tag_slugs) or list(record.tags.values_list("slug", flat=True))
-        content_text = "\n".join(record.content.order_by("position").values_list("content", flat=True))
+        content_text = "\n".join(
+            self.content_text(value)
+            for value in record.content.order_by("position").values_list("content", flat=True)
+        )
         return "\n".join(
             [
                 record.slug,
@@ -135,7 +138,7 @@ class RecordService:
         content_items: list[dict],
         tag_slugs: tuple[str, ...] = (),
     ) -> str:
-        content_text = "\n".join(item["content"] for item in content_items)
+        content_text = "\n".join(self.content_text(item["content"]) for item in content_items)
         return "\n".join(
             [
                 record.slug,
@@ -147,6 +150,10 @@ class RecordService:
                 " ".join(tag_slugs),
             ]
         ).strip()
+
+    @staticmethod
+    def content_text(value: str | list[str]) -> str:
+        return "\n".join(value) if isinstance(value, list) else value
 
     def search(
         self,

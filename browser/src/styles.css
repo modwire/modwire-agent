@@ -45,3 +45,30 @@ body { margin: 0; }
 .code-view .hll { background-color: #374151; }
 .code-view .k,.code-view .kd,.code-view .kn { color: #c4b5fd; }.code-view .s,.code-view .s1,.code-view .s2 { color:#86efac; }.code-view .c,.code-view .c1 { color:#6b7280; }.code-view .nf,.code-view .nc { color:#93c5fd; }.code-view .mi,.code-view .mf { color:#fca5a5; }
 @media (max-width: 1000px) { .workspace { grid-template-columns: 1fr; }.sidebar { border-right: 0; border-bottom: 1px solid #e3e7ef; }.catalog { flex-direction: row !important; overflow-x: auto; }.catalog-item { min-width: 180px !important; }.main-pane { padding: 22px 16px; }.scaffolding-studio { height: 760px; } }
+.record-snippet {
+  background: #111827;
+  border-radius: 8px;
+  color: #e5e7eb;
+  overflow: hidden;
+}
+
+.record-snippet-language {
+  display: block;
+  padding: 8px 14px 0;
+  color: #9ca3af;
+  font-family: monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.record-snippet pre {
+  margin: 0;
+  overflow-x: auto;
+  padding: 12px 14px 16px;
+}
+
+.record-snippet code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  white-space: pre;
+}

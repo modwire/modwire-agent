@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ContentRole(str, Enum):
     HEADING = "heading"
     IMAGE = "image"

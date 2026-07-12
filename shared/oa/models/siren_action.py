@@ -1,38 +1,31 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..types import UNSET, Unset
-from typing import cast
-
 if TYPE_CHECKING:
-  from ..models.siren_field import SirenField
-
-
-
+    from ..models.siren_field import SirenField
 
 
 T = TypeVar("T", bound="SirenAction")
 
 
-
 @_attrs_define
 class SirenAction:
-    """ 
-        Attributes:
-            name (str):
-            method (str):
-            href (str):
-            title (str | Unset):
-            type_ (str | Unset):
-            fields (list[SirenField] | Unset):
-     """
+    """
+    Attributes:
+        name (str):
+        method (str):
+        href (str):
+        title (str | Unset):
+        type_ (str | Unset):
+        fields (list[SirenField] | Unset):
+    """
 
     name: str
     method: str
@@ -42,12 +35,7 @@ class SirenAction:
     fields: list[SirenField] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
-        from ..models.siren_field import SirenField
         name = self.name
 
         method = self.method
@@ -65,16 +53,15 @@ class SirenAction:
                 fields_item = fields_item_data.to_dict()
                 fields.append(fields_item)
 
-
-
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "name": name,
-            "method": method,
-            "href": href,
-        })
+        field_dict.update(
+            {
+                "name": name,
+                "method": method,
+                "href": href,
+            }
+        )
         if title is not UNSET:
             field_dict["title"] = title
         if type_ is not UNSET:
@@ -84,11 +71,10 @@ class SirenAction:
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.siren_field import SirenField
+
         d = dict(src_dict)
         name = d.pop("name")
 
@@ -107,10 +93,7 @@ class SirenAction:
             for fields_item_data in _fields:
                 fields_item = SirenField.from_dict(fields_item_data)
 
-
-
                 fields.append(fields_item)
-
 
         siren_action = cls(
             name=name,
@@ -120,7 +103,6 @@ class SirenAction:
             type_=type_,
             fields=fields,
         )
-
 
         siren_action.additional_properties = d
         return siren_action

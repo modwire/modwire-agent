@@ -34,7 +34,9 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { EditorPanels } from "./components/EditorPanels";
 import { FileTree, PreviewFile } from "./components/FileTree";
 import { PreviewPane } from "./components/PreviewPane";
+import { RecordBlock } from "./components/RecordBlock";
 import { TemplatePane, TemplateSource } from "./components/TemplatePane";
+import { RecordContent } from "./models/recordContent.generated";
 
 type Properties = Record<string, unknown>;
 type SirenLink = { rel: string[]; href: string; title?: string };
@@ -43,7 +45,6 @@ type SirenEntity = { properties?: Properties; entities?: SirenEntity[]; links?: 
 type Scaffolding = { id: string; name: string; description: string; language: string; href: string };
 type Language = { id: string; name: string };
 type RecordSummary = { slug: string; section_slug: string; title: string; description: string; tag_slugs: string[]; href: string };
-type RecordContent = { role: string; content: string; language: string; metadata: Properties };
 type RecordResource = RecordSummary & { sources: string[]; content: RecordContent[] };
 type SectionSummary = { slug: string; title: string; description: string };
 type SchemaProperty = {
@@ -471,9 +472,7 @@ export function App() {
             </Stack>
             <Paper className="panel record-panel" elevation={0}>
               <Stack spacing={2.5}>
-                {selectedRecord.content.map((block, index) => block.role === "list"
-                  ? <Box component="ul" key={index} sx={{ my: 0, pl: 3 }}>{block.content.split("\n").map((line) => <li key={line}><Typography>{line}</Typography></li>)}</Box>
-                  : <Typography key={index} sx={{ whiteSpace: "pre-wrap" }}>{block.content}</Typography>)}
+                {selectedRecord.content.map((block, index) => <RecordBlock block={block} key={index} />)}
                 {selectedRecord.sources.length > 0 && <><Divider /><Typography variant="overline" fontWeight={800}>Sources</Typography>{selectedRecord.sources.map((source) => <Typography component="a" href={source} target="_blank" rel="noreferrer" key={source} color="primary">{source}</Typography>)}</>}
               </Stack>
             </Paper>

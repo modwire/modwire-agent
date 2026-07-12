@@ -1,4 +1,4 @@
-""" Contains all the data models used in inputs/outputs """
+"""Contains all the data models used in inputs/outputs"""
 
 from .api_key_created_out import ApiKeyCreatedOut
 from .api_key_in import ApiKeyIn
@@ -6,29 +6,38 @@ from .api_key_out import ApiKeyOut
 from .api_key_patch_in import ApiKeyPatchIn
 from .command_out import CommandOut
 from .command_result import CommandResult
+from .content_block import ContentBlock
 from .content_in import ContentIn
-from .content_in_role import ContentInRole
+from .content_metadata import ContentMetadata
 from .content_out import ContentOut
-from .content_out_role import ContentOutRole
 from .content_patch_in import ContentPatchIn
 from .content_role import ContentRole
+from .convergence_changes_out import ConvergenceChangesOut
+from .convergence_plan_out import ConvergencePlanOut
+from .convergence_plan_out_scaffolding import ConvergencePlanOutScaffolding
 from .details import Details
 from .language_out import LanguageOut
 from .list_tools_role import ListToolsRole
-from .metadata import Metadata
 from .package_manager_out import PackageManagerOut
 from .preview_error_out import PreviewErrorOut
 from .preview_error_out_code import PreviewErrorOutCode
 from .preview_file_out import PreviewFileOut
 from .problem import Problem
 from .properties import Properties
-from .record_content_in_metadata import RecordContentInMetadata
-from .record_content_out_metadata import RecordContentOutMetadata
 from .record_in import RecordIn
 from .record_out import RecordOut
 from .record_patch_in import RecordPatchIn
 from .record_search_result_out import RecordSearchResultOut
 from .record_summary_out import RecordSummaryOut
+from .scaffolding_bundle_out import ScaffoldingBundleOut
+from .scaffolding_bundle_template_out import ScaffoldingBundleTemplateOut
+from .scaffolding_bundle_variable_out import ScaffoldingBundleVariableOut
+from .scaffolding_bundle_variable_out_type import ScaffoldingBundleVariableOutType
+from .scaffolding_convergence_in import ScaffoldingConvergenceIn
+from .scaffolding_convergence_out import ScaffoldingConvergenceOut
+from .scaffolding_convergence_template_in import ScaffoldingConvergenceTemplateIn
+from .scaffolding_convergence_variable_in import ScaffoldingConvergenceVariableIn
+from .scaffolding_convergence_variable_in_type import ScaffoldingConvergenceVariableInType
 from .scaffolding_form_schema_out import ScaffoldingFormSchemaOut
 from .scaffolding_in import ScaffoldingIn
 from .scaffolding_out import ScaffoldingOut
@@ -48,6 +57,8 @@ from .siren_action import SirenAction
 from .siren_entity import SirenEntity
 from .siren_entity_properties import SirenEntityProperties
 from .siren_field import SirenField
+from .siren_field_options_item import SirenFieldOptionsItem
+from .siren_field_schema import SirenFieldSchema
 from .siren_link import SirenLink
 from .tag_in import TagIn
 from .tag_out import TagOut
@@ -67,6 +78,7 @@ from .variable_in import VariableIn
 from .variable_out import VariableOut
 from .variable_patch_in import VariablePatchIn
 from .variable_type import VariableType
+from .write_mode import WriteMode
 
 __all__ = (
     "ApiKeyCreatedOut",
@@ -75,29 +87,38 @@ __all__ = (
     "ApiKeyPatchIn",
     "CommandOut",
     "CommandResult",
+    "ContentBlock",
     "ContentIn",
-    "ContentInRole",
+    "ContentMetadata",
     "ContentOut",
-    "ContentOutRole",
     "ContentPatchIn",
     "ContentRole",
+    "ConvergenceChangesOut",
+    "ConvergencePlanOut",
+    "ConvergencePlanOutScaffolding",
     "Details",
     "LanguageOut",
     "ListToolsRole",
-    "Metadata",
     "PackageManagerOut",
     "PreviewErrorOut",
     "PreviewErrorOutCode",
     "PreviewFileOut",
     "Problem",
     "Properties",
-    "RecordContentInMetadata",
-    "RecordContentOutMetadata",
     "RecordIn",
     "RecordOut",
     "RecordPatchIn",
     "RecordSearchResultOut",
     "RecordSummaryOut",
+    "ScaffoldingBundleOut",
+    "ScaffoldingBundleTemplateOut",
+    "ScaffoldingBundleVariableOut",
+    "ScaffoldingBundleVariableOutType",
+    "ScaffoldingConvergenceIn",
+    "ScaffoldingConvergenceOut",
+    "ScaffoldingConvergenceTemplateIn",
+    "ScaffoldingConvergenceVariableIn",
+    "ScaffoldingConvergenceVariableInType",
     "ScaffoldingFormSchemaOut",
     "ScaffoldingIn",
     "ScaffoldingOut",
@@ -117,6 +138,8 @@ __all__ = (
     "SirenEntity",
     "SirenEntityProperties",
     "SirenField",
+    "SirenFieldOptionsItem",
+    "SirenFieldSchema",
     "SirenLink",
     "TagIn",
     "TagOut",
@@ -136,4 +159,5 @@ __all__ = (
     "VariableOut",
     "VariablePatchIn",
     "VariableType",
+    "WriteMode",
 )

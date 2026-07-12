@@ -1,28 +1,20 @@
 from http import HTTPStatus
-from typing import Any, cast
-from urllib.parse import quote
+from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.list_tools_role import ListToolsRole
 from ...models.siren_entity import SirenEntity
-from typing import cast
-
+from ...types import UNSET, Response
 
 
 def _get_kwargs(
     *,
     language_id: str,
     role: ListToolsRole,
-
 ) -> dict[str, Any]:
-    
-
-    
 
     params: dict[str, Any] = {}
 
@@ -31,9 +23,7 @@ def _get_kwargs(
     json_role = role.value
     params["role"] = json_role
 
-
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
-
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -41,16 +31,12 @@ def _get_kwargs(
         "params": params,
     }
 
-
     return _kwargs
-
 
 
 def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
         response_200 = SirenEntity.from_dict(response.json())
-
-
 
         return response_200
 
@@ -74,9 +60,8 @@ def sync_detailed(
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-
 ) -> Response[SirenEntity]:
-    """ List tools.
+    """List tools.
 
     Args:
         language_id (str):
@@ -88,13 +73,11 @@ def sync_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         language_id=language_id,
-role=role,
-
+        role=role,
     )
 
     response = client.get_httpx_client().request(
@@ -103,14 +86,14 @@ role=role,
 
     return _build_response(client=client, response=response)
 
+
 def sync(
     *,
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-
 ) -> SirenEntity | None:
-    """ List tools.
+    """List tools.
 
     Args:
         language_id (str):
@@ -122,24 +105,22 @@ def sync(
 
     Returns:
         SirenEntity
-     """
-
+    """
 
     return sync_detailed(
         client=client,
-language_id=language_id,
-role=role,
-
+        language_id=language_id,
+        role=role,
     ).parsed
+
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-
 ) -> Response[SirenEntity]:
-    """ List tools.
+    """List tools.
 
     Args:
         language_id (str):
@@ -151,29 +132,25 @@ async def asyncio_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         language_id=language_id,
-role=role,
-
+        role=role,
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
     language_id: str,
     role: ListToolsRole,
-
 ) -> SirenEntity | None:
-    """ List tools.
+    """List tools.
 
     Args:
         language_id (str):
@@ -185,12 +162,12 @@ async def asyncio(
 
     Returns:
         SirenEntity
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        client=client,
-language_id=language_id,
-role=role,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            client=client,
+            language_id=language_id,
+            role=role,
+        )
+    ).parsed

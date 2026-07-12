@@ -1,40 +1,33 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..types import UNSET, Unset
-from typing import cast
-
 if TYPE_CHECKING:
-  from ..models.siren_action import SirenAction
-  from ..models.siren_entity_properties import SirenEntityProperties
-  from ..models.siren_link import SirenLink
-
-
-
+    from ..models.siren_action import SirenAction
+    from ..models.siren_entity_properties import SirenEntityProperties
+    from ..models.siren_link import SirenLink
 
 
 T = TypeVar("T", bound="SirenEntity")
 
 
-
 @_attrs_define
 class SirenEntity:
-    """ 
-        Attributes:
-            class_ (list[str]):
-            links (list[SirenLink]):
-            rel (list[str] | Unset):
-            properties (SirenEntityProperties | Unset):
-            entities (list[SirenEntity] | Unset):
-            actions (list[SirenAction] | Unset):
-     """
+    """
+    Attributes:
+        class_ (list[str]):
+        links (list[SirenLink]):
+        rel (list[str] | Unset):
+        properties (SirenEntityProperties | Unset):
+        entities (list[SirenEntity] | Unset):
+        actions (list[SirenAction] | Unset):
+    """
 
     class_: list[str]
     links: list[SirenLink]
@@ -44,30 +37,17 @@ class SirenEntity:
     actions: list[SirenAction] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
-        from ..models.siren_action import SirenAction
-        from ..models.siren_entity_properties import SirenEntityProperties
-        from ..models.siren_link import SirenLink
         class_ = self.class_
-
-
 
         links = []
         for links_item_data in self.links:
             links_item = links_item_data.to_dict()
             links.append(links_item)
 
-
-
         rel: list[str] | Unset = UNSET
         if not isinstance(self.rel, Unset):
             rel = self.rel
-
-
 
         properties: dict[str, Any] | Unset = UNSET
         if not isinstance(self.properties, Unset):
@@ -80,8 +60,6 @@ class SirenEntity:
                 entities_item = entities_item_data.to_dict()
                 entities.append(entities_item)
 
-
-
         actions: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.actions, Unset):
             actions = []
@@ -89,15 +67,14 @@ class SirenEntity:
                 actions_item = actions_item_data.to_dict()
                 actions.append(actions_item)
 
-
-
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "class": class_,
-            "links": links,
-        })
+        field_dict.update(
+            {
+                "class": class_,
+                "links": links,
+            }
+        )
         if rel is not UNSET:
             field_dict["rel"] = rel
         if properties is not UNSET:
@@ -109,39 +86,30 @@ class SirenEntity:
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.siren_action import SirenAction
         from ..models.siren_entity_properties import SirenEntityProperties
         from ..models.siren_link import SirenLink
+
         d = dict(src_dict)
         class_ = cast(list[str], d.pop("class"))
 
-
         links = []
         _links = d.pop("links")
-        for links_item_data in (_links):
+        for links_item_data in _links:
             links_item = SirenLink.from_dict(links_item_data)
-
-
 
             links.append(links_item)
 
-
         rel = cast(list[str], d.pop("rel", UNSET))
-
 
         _properties = d.pop("properties", UNSET)
         properties: SirenEntityProperties | Unset
-        if isinstance(_properties,  Unset):
+        if isinstance(_properties, Unset):
             properties = UNSET
         else:
             properties = SirenEntityProperties.from_dict(_properties)
-
-
-
 
         _entities = d.pop("entities", UNSET)
         entities: list[SirenEntity] | Unset = UNSET
@@ -150,10 +118,7 @@ class SirenEntity:
             for entities_item_data in _entities:
                 entities_item = SirenEntity.from_dict(entities_item_data)
 
-
-
                 entities.append(entities_item)
-
 
         _actions = d.pop("actions", UNSET)
         actions: list[SirenAction] | Unset = UNSET
@@ -162,10 +127,7 @@ class SirenEntity:
             for actions_item_data in _actions:
                 actions_item = SirenAction.from_dict(actions_item_data)
 
-
-
                 actions.append(actions_item)
-
 
         siren_entity = cls(
             class_=class_,
@@ -175,7 +137,6 @@ class SirenEntity:
             entities=entities,
             actions=actions,
         )
-
 
         siren_entity.additional_properties = d
         return siren_entity

@@ -1,34 +1,24 @@
 from http import HTTPStatus
-from typing import Any, cast
-from urllib.parse import quote
+from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.siren_entity import SirenEntity
-from typing import cast
-
+from ...types import UNSET, Response
 
 
 def _get_kwargs(
     *,
     tool_id: str,
-
 ) -> dict[str, Any]:
-    
-
-    
 
     params: dict[str, Any] = {}
 
     params["tool_id"] = tool_id
 
-
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
-
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -36,16 +26,12 @@ def _get_kwargs(
         "params": params,
     }
 
-
     return _kwargs
-
 
 
 def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
         response_200 = SirenEntity.from_dict(response.json())
-
-
 
         return response_200
 
@@ -68,9 +54,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     tool_id: str,
-
 ) -> Response[SirenEntity]:
-    """ List tool_commands.
+    """List tool_commands.
 
     Args:
         tool_id (str):
@@ -81,12 +66,10 @@ def sync_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         tool_id=tool_id,
-
     )
 
     response = client.get_httpx_client().request(
@@ -95,13 +78,13 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
+
 def sync(
     *,
     client: AuthenticatedClient,
     tool_id: str,
-
 ) -> SirenEntity | None:
-    """ List tool_commands.
+    """List tool_commands.
 
     Args:
         tool_id (str):
@@ -112,22 +95,20 @@ def sync(
 
     Returns:
         SirenEntity
-     """
-
+    """
 
     return sync_detailed(
         client=client,
-tool_id=tool_id,
-
+        tool_id=tool_id,
     ).parsed
+
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     tool_id: str,
-
 ) -> Response[SirenEntity]:
-    """ List tool_commands.
+    """List tool_commands.
 
     Args:
         tool_id (str):
@@ -138,27 +119,23 @@ async def asyncio_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         tool_id=tool_id,
-
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
     tool_id: str,
-
 ) -> SirenEntity | None:
-    """ List tool_commands.
+    """List tool_commands.
 
     Args:
         tool_id (str):
@@ -169,11 +146,11 @@ async def asyncio(
 
     Returns:
         SirenEntity
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        client=client,
-tool_id=tool_id,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            client=client,
+            tool_id=tool_id,
+        )
+    ).parsed

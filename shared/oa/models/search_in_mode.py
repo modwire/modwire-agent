@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SearchInMode(str, Enum):
     FTS = "fts"
     VECTOR = "vector"

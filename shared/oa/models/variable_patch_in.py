@@ -1,45 +1,32 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
-from attrs import field as _attrs_field
-
-from ..types import UNSET, Unset
 
 from ..models.variable_type import VariableType
 from ..types import UNSET, Unset
 
-
-
-
-
-
 T = TypeVar("T", bound="VariablePatchIn")
-
 
 
 @_attrs_define
 class VariablePatchIn:
-    """ 
-        Attributes:
-            name (str | Unset):
-            type_ (VariableType | Unset):
-            description (str | Unset):
-            default_value (Any | Unset):
-            required (bool | Unset):
-     """
+    """
+    Attributes:
+        name (str | Unset):
+        type_ (VariableType | Unset):
+        description (str | Unset):
+        default_value (Any | Unset):
+        required (bool | Unset):
+    """
 
     name: str | Unset = UNSET
     type_: VariableType | Unset = UNSET
     description: str | Unset = UNSET
     default_value: Any | Unset = UNSET
     required: bool | Unset = UNSET
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         name = self.name
@@ -48,18 +35,15 @@ class VariablePatchIn:
         if not isinstance(self.type_, Unset):
             type_ = self.type_.value
 
-
         description = self.description
 
         default_value = self.default_value
 
         required = self.required
 
-
         field_dict: dict[str, Any] = {}
 
-        field_dict.update({
-        })
+        field_dict.update({})
         if name is not UNSET:
             field_dict["name"] = name
         if type_ is not UNSET:
@@ -73,8 +57,6 @@ class VariablePatchIn:
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
@@ -82,13 +64,10 @@ class VariablePatchIn:
 
         _type_ = d.pop("type", UNSET)
         type_: VariableType | Unset
-        if isinstance(_type_,  Unset):
+        if isinstance(_type_, Unset):
             type_ = UNSET
         else:
             type_ = VariableType(_type_)
-
-
-
 
         description = d.pop("description", UNSET)
 
@@ -105,4 +84,3 @@ class VariablePatchIn:
         )
 
         return variable_patch_in
-

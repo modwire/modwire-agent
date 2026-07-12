@@ -1,48 +1,36 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
 from ..models.preview_error_out_code import PreviewErrorOutCode
 from ..types import UNSET, Unset
-from typing import cast
 
 if TYPE_CHECKING:
-  from ..models.details import Details
-
-
-
+    from ..models.details import Details
 
 
 T = TypeVar("T", bound="PreviewErrorOut")
 
 
-
 @_attrs_define
 class PreviewErrorOut:
-    """ 
-        Attributes:
-            code (PreviewErrorOutCode):
-            message (str):
-            details (Details | Unset):
-     """
+    """
+    Attributes:
+        code (PreviewErrorOutCode):
+        message (str):
+        details (Details | Unset):
+    """
 
     code: PreviewErrorOutCode
     message: str
     details: Details | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
-        from ..models.details import Details
         code = self.code.value
 
         message = self.message
@@ -51,47 +39,40 @@ class PreviewErrorOut:
         if not isinstance(self.details, Unset):
             details = self.details.to_dict()
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "code": code,
-            "message": message,
-        })
+        field_dict.update(
+            {
+                "code": code,
+                "message": message,
+            }
+        )
         if details is not UNSET:
             field_dict["details"] = details
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.details import Details
+
         d = dict(src_dict)
         code = PreviewErrorOutCode(d.pop("code"))
-
-
-
 
         message = d.pop("message")
 
         _details = d.pop("details", UNSET)
         details: Details | Unset
-        if isinstance(_details,  Unset):
+        if isinstance(_details, Unset):
             details = UNSET
         else:
             details = Details.from_dict(_details)
-
-
-
 
         preview_error_out = cls(
             code=code,
             message=message,
             details=details,
         )
-
 
         preview_error_out.additional_properties = d
         return preview_error_out

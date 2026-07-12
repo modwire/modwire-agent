@@ -1,94 +1,115 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
-from attrs import field as _attrs_field
 
+from ..models.content_role import ContentRole
 from ..types import UNSET, Unset
 
-from ..models.content_in_role import ContentInRole
-from typing import cast
-
 if TYPE_CHECKING:
-  from ..models.record_content_in_metadata import RecordContentInMetadata
-
-
-
+    from ..models.content_metadata import ContentMetadata
 
 
 T = TypeVar("T", bound="ContentIn")
 
 
-
 @_attrs_define
 class ContentIn:
-    """ 
-        Attributes:
-            role (ContentInRole):
-            content (str):
-            language (str):
-            metadata (RecordContentInMetadata):
-     """
+    """
+    Attributes:
+        role (ContentRole):
+        content (list[str] | str): An array of plain strings for lists; a string for every other role.
+        language (str): Natural language for prose and lists; syntax identifier for snippets.
+        record_slug (str):
+        position (int):
+        metadata (ContentMetadata | Unset): Supported provenance, accessibility, and presentation metadata.
+    """
 
-    role: ContentInRole
-    content: str
+    role: ContentRole
+    content: list[str] | str
     language: str
-    metadata: RecordContentInMetadata
-
-
-
-
+    record_slug: str
+    position: int
+    metadata: ContentMetadata | Unset = UNSET
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.record_content_in_metadata import RecordContentInMetadata
         role = self.role.value
 
-        content = self.content
+        content: list[str] | str
+        if isinstance(self.content, list):
+            content = self.content
+
+        else:
+            content = self.content
 
         language = self.language
 
-        metadata = self.metadata.to_dict()
+        record_slug = self.record_slug
 
+        position = self.position
+
+        metadata: dict[str, Any] | Unset = UNSET
+        if not isinstance(self.metadata, Unset):
+            metadata = self.metadata.to_dict()
 
         field_dict: dict[str, Any] = {}
 
-        field_dict.update({
-            "role": role,
-            "content": content,
-            "language": language,
-            "metadata": metadata,
-        })
+        field_dict.update(
+            {
+                "role": role,
+                "content": content,
+                "language": language,
+                "record_slug": record_slug,
+                "position": position,
+            }
+        )
+        if metadata is not UNSET:
+            field_dict["metadata"] = metadata
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.record_content_in_metadata import RecordContentInMetadata
+        from ..models.content_metadata import ContentMetadata
+
         d = dict(src_dict)
-        role = ContentInRole(d.pop("role"))
+        role = ContentRole(d.pop("role"))
 
+        def _parse_content(data: object) -> list[str] | str:
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                content_type_1 = cast(list[str], data)
 
+                return content_type_1
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[str] | str, data)
 
-
-        content = d.pop("content")
+        content = _parse_content(d.pop("content"))
 
         language = d.pop("language")
 
-        metadata = RecordContentInMetadata.from_dict(d.pop("metadata"))
+        record_slug = d.pop("record_slug")
 
+        position = d.pop("position")
 
-
+        _metadata = d.pop("metadata", UNSET)
+        metadata: ContentMetadata | Unset
+        if isinstance(_metadata, Unset):
+            metadata = UNSET
+        else:
+            metadata = ContentMetadata.from_dict(_metadata)
 
         content_in = cls(
             role=role,
             content=content,
             language=language,
+            record_slug=record_slug,
+            position=position,
             metadata=metadata,
         )
 
         return content_in
-

@@ -26,16 +26,20 @@ class SirenAPI(NinjaExtraAPI):
                     },
                 },
                 "SirenField": {
+                    "description": "A Siren action input. Complex inputs include a self-contained JSON Schema in schema.",
                     "type": "object",
                     "additionalProperties": False,
                     "required": ["name", "type", "required"],
                     "properties": {
-                        "name": {"type": "string"},
-                        "type": {"type": "string"},
-                        "required": {"type": "boolean"},
-                        "title": {"type": "string"},
-                        "description": {"type": "string"},
-                        "value": {},
+                        "name": {"type": "string", "description": "Request property or query parameter name."},
+                        "type": {
+                            "type": "string",
+                            "description": "Siren field type. json identifies an array, object, or union described by schema.",
+                        },
+                        "required": {"type": "boolean", "description": "Whether the operation requires this field."},
+                        "title": {"type": "string", "description": "Human-readable field label."},
+                        "description": {"type": "string", "description": "Usage and validation guidance."},
+                        "value": {"description": "Advertised default or current value."},
                         "options": {
                             "type": "array",
                             "items": {
@@ -45,7 +49,10 @@ class SirenAPI(NinjaExtraAPI):
                                 "properties": {"value": {}, "title": {"type": "string"}},
                             },
                         },
-                        "schema": {},
+                        "schema": {
+                            "type": "object",
+                            "description": "Self-contained JSON Schema for a complex field; it contains no external component references.",
+                        },
                         "minimum": {"type": "number"},
                         "maximum": {"type": "number"},
                         "minLength": {"type": "integer"},

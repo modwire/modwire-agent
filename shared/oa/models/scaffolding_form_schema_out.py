@@ -1,51 +1,37 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-from typing import cast
-from typing import Literal, cast
-
 if TYPE_CHECKING:
-  from ..models.properties import Properties
-
-
-
+    from ..models.properties import Properties
 
 
 T = TypeVar("T", bound="ScaffoldingFormSchemaOut")
 
 
-
 @_attrs_define
 class ScaffoldingFormSchemaOut:
-    """ 
-        Attributes:
-            schema (Literal['https://json-schema.org/draft/2020-12/schema']):
-            type_ (Literal['object']):
-            properties (Properties):
-            required (list[str]):
-            additional_properties (bool):
-     """
+    """
+    Attributes:
+        schema (Literal['https://json-schema.org/draft/2020-12/schema']):
+        type_ (Literal['object']):
+        properties (Properties):
+        required (list[str]):
+        additional_properties (bool):
+    """
 
-    schema: Literal['https://json-schema.org/draft/2020-12/schema']
-    type_: Literal['object']
+    schema: Literal["https://json-schema.org/draft/2020-12/schema"]
+    type_: Literal["object"]
     properties: Properties
     required: list[str]
     additional_properties: bool
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
-        from ..models.properties import Properties
         schema = self.schema
 
         type_ = self.type_
@@ -54,44 +40,38 @@ class ScaffoldingFormSchemaOut:
 
         required = self.required
 
-
-
         additional_properties = self.additional_properties
-
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "$schema": schema,
-            "type": type_,
-            "properties": properties,
-            "required": required,
-            "additionalProperties": additional_properties,
-        })
+        field_dict.update(
+            {
+                "$schema": schema,
+                "type": type_,
+                "properties": properties,
+                "required": required,
+                "additionalProperties": additional_properties,
+            }
+        )
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.properties import Properties
+
         d = dict(src_dict)
-        schema = cast(Literal['https://json-schema.org/draft/2020-12/schema'] , d.pop("$schema"))
-        if schema != 'https://json-schema.org/draft/2020-12/schema':
+        schema = cast(Literal["https://json-schema.org/draft/2020-12/schema"], d.pop("$schema"))
+        if schema != "https://json-schema.org/draft/2020-12/schema":
             raise ValueError(f"$schema must match const 'https://json-schema.org/draft/2020-12/schema', got '{schema}'")
 
-        type_ = cast(Literal['object'] , d.pop("type"))
-        if type_ != 'object':
+        type_ = cast(Literal["object"], d.pop("type"))
+        if type_ != "object":
             raise ValueError(f"type must match const 'object', got '{type_}'")
 
         properties = Properties.from_dict(d.pop("properties"))
 
-
-
-
         required = cast(list[str], d.pop("required"))
-
 
         additional_properties = d.pop("additionalProperties")
 
@@ -102,7 +82,6 @@ class ScaffoldingFormSchemaOut:
             required=required,
             additional_properties=additional_properties,
         )
-
 
         scaffolding_form_schema_out.additional_properties = d
         return scaffolding_form_schema_out

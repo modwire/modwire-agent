@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class VariableType(str, Enum):
     BOOL = "bool"
     DICT = "dict"

@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class CommandResult(str, Enum):
     ADD_DEVELOPMENT = "add_development"
     ADD_OPTIONAL = "add_optional"

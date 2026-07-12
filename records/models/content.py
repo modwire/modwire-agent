@@ -5,20 +5,23 @@ from model_utils.models import TimeStampedModel
 from .record import Record
 
 
+class ContentRole(models.TextChoices):
+    HEADING = "heading", "Heading"
+    SUBHEADING = "subheading", "Subheading"
+    PARAGRAPH = "paragraph", "Paragraph"
+    LIST = "list", "List"
+    MARKDOWN = "markdown", "Markdown"
+    SNIPPET = "snippet", "Snippet"
+    IMAGE = "image", "Image"
+
+
 class Content(TimeStampedModel):
-    class Role(models.TextChoices):
-        HEADING = "heading", "Heading"
-        SUBHEADING = "subheading", "Subheading"
-        PARAGRAPH = "paragraph", "Paragraph"
-        LIST = "list", "List"
-        MARKDOWN = "markdown", "Markdown"
-        SNIPPET = "snippet", "Snippet"
-        IMAGE = "image", "Image"
+    Role = ContentRole
 
     record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name="content")
     position = models.PositiveIntegerField()
     role = models.CharField(max_length=20, choices=Role.choices)
-    content = models.TextField()
+    content = models.JSONField()
     language = models.CharField(max_length=40)
     metadata = models.JSONField()
 
@@ -36,6 +39,13 @@ class Content(TimeStampedModel):
 
     def clean(self):
         super().clean()
+        if self.role == self.Role.LIST:
+            if not isinstance(self.content, list) or not all(
+                isinstance(item, str) for item in self.content
+            ):
+                raise ValidationError({"content": "List content must be an array of strings."})
+        elif not isinstance(self.content, str):
+            raise ValidationError({"content": "Non-list content must be a string."})
         if self.role == self.Role.SNIPPET and not self.language:
             raise ValidationError({"language": "Snippet content requires a language."})
         if not self.language:

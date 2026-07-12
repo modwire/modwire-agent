@@ -46,17 +46,30 @@ def _link(rel: str | list[str], href: str, title: str | None = None) -> dict:
     return result
 
 
-def _resolve_schema(schema: dict, components: dict) -> dict:
+def _resolve_schema(schema: dict, components: dict, resolving: frozenset[str] = frozenset()) -> dict:
+    """Bundle an operation schema so a Siren client never needs the OpenAPI document."""
     schema = deepcopy(schema)
     if "$ref" in schema:
-        schema = deepcopy(components.get(schema["$ref"].rsplit("/", 1)[-1], {}))
-    if "allOf" in schema:
-        merged = {}
-        for part in schema.pop("allOf"):
-            merged.update(_resolve_schema(part, components))
-        merged.update(schema)
-        schema = merged
-    return schema
+        name = schema.pop("$ref").rsplit("/", 1)[-1]
+        if name in resolving:
+            return schema
+        target = deepcopy(components.get(name, {}))
+        target.update(schema)
+        schema = _resolve_schema(target, components, resolving | {name})
+    result = {}
+    for key, value in schema.items():
+        if key == "mapping" and isinstance(value, dict):
+            continue
+        if isinstance(value, dict):
+            result[key] = _resolve_schema(value, components, resolving)
+        elif isinstance(value, list):
+            result[key] = [
+                _resolve_schema(item, components, resolving) if isinstance(item, dict) else item
+                for item in value
+            ]
+        else:
+            result[key] = value
+    return result
 
 
 def _field(name: str, schema: dict, required: bool, components: dict) -> dict:
@@ -75,7 +88,7 @@ def _field(name: str, schema: dict, required: bool, components: dict) -> dict:
         result["value"] = schema["default"]
     if "enum" in schema:
         result["options"] = [{"value": value, "title": str(value)} for value in schema["enum"]]
-    if kind in {"array", "object"} or "anyOf" in schema:
+    if kind in {"array", "object"} or any(key in schema for key in ("allOf", "anyOf", "oneOf")):
         result["type"] = "json"
         result["schema"] = schema
     for key in ("minimum", "maximum", "minLength", "maxLength", "pattern"):

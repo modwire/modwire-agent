@@ -1,35 +1,28 @@
 from http import HTTPStatus
-from typing import Any, cast
+from typing import Any
 from urllib.parse import quote
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.api_key_patch_in import ApiKeyPatchIn
 from ...models.siren_entity import SirenEntity
-from typing import cast
-
+from ...types import Response
 
 
 def _get_kwargs(
     api_key_id: int,
     *,
     body: ApiKeyPatchIn,
-
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
-
-    
-
-    
-
     _kwargs: dict[str, Any] = {
         "method": "patch",
-        "url": "/api/api_keys/{api_key_id}".format(api_key_id=quote(str(api_key_id), safe=""),),
+        "url": "/api/api_keys/{api_key_id}".format(
+            api_key_id=quote(str(api_key_id), safe=""),
+        ),
     }
 
     _kwargs["json"] = body.to_dict()
@@ -40,12 +33,9 @@ def _get_kwargs(
     return _kwargs
 
 
-
 def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> SirenEntity | None:
     if response.status_code == 200:
         response_200 = SirenEntity.from_dict(response.json())
-
-
 
         return response_200
 
@@ -69,9 +59,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: ApiKeyPatchIn,
-
 ) -> Response[SirenEntity]:
-    """ Rename an API key.
+    """Rename an API key.
 
     Args:
         api_key_id (int):
@@ -83,13 +72,11 @@ def sync_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         api_key_id=api_key_id,
-body=body,
-
+        body=body,
     )
 
     response = client.get_httpx_client().request(
@@ -98,14 +85,14 @@ body=body,
 
     return _build_response(client=client, response=response)
 
+
 def sync(
     api_key_id: int,
     *,
     client: AuthenticatedClient,
     body: ApiKeyPatchIn,
-
 ) -> SirenEntity | None:
-    """ Rename an API key.
+    """Rename an API key.
 
     Args:
         api_key_id (int):
@@ -117,24 +104,22 @@ def sync(
 
     Returns:
         SirenEntity
-     """
-
+    """
 
     return sync_detailed(
         api_key_id=api_key_id,
-client=client,
-body=body,
-
+        client=client,
+        body=body,
     ).parsed
+
 
 async def asyncio_detailed(
     api_key_id: int,
     *,
     client: AuthenticatedClient,
     body: ApiKeyPatchIn,
-
 ) -> Response[SirenEntity]:
-    """ Rename an API key.
+    """Rename an API key.
 
     Args:
         api_key_id (int):
@@ -146,29 +131,25 @@ async def asyncio_detailed(
 
     Returns:
         Response[SirenEntity]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         api_key_id=api_key_id,
-body=body,
-
+        body=body,
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     api_key_id: int,
     *,
     client: AuthenticatedClient,
     body: ApiKeyPatchIn,
-
 ) -> SirenEntity | None:
-    """ Rename an API key.
+    """Rename an API key.
 
     Args:
         api_key_id (int):
@@ -180,12 +161,12 @@ async def asyncio(
 
     Returns:
         SirenEntity
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        api_key_id=api_key_id,
-client=client,
-body=body,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            api_key_id=api_key_id,
+            client=client,
+            body=body,
+        )
+    ).parsed
