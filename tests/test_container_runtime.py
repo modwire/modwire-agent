@@ -67,6 +67,7 @@ def test_release_publishes_both_images_for_intel_and_arm_hosts():
         "contents": "read",
         "packages": "write",
         "attestations": "write",
+        "artifact-metadata": "write",
         "id-token": "write",
     }
     assert publish["strategy"]["matrix"]["include"] == [
