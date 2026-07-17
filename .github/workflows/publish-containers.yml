@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: [{"dockerfile": "Dockerfile", "image": "modwire-mcp-runtime"}, {"dockerfile": "Dockerfile.adapter", "image": "modwire-mcp-adapter"}]
+        include: [{"dockerfile": "Dockerfile", "image": "modwire-agent-runtime"}, {"dockerfile": "Dockerfile.adapter", "image": "modwire-agent-adapter"}]
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -69,18 +69,3 @@ jobs:
           subject-name: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
-
-  deploy-scaffolding-api:
-    name: Deploy scaffolding API to Coolify
-    needs: publish
-    if: ${{ !github.event.release.prerelease }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Coolify
-        env:
-          COOLIFY_DEPLOY_TOKEN: ${{ secrets.COOLIFY_DEPLOY_TOKEN }}
-          COOLIFY_DEPLOY_URL: ${{ secrets.COOLIFY_DEPLOY_URL }}
-        run: >-
-          curl --fail-with-body --retry 3 --retry-all-errors
-          --header "Authorization: Bearer ${COOLIFY_DEPLOY_TOKEN}"
-          "${COOLIFY_DEPLOY_URL}"

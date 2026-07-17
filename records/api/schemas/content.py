@@ -3,7 +3,7 @@ from pydantic import ConfigDict, Field, model_validator
 from records.models.content import Content
 from shared.api.schema import StrictSchema
 
-SCHEMA_ROOT = "https://raw.githubusercontent.com/modwire/modwire-mcp/main/schemas"
+SCHEMA_ROOT = "https://raw.githubusercontent.com/modwire/modwire-agent/main/schemas"
 SCHEMA_IDS = {
     "ContentBlock": f"{SCHEMA_ROOT}/content-block.schema.json",
     "ContentIn": f"{SCHEMA_ROOT}/content-in.schema.json",

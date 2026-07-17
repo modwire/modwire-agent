@@ -237,7 +237,7 @@ def test_public_json_schemas_are_generated_with_github_ids():
     for name, expected in generator["render"]().items():
         schema = json.loads(expected)
         assert schema["$id"] == (
-            f"https://raw.githubusercontent.com/modwire/modwire-mcp/main/schemas/{name}"
+            f"https://raw.githubusercontent.com/modwire/modwire-agent/main/schemas/{name}"
         )
         assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
         assert (root / "schemas" / name).read_text() == expected

@@ -2,7 +2,7 @@ name: modwire-mcp
 
 services:
   scaffolding-api:
-    image: ghcr.io/modwire/modwire-mcp-runtime:${MODWIRE_MCP_VERSION:-latest}
+    image: ghcr.io/modwire/modwire-agent-runtime:${MODWIRE_MCP_VERSION:-latest}
     environment:
       ALLOWED_HOSTS: localhost,127.0.0.1,scaffolding-api
       DATABASE_HOST: postgres
@@ -29,7 +29,7 @@ services:
       MCP_ADAPTER_VERSION: ${MODWIRE_MCP_VERSION:-latest}
       SCAFFOLDING_API_KEY_FILE: /run/secrets/scaffolding-api-key
       SCAFFOLDING_API_URL: http://scaffolding-api:8000/api/
-    image: ghcr.io/modwire/modwire-mcp-adapter:${MODWIRE_MCP_VERSION:-latest}
+    image: ghcr.io/modwire/modwire-agent-adapter:${MODWIRE_MCP_VERSION:-latest}
     healthcheck:
       test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8200/health', timeout=4).read()"]
       interval: 30s

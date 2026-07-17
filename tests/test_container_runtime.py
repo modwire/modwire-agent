@@ -1,3 +1,4 @@
+import tomllib
 from pathlib import Path
 
 import yaml
@@ -9,6 +10,7 @@ def test_compose_reuses_the_external_database_runtime():
     compose = yaml.safe_load((ROOT / "compose.yaml").read_text())
 
     assert set(compose["services"]) == {"scaffolding-api", "mcp-adapter"}
+    assert compose["name"] == "modwire-mcp"
     assert "postgres" not in compose["services"]
     assert "volumes" not in compose
     assert compose["networks"]["records"] == {
@@ -25,15 +27,27 @@ def test_compose_reuses_the_external_database_runtime():
     assert "records" not in compose["services"]["mcp-adapter"]["networks"]
     assert "volumes" not in compose["services"]["mcp-adapter"]
     assert compose["services"]["mcp-adapter"]["image"] == (
-        "ghcr.io/modwire/modwire-mcp-adapter:${MODWIRE_MCP_VERSION:-latest}"
+        "ghcr.io/modwire/modwire-agent-adapter:${MODWIRE_MCP_VERSION:-latest}"
     )
     assert compose["services"]["scaffolding-api"]["image"] == (
-        "ghcr.io/modwire/modwire-mcp-runtime:${MODWIRE_MCP_VERSION:-latest}"
+        "ghcr.io/modwire/modwire-agent-runtime:${MODWIRE_MCP_VERSION:-latest}"
     )
     assert "build" not in compose["services"]["mcp-adapter"]
     assert "build" not in compose["services"]["scaffolding-api"]
     assert compose["services"]["mcp-adapter"]["ports"] == [
         "127.0.0.1:${MCP_ADAPTER_PORT:-8200}:8200",
+    ]
+
+
+def test_declares_exact_direct_modwire_dependencies():
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    dependencies = project["project"]["dependencies"]
+    modwire_dependencies = sorted(dependency for dependency in dependencies if dependency.startswith("modwire-"))
+
+    assert modwire_dependencies == [
+        "modwire-architecture>=6.0.0,<7",
+        "modwire-mermaid>=1.0.1,<2",
+        "modwire-siren>=1.2.0,<2",
     ]
 
 
@@ -71,10 +85,10 @@ def test_release_publishes_both_images_for_intel_and_arm_hosts():
         "id-token": "write",
     }
     assert publish["strategy"]["matrix"]["include"] == [
-        {"dockerfile": "Dockerfile", "image": "modwire-mcp-runtime"},
+        {"dockerfile": "Dockerfile", "image": "modwire-agent-runtime"},
         {
             "dockerfile": "Dockerfile.adapter",
-            "image": "modwire-mcp-adapter",
+            "image": "modwire-agent-adapter",
         },
     ]
     build = next(
@@ -97,21 +111,12 @@ def test_release_publishes_both_images_for_intel_and_arm_hosts():
     assert "value=${{ github.event.release.tag_name }}" in metadata["with"]["tags"]
 
 
-def test_release_deploys_the_latest_runtime_after_every_image_is_published():
+def test_release_does_not_deploy_the_existing_coolify_application():
     workflow = yaml.load(
         (ROOT / ".github" / "workflows" / "publish-containers.yml").read_text(),
         Loader=yaml.BaseLoader,
     )
-    deploy = workflow["jobs"]["deploy-scaffolding-api"]
-
-    assert deploy["needs"] == "publish"
-    assert deploy["if"] == "${{ !github.event.release.prerelease }}"
-    notify = deploy["steps"][0]
-    assert notify["env"] == {
-        "COOLIFY_DEPLOY_TOKEN": "${{ secrets.COOLIFY_DEPLOY_TOKEN }}",
-        "COOLIFY_DEPLOY_URL": "${{ secrets.COOLIFY_DEPLOY_URL }}",
-    }
-    assert "curl --fail-with-body --retry 3" in notify["run"]
+    assert "deploy-scaffolding-api" not in workflow["jobs"]
 
 
 def test_adapter_image_contains_only_the_adapter_source():
