@@ -121,10 +121,12 @@ def test_release_does_not_deploy_the_existing_coolify_application():
 
 def test_adapter_image_contains_only_the_adapter_source():
     dockerfile = (ROOT / "Dockerfile.adapter").read_text()
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())
 
     assert "--only-group mcp-adapter" in dockerfile
     assert "COPY mcp_adapter ./mcp_adapter" in dockerfile
     assert "COPY . ." not in dockerfile
+    assert "modwire-siren>=1.2.0,<2" in project["dependency-groups"]["mcp-adapter"]
 
 
 def test_build_caches_are_kept_outside_both_runtime_copy_roots():

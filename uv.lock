@@ -992,6 +992,7 @@ dependencies = [
 dev = [
     { name = "httpx" },
     { name = "mcp" },
+    { name = "modwire-siren" },
     { name = "openapi-python-client" },
     { name = "pytest" },
     { name = "pytest-django" },
@@ -1000,6 +1001,7 @@ dev = [
 mcp-adapter = [
     { name = "httpx" },
     { name = "mcp" },
+    { name = "modwire-siren" },
 ]
 
 [package.metadata]
@@ -1031,6 +1033,7 @@ requires-dist = [
 dev = [
     { name = "httpx", specifier = ">=0.28" },
     { name = "mcp", specifier = ">=1.28.1" },
+    { name = "modwire-siren", specifier = ">=1.2.0,<2" },
     { name = "openapi-python-client" },
     { name = "pytest" },
     { name = "pytest-django" },
@@ -1039,6 +1042,7 @@ dev = [
 mcp-adapter = [
     { name = "httpx", specifier = ">=0.28" },
     { name = "mcp", specifier = ">=1.28.1" },
+    { name = "modwire-siren", specifier = ">=1.2.0,<2" },
 ]
 
 [[package]]
