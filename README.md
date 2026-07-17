@@ -34,8 +34,8 @@ gh auth refresh -h github.com -s read:packages
 ```
 
 Each GitHub release publishes `linux/amd64` and `linux/arm64` variants of
-`ghcr.io/modwire/modwire-mcp-runtime` and
-`ghcr.io/modwire/modwire-mcp-adapter`. Docker selects the matching image on
+`ghcr.io/modwire/modwire-agent-runtime` and
+`ghcr.io/modwire/modwire-agent-adapter`. Docker selects the matching image on
 Intel Linux, Intel macOS, or Apple Silicon macOS hosts. Local image builds are
 an explicit development mode and never occur during normal installation:
 

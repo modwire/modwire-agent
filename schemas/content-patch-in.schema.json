@@ -1,7 +1,7 @@
 {
   "$defs": {
     "ContentMetadata": {
-      "$id": "https://raw.githubusercontent.com/modwire/modwire-mcp/main/schemas/content-metadata.schema.json",
+      "$id": "https://raw.githubusercontent.com/modwire/modwire-agent/main/schemas/content-metadata.schema.json",
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "additionalProperties": false,
       "description": "Supported provenance, accessibility, and presentation metadata.",
@@ -61,7 +61,7 @@
       "type": "string"
     }
   },
-  "$id": "https://raw.githubusercontent.com/modwire/modwire-mcp/main/schemas/content-patch-in.schema.json",
+  "$id": "https://raw.githubusercontent.com/modwire/modwire-agent/main/schemas/content-patch-in.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {

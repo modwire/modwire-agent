@@ -2,10 +2,10 @@ services:
   scaffolding-api:
     build:
       context: .
-    image: modwire-mcp-runtime:dev
+    image: modwire-agent-runtime:dev
 
   mcp-adapter:
     build:
       context: .
       dockerfile: Dockerfile.adapter
-    image: modwire-mcp-adapter:dev
+    image: modwire-agent-adapter:dev
