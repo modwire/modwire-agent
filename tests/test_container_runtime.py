@@ -10,7 +10,7 @@ def test_compose_reuses_the_external_database_runtime():
     compose = yaml.safe_load((ROOT / "compose.yaml").read_text())
 
     assert set(compose["services"]) == {"scaffolding-api", "mcp-adapter"}
-    assert compose["name"] == "modwire-mcp"
+    assert compose["name"] == "modwire-agent"
     assert "postgres" not in compose["services"]
     assert "volumes" not in compose
     assert compose["networks"]["records"] == {

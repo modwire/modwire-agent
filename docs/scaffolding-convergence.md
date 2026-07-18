@@ -26,7 +26,7 @@ and `.modwire/shape.yaml` files. Module and `shared` initializers use
 | Mermaid | `modwire_mermaid` / `architecture` | Add both `.modwire` files and `shared`; preserve the existing `architecture` initializer. |
 | Siren | `modwire_siren` / `client` | Add both `.modwire` files and `shared`; preserve the existing `client` initializer. |
 
-`modwire-mcp` is the scaffolding application and MCP transport host. It is
+`modwire-agent` is the scaffolding application and MCP transport host. It is
 intentionally not a target profile for this repository scaffold.
 
 The library and CLI golden shapes are stored under `tests/golden`. Any later

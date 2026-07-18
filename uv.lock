@@ -935,33 +935,7 @@ wheels = [
 ]
 
 [[package]]
-name = "modwire-architecture"
-version = "6.0.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "modwire-extraction" },
-    { name = "pydantic" },
-    { name = "pydantic-yaml" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/14/7b/e0ad59df4797f766b0503aaf90b33b1c603c8cf8d1c9a0bdfe4101686b0b/modwire_architecture-6.0.0.tar.gz", hash = "sha256:d468ff371c3a0848859ceee185b8ff309628cdc5569092f6418a222e17d77c18", size = 96509, upload-time = "2026-07-17T17:34:04.418Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/de/f4/d98c8822649ec5c119c9332f2c94fd9b84e332303d8feb2b70d882047377/modwire_architecture-6.0.0-py3-none-any.whl", hash = "sha256:65fca29186262b728be92406ce18a5889fe5d2fb834537863bc5854c4829b10f", size = 51959, upload-time = "2026-07-17T17:34:02.989Z" },
-]
-
-[[package]]
-name = "modwire-extraction"
-version = "2.0.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pydantic" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/58/6d/cd1301997c7d167e6c67aa3b6a9918d277e7ecd38201382ee1f0be23d4dd/modwire_extraction-2.0.1.tar.gz", hash = "sha256:a572fc7e770930800b949d18e4eb5b085c67cc5c4770980d1e5b50060dc1f15c", size = 2363341, upload-time = "2026-07-11T23:12:20.284Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9f/7f/4f8c4b83a1b6d877b57dc6e42db8191d01d7f1f7242cf531cd57913e90ef/modwire_extraction-2.0.1-py3-none-any.whl", hash = "sha256:970bcfbe7928a0c7e035f04a30731d4037e47a2aef9006709c9158d7b2963e45", size = 2335507, upload-time = "2026-07-11T23:12:18.612Z" },
-]
-
-[[package]]
-name = "modwire-mcp"
+name = "modwire-agent"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
@@ -1043,6 +1017,32 @@ mcp-adapter = [
     { name = "httpx", specifier = ">=0.28" },
     { name = "mcp", specifier = ">=1.28.1" },
     { name = "modwire-siren", specifier = ">=1.2.0,<2" },
+]
+
+[[package]]
+name = "modwire-architecture"
+version = "6.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "modwire-extraction" },
+    { name = "pydantic" },
+    { name = "pydantic-yaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/14/7b/e0ad59df4797f766b0503aaf90b33b1c603c8cf8d1c9a0bdfe4101686b0b/modwire_architecture-6.0.0.tar.gz", hash = "sha256:d468ff371c3a0848859ceee185b8ff309628cdc5569092f6418a222e17d77c18", size = 96509, upload-time = "2026-07-17T17:34:04.418Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/de/f4/d98c8822649ec5c119c9332f2c94fd9b84e332303d8feb2b70d882047377/modwire_architecture-6.0.0-py3-none-any.whl", hash = "sha256:65fca29186262b728be92406ce18a5889fe5d2fb834537863bc5854c4829b10f", size = 51959, upload-time = "2026-07-17T17:34:02.989Z" },
+]
+
+[[package]]
+name = "modwire-extraction"
+version = "2.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/58/6d/cd1301997c7d167e6c67aa3b6a9918d277e7ecd38201382ee1f0be23d4dd/modwire_extraction-2.0.1.tar.gz", hash = "sha256:a572fc7e770930800b949d18e4eb5b085c67cc5c4770980d1e5b50060dc1f15c", size = 2363341, upload-time = "2026-07-11T23:12:20.284Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9f/7f/4f8c4b83a1b6d877b57dc6e42db8191d01d7f1f7242cf531cd57913e90ef/modwire_extraction-2.0.1-py3-none-any.whl", hash = "sha256:970bcfbe7928a0c7e035f04a30731d4037e47a2aef9006709c9158d7b2963e45", size = 2335507, upload-time = "2026-07-11T23:12:18.612Z" },
 ]
 
 [[package]]

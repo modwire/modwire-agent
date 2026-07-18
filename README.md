@@ -1,5 +1,4 @@
-/Users/gorky/.rvm/scripts/rvm:29: operation not permitted: ps
-# New Project
+# modwire-agent
 
 Django API scaffold with JSON logs, dotenv settings, health checks, and auto-discovered Django Ninja Extra controllers.
 

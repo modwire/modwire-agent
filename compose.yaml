@@ -1,4 +1,4 @@
-name: modwire-mcp
+name: modwire-agent
 
 services:
   scaffolding-api:
