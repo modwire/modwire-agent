@@ -17,7 +17,6 @@ LOCAL_APPS = (
     LocalApp("languages", "modwire.apps.languages", "LanguagesConfig"),
     LocalApp("records", "modwire.apps.records", "RecordsConfig"),
     LocalApp("scaffoldings", "modwire.apps.scaffoldings", "ScaffoldingsConfig"),
-    LocalApp("scrapers", "modwire.apps.scrapers", "ScrapersConfig"),
     LocalApp("tokens", "modwire.apps.tokens", "TokensConfig"),
 )
 

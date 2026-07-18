@@ -23,7 +23,6 @@ dependencies = [
     "pygments",
     "python-dotenv",
     "pyyaml",
-    "scrapy",
     "structlog",
     "wireup",
 ]
