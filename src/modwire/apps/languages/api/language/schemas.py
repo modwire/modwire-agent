@@ -1,13 +1,48 @@
-from ninja import ModelSchema
+from ninja import Schema
 
-from modwire.shared.api.types import ShortUUID
-
-from ...models.language import Language
+from modwire.shared import languages
 
 
-class LanguageOut(ModelSchema):
-    id: ShortUUID
+class VersionProviderOut(Schema):
+    kind: languages.VersionProviderKind
+    url: str
+    result_path: tuple[languages.VersionPathItem, ...]
 
-    class Meta:
-        model = Language
-        fields = "__all__"
+
+class PackageManagerOut(Schema):
+    id: str
+    name: str
+    executable: str
+    manifest_paths: tuple[str, ...]
+    lockfile_paths: tuple[str, ...]
+    registry_url: str
+    package_url_type: str
+    version_constraint: str
+    supports_workspaces: bool
+    commit_lockfiles: bool
+    commands: dict[languages.PackageManagerCommand, str]
+
+
+class ToolOut(Schema):
+    id: str
+    name: str
+    roles: tuple[languages.ToolRole, ...]
+    executable: str
+    package_name: str
+    stable_version: str
+    homepage_url: str
+    config_paths: tuple[str, ...]
+    default_enabled: bool
+    commands: dict[languages.ToolCommand, str]
+
+
+class LanguageOut(Schema):
+    id: str
+    name: str
+    executable: str
+    source_extensions: tuple[str, ...]
+    aliases: tuple[str, ...]
+    package_managers: tuple[PackageManagerOut, ...]
+    tools: tuple[ToolOut, ...]
+    stable_version: str
+    version_provider: VersionProviderOut

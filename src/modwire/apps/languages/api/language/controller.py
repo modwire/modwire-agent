@@ -4,7 +4,8 @@ from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
-from ...services.language import LanguageService
+from modwire.shared.languages import LanguageCatalogService
+
 from .schemas import LanguageOut
 
 
@@ -17,5 +18,5 @@ class LanguageController(ControllerBase):
         summary="List languages.",
     )
     @inject
-    def list(self, service: Annotated[LanguageService, Inject()]):
-        return service.list()
+    def find_all(self, service: Annotated[LanguageCatalogService, Inject()]):
+        return service.find_all()
