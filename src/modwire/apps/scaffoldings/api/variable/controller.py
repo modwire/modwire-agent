@@ -1,12 +1,12 @@
 from typing import Annotated
 
-from modwire_siren import siren_resource
 from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
 from modwire.shared.api.errors import validated
+from modwire.shared.api.hypermedia import siren_resource
 from modwire.shared.api.types import ShortUUID
 
 from ...services.variable import VariableService

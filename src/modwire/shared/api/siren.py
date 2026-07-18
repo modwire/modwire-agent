@@ -1,8 +1,6 @@
 import json
-import re
-from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Literal
+from typing import Any
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -15,24 +13,12 @@ from modwire_siren import (
     SirenCollectionRequest,
 )
 from modwire_siren.integrations.django import to_django_response
-from modwire_siren.openapi.error import OpenApiError
 from modwire_siren.standards import SirenMediaType
+
+from modwire.shared.api.hypermedia import ProjectionCatalog
 
 SIREN_TYPE = str(SirenMediaType.ENTITY)
 PROBLEM_TYPE = str(SirenMediaType.PROBLEM)
-SIREN_RESOURCE_EXTENSION = "x-siren-resource"
-HTTP_METHODS = ("get", "post", "put", "patch", "delete")
-
-
-@dataclass(frozen=True, slots=True)
-class _ProjectionConfig:
-    path: str
-    methods: tuple[str, ...]
-    kind: Literal["collection", "entity"]
-    resource_name: str
-    operation_ids: tuple[str, ...]
-    path_parameters: dict[str, str]
-    item_operation_ids: tuple[str, ...] = ()
 
 
 def _base_url(request) -> str:
@@ -51,6 +37,13 @@ def _siren_factory():
     return ModwireSirenFactory.web(_openapi_schema(), base_url_resolver=_base_url)
 
 
+@lru_cache(maxsize=1)
+def _projection_catalog() -> ProjectionCatalog:
+    from modwire.core.api import RESOURCE_SPECS
+
+    return ProjectionCatalog(_openapi_schema(), RESOURCE_SPECS)
+
+
 def _adapter(request) -> NinjaExtraSirenResponseAdapter:
     return NinjaExtraSirenResponseAdapter.for_request(siren_factory=_siren_factory(), request=request)
 
@@ -67,203 +60,8 @@ def api_root_document(request) -> dict[str, Any]:
     )
 
 
-@lru_cache(maxsize=1)
-def _projection_configs() -> tuple[_ProjectionConfig, ...]:
-    paths = _openapi_schema().get("paths", {})
-    configs: list[_ProjectionConfig] = []
-    for resource_path, path_item in paths.items():
-        resource = path_item.get(SIREN_RESOURCE_EXTENSION)
-        if not resource:
-            continue
-        if resource.get("collection-only"):
-            configs.extend(_collection_only_configs(resource_path, path_item, resource))
-            continue
-        if resource.get("singleton"):
-            configs.append(_entity_config(resource_path, path_item, resource))
-            continue
-
-        configs.append(_entity_config(resource_path, path_item, resource))
-        collection_path = _parent_path(resource_path)
-        if collection_path in paths and not _has_placeholders(collection_path):
-            collection_path_item = paths[collection_path]
-            collection_operation_ids = _merge_operation_ids(
-                _operation_ids(collection_path_item),
-                tuple(resource.get("collection-operations", ())),
-            )
-            collection_methods = ("get",) if "get" in collection_path_item else ()
-            if collection_operation_ids and collection_methods:
-                configs.append(
-                    _ProjectionConfig(
-                        path=collection_path,
-                        methods=collection_methods,
-                        kind="collection",
-                        resource_name=resource["name"],
-                        operation_ids=collection_operation_ids,
-                        item_operation_ids=_get_operation_ids(path_item),
-                        path_parameters={},
-                    )
-                )
-            entity_methods = tuple(method for method in _methods(collection_path_item) if method != "get")
-            if entity_methods:
-                configs.append(
-                    _ProjectionConfig(
-                        path=collection_path,
-                        methods=entity_methods,
-                        kind="entity",
-                        resource_name=resource["name"],
-                        operation_ids=_merge_operation_ids(
-                            _operation_ids(path_item),
-                            tuple(resource.get("operations", ())),
-                        ),
-                        path_parameters={},
-                    )
-                )
-    return tuple(sorted(configs, key=_projection_priority))
-
-
-def _collection_only_configs(
-    path: str,
-    path_item: dict[str, Any],
-    resource: dict[str, Any],
-) -> tuple[_ProjectionConfig, ...]:
-    return tuple(
-        _ProjectionConfig(
-            path=path,
-            methods=(method,),
-            kind="collection" if _is_list_operation(operation) else "entity",
-            resource_name=resource["name"],
-            operation_ids=_method_operation_ids(path_item, method),
-            path_parameters=dict(resource.get("path-parameters", {})),
-        )
-        for method, operation in _method_operations(path_item)
-    )
-
-
-def _entity_config(path: str, path_item: dict[str, Any], resource: dict[str, Any]) -> _ProjectionConfig:
-    return _ProjectionConfig(
-        path=path,
-        methods=_methods(path_item),
-        kind="entity",
-        resource_name=resource["name"],
-        operation_ids=_merge_operation_ids(
-            _operation_ids(path_item),
-            tuple(resource.get("operations", ())),
-        ),
-        path_parameters=dict(resource.get("path-parameters", {})),
-    )
-
-
-def _projection_config(path: str, method: str) -> tuple[_ProjectionConfig, dict[str, str]]:
-    normalized = path.rstrip("/") or path
-    paths = _openapi_schema().get("paths", {})
-    method = method.lower()
-    for config in _projection_configs():
-        if method not in config.methods:
-            continue
-        match = re.fullmatch(_path_pattern(config.path, paths[config.path]), normalized)
-        if not match:
-            continue
-        return config, {
-            config.path_parameters[name]: value
-            for name, value in match.groupdict().items()
-        }
-    raise OpenApiError(f"No Siren projection is configured for API path {path!r}")
-
-
-def _path_pattern(template: str, path_item: dict[str, Any]) -> str:
-    parameter_patterns = _path_parameter_patterns(path_item)
-    pattern = ""
-    index = 0
-    for match in re.finditer(r"\{([^}]+)\}", template):
-        pattern += re.escape(template[index:match.start()])
-        name = match.group(1)
-        pattern += rf"(?P<{name}>{parameter_patterns.get(name, '[^/]+')})"
-        index = match.end()
-    pattern += re.escape(template[index:])
-    return pattern
-
-
-def _path_parameter_patterns(path_item: dict[str, Any]) -> dict[str, str]:
-    patterns: dict[str, str] = {}
-    for operation in _operations(path_item):
-        for parameter in operation.get("parameters", ()):
-            if parameter.get("in") != "path":
-                continue
-            name = parameter["name"]
-            schema_pattern = parameter.get("schema", {}).get("pattern", "")
-            patterns[name] = ".+" if "/" in schema_pattern else "[^/]+"
-    return patterns
-
-
-def _projection_priority(config: _ProjectionConfig) -> tuple[bool, int]:
-    return (_has_placeholders(config.path), -len(config.path))
-
-
-def _operations(path_item: dict[str, Any]):
-    return (
-        operation
-        for _, operation in _method_operations(path_item)
-    )
-
-
-def _method_operations(path_item: dict[str, Any]):
-    return (
-        (method, operation)
-        for method, operation in path_item.items()
-        if method in HTTP_METHODS and isinstance(operation, dict)
-    )
-
-
-def _methods(path_item: dict[str, Any]) -> tuple[str, ...]:
-    return tuple(method for method, _ in _method_operations(path_item))
-
-
-def _is_list_operation(operation: dict[str, Any]) -> bool:
-    operation_id = operation.get("operationId", "")
-    return isinstance(operation_id, str) and operation_id.startswith("list_")
-
-
-
-
-def _operation_ids(path_item: dict[str, Any]) -> tuple[str, ...]:
-    return tuple(
-        operation["operationId"]
-        for operation in _operations(path_item)
-        if operation.get("operationId")
-    )
-
-
-def _method_operation_ids(path_item: dict[str, Any], *methods: str) -> tuple[str, ...]:
-    return tuple(
-        operation["operationId"]
-        for method, operation in _method_operations(path_item)
-        if method in methods and operation.get("operationId")
-    )
-
-
-def _get_operation_ids(path_item: dict[str, Any]) -> tuple[str, ...]:
-    operation = path_item.get("get", {})
-    return (operation["operationId"],) if operation.get("operationId") else ()
-
-
-def _merge_operation_ids(*groups: tuple[str, ...]) -> tuple[str, ...]:
-    operation_ids = []
-    seen = set()
-    for group in groups:
-        for operation_id in group:
-            if operation_id in seen:
-                continue
-            seen.add(operation_id)
-            operation_ids.append(operation_id)
-    return tuple(operation_ids)
-
-
-def _parent_path(path: str) -> str:
-    return path.rstrip("/").rsplit("/", 1)[0] or "/"
-
-
-def _has_placeholders(path: str) -> bool:
-    return bool(re.search(r"\{[^}]+}", path))
+def _projection_config(path: str, method: str):
+    return _projection_catalog().match(path, method)
 
 
 def _pagination(request, data: list[Any]):

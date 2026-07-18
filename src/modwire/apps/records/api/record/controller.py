@@ -2,13 +2,13 @@ from typing import Annotated
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from modwire_siren import siren_resource
 from ninja import Query, Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
 from modwire.apps.records.api.errors import validation_error
+from modwire.shared.api.hypermedia import siren_resource
 from modwire.shared.api.types import RecordSlug, Slug
 
 from ...services.record import RecordService

@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from modwire_siren import siren_resource
 from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
+
+from modwire.shared.api.hypermedia import siren_resource
 
 from ...services.api_key import ApiKeyService
 from .schemas import ApiKeyCreatedOut, ApiKeyIn, ApiKeyOut, ApiKeyPatchIn

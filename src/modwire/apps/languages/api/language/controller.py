@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from modwire_siren import siren_resource
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
 from wireup.integration.django import inject
 
+from modwire.shared.api.hypermedia import siren_resource
 from modwire.shared.languages import LanguageCatalogService
 
 from .schemas import LanguageOut

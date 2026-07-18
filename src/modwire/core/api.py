@@ -4,11 +4,12 @@ from pkgutil import walk_packages
 
 from django.apps import apps
 from django.conf import settings
-from modwire_siren import collect_siren_resources, inject_siren_resources
+from modwire_siren import inject_siren_resources
 from modwire_siren.openapi.response_api import enrich_siren_openapi
 from ninja_extra import NinjaExtraAPI
 
 from modwire.apps.tokens.auth import ApiKeyAuth
+from modwire.shared.api.hypermedia import collect_resources, collect_siren_resources
 
 
 class SirenAPI(NinjaExtraAPI):
@@ -51,6 +52,7 @@ def _controllers():
 
 
 CONTROLLERS = tuple(_controllers())
+RESOURCE_SPECS = collect_resources(*CONTROLLERS)
 SIREN_RESOURCE_SPECS = collect_siren_resources(*CONTROLLERS)
 
 for c in CONTROLLERS:
