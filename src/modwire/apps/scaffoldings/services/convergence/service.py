@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from wireup import injectable
 
-from modwire.apps.languages.models.language import Language
+from modwire.shared import languages
 
 from ...models.scaffolding import Scaffolding
 from .contracts import ConvergencePlan, ConvergenceResult, TemplateSpec, VariableSpec
@@ -16,6 +15,7 @@ from .writer import ScaffoldingAggregateWriter
 @injectable
 @dataclass(frozen=True)
 class ScaffoldingConvergenceService:
+    catalog: languages.LanguageCatalogService
     validator: ScaffoldingAggregateValidator
     planner: ScaffoldingConvergencePlanner
     writer: ScaffoldingAggregateWriter
@@ -30,7 +30,7 @@ class ScaffoldingConvergenceService:
         templates: list[TemplateSpec],
         dry_run: bool,
     ) -> ConvergenceResult:
-        language = get_object_or_404(Language, id=language_id)
+        language = self.catalog.find(language_id)
         current = self._current(language, name)
         desired = self.validator.validate(language, current, name, description, variables, templates)
         plan = self.planner.plan(current, desired)
@@ -45,8 +45,8 @@ class ScaffoldingConvergenceService:
         return self._result(name, False, plan)
 
     @staticmethod
-    def _current(language: Language, name: str, *, lock: bool = False) -> Scaffolding | None:
-        query = Scaffolding.objects.filter(language=language, name=name)
+    def _current(language: languages.Language, name: str, *, lock: bool = False) -> Scaffolding | None:
+        query = Scaffolding.objects.filter(language_id=language.id, name=name)
         return query.select_for_update().first() if lock else query.first()
 
     @staticmethod

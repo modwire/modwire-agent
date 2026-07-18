@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from wireup import injectable
 
-from modwire.apps.languages.models.language import Language
+from modwire.shared import languages
 
 from ..models.scaffolding import Scaffolding
 
@@ -10,6 +10,9 @@ from ..models.scaffolding import Scaffolding
 class ScaffoldingService:
     model = Scaffolding
 
+    def __init__(self, catalog: languages.LanguageCatalogService):
+        self.catalog = catalog
+
     def list(self):
         return self.model.objects.order_by("name")
 
@@ -17,8 +20,9 @@ class ScaffoldingService:
         return get_object_or_404(self.model, id=scaffolding_id)
 
     def create(self, language_id: str, name: str, description: str):
+        language = self.catalog.find(language_id)
         scaffolding = self.model(
-            language=get_object_or_404(Language, id=language_id),
+            language_id=language.id,
             name=name,
             description=description,
         )
@@ -29,7 +33,7 @@ class ScaffoldingService:
     def update(self, scaffolding_id: str, **data):
         instance = self.get(scaffolding_id)
         if "language_id" in data:
-            instance.language = get_object_or_404(Language, id=data.pop("language_id"))
+            instance.language_id = self.catalog.find(data.pop("language_id")).id
         for field, value in data.items():
             setattr(instance, field, value)
         instance.full_clean()

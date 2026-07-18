@@ -4,7 +4,7 @@ from typing import Literal
 from django.core.exceptions import ValidationError
 from wireup import injectable
 
-from modwire.apps.languages.models.language import Language
+from modwire.shared import languages
 
 from ...models.scaffolding import Scaffolding
 from ...models.template import Template
@@ -16,7 +16,7 @@ from .contracts import DesiredScaffolding, TemplateSpec, VariableSpec
 class ScaffoldingAggregateValidator:
     def validate(
         self,
-        language: Language,
+        language: languages.Language,
         current: Scaffolding | None,
         name: str,
         description: str,
@@ -26,7 +26,7 @@ class ScaffoldingAggregateValidator:
         self._reject_duplicates("variables", "name", [item["name"] for item in variables])
         self._reject_duplicates("templates", "relative_path", [item["relative_path"] for item in templates])
 
-        scaffolding = Scaffolding(language=language, name=name, description=description)
+        scaffolding = Scaffolding(language_id=language.id, name=name, description=description)
         if current:
             scaffolding.id = current.id
         scaffolding._state.adding = current is None

@@ -1,6 +1,6 @@
 from wireup import injectable
 
-from modwire.apps.languages.models.language import Language
+from modwire.shared import languages
 
 from ...models.scaffolding import Scaffolding
 from ...models.template import Template
@@ -12,7 +12,7 @@ from .contracts import DesiredScaffolding
 class ScaffoldingAggregateWriter:
     def apply(
         self,
-        language: Language,
+        language: languages.Language,
         current: Scaffolding | None,
         desired: DesiredScaffolding,
     ) -> Scaffolding:
@@ -22,9 +22,13 @@ class ScaffoldingAggregateWriter:
         return scaffolding
 
     @staticmethod
-    def _scaffolding(language: Language, current: Scaffolding | None, desired: Scaffolding) -> Scaffolding:
+    def _scaffolding(
+        language: languages.Language,
+        current: Scaffolding | None,
+        desired: Scaffolding,
+    ) -> Scaffolding:
         if current is None:
-            desired.language = language
+            desired.language_id = language.id
             desired.save()
             return desired
         current.description = desired.description
