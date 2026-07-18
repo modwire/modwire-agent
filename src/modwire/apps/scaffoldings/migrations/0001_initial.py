@@ -10,9 +10,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('languages', '0001_initial'),
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
@@ -21,7 +19,7 @@ class Migration(migrations.Migration):
                 ('id', models.CharField(default=modwire.shared.models.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=120)),
                 ('description', models.TextField()),
-                ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='scaffoldings', to='languages.language')),
+                ('language_id', models.CharField(max_length=64)),
             ],
             options={
                 'ordering': ('name',),
@@ -55,7 +53,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='scaffolding',
-            constraint=models.UniqueConstraint(fields=('language', 'name'), name='unique_scaffolding_name_per_language'),
+            constraint=models.UniqueConstraint(fields=('language_id', 'name'), name='unique_scaffolding_name_per_language'),
         ),
         migrations.AddConstraint(
             model_name='template',
