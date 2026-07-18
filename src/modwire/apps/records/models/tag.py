@@ -1,12 +1,5 @@
-from django.core.validators import RegexValidator
 from django.db import models
 from model_utils.models import TimeStampedModel
-
-SLUG_PATTERN = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
-slug_validator = RegexValidator(
-    SLUG_PATTERN,
-    "Use lowercase letters, numbers, and hyphens. Hyphens cannot be leading, trailing, or repeated.",
-)
 
 
 class Tag(TimeStampedModel):
@@ -16,6 +9,3 @@ class Tag(TimeStampedModel):
 
     class Meta:
         ordering = ["slug"]
-
-    def __str__(self):
-        return self.slug
