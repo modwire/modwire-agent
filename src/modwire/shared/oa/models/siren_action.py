@@ -20,16 +20,16 @@ class SirenAction:
     """
     Attributes:
         name (str):
-        method (str):
         href (str):
+        method (str | Unset):
         title (str | Unset):
         type_ (str | Unset):
         fields (list[SirenField] | Unset):
     """
 
     name: str
-    method: str
     href: str
+    method: str | Unset = UNSET
     title: str | Unset = UNSET
     type_: str | Unset = UNSET
     fields: list[SirenField] | Unset = UNSET
@@ -38,9 +38,9 @@ class SirenAction:
     def to_dict(self) -> dict[str, Any]:
         name = self.name
 
-        method = self.method
-
         href = self.href
+
+        method = self.method
 
         title = self.title
 
@@ -58,10 +58,11 @@ class SirenAction:
         field_dict.update(
             {
                 "name": name,
-                "method": method,
                 "href": href,
             }
         )
+        if method is not UNSET:
+            field_dict["method"] = method
         if title is not UNSET:
             field_dict["title"] = title
         if type_ is not UNSET:
@@ -78,9 +79,9 @@ class SirenAction:
         d = dict(src_dict)
         name = d.pop("name")
 
-        method = d.pop("method")
-
         href = d.pop("href")
+
+        method = d.pop("method", UNSET)
 
         title = d.pop("title", UNSET)
 
@@ -97,8 +98,8 @@ class SirenAction:
 
         siren_action = cls(
             name=name,
-            method=method,
             href=href,
+            method=method,
             title=title,
             type_=type_,
             fields=fields,

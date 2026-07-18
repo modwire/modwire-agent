@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from modwire_siren import siren_resource
 from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
@@ -9,6 +10,14 @@ from ...services.api_key import ApiKeyService
 from .schemas import ApiKeyCreatedOut, ApiKeyIn, ApiKeyOut, ApiKeyPatchIn
 
 
+@siren_resource(
+    name="api_key",
+    path="/api/api_keys/{api_key_id}",
+    class_="api-key",
+    identifier="id",
+    path_parameters={"api_key_id": "id"},
+    relations={},
+)
 @api_controller("/api_keys", tags=["ApiKeys"])
 class ApiKeyController(ControllerBase):
     @route.get("", response=list[ApiKeyOut], operation_id="list_api_keys", summary="List API keys.")

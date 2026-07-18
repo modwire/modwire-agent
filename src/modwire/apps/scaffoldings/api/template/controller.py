@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from modwire_siren import siren_resource
 from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
@@ -12,6 +13,14 @@ from ...services.template import TemplateService
 from .schemas import TemplateIn, TemplateOut, TemplatePatchIn
 
 
+@siren_resource(
+    name="template",
+    path="/api/templates/{template_id}",
+    class_="template",
+    identifier="id",
+    path_parameters={"template_id": "id"},
+    relations={"scaffolding": {"rel": "scaffolding", "resource": "scaffolding", "many": False}},
+)
 @api_controller("/templates", tags=["Templates"])
 class TemplateController(ControllerBase):
     @route.get(

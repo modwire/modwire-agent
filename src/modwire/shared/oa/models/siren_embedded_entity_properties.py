@@ -6,69 +6,29 @@ from typing import Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.command_result import CommandResult
-
-T = TypeVar("T", bound="CommandOut")
+T = TypeVar("T", bound="SirenEmbeddedEntityProperties")
 
 
 @_attrs_define
-class CommandOut:
-    """
-    Attributes:
-        id (str):
-        package_manager (str):
-        result (CommandResult):
-        cmd (str):
-    """
+class SirenEmbeddedEntityProperties:
+    """ """
 
-    id: str
-    package_manager: str
-    result: CommandResult
-    cmd: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        id = self.id
-
-        package_manager = self.package_manager
-
-        result = self.result.value
-
-        cmd = self.cmd
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "id": id,
-                "package_manager": package_manager,
-                "result": result,
-                "cmd": cmd,
-            }
-        )
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        id = d.pop("id")
+        siren_embedded_entity_properties = cls()
 
-        package_manager = d.pop("package_manager")
-
-        result = CommandResult(d.pop("result"))
-
-        cmd = d.pop("cmd")
-
-        command_out = cls(
-            id=id,
-            package_manager=package_manager,
-            result=result,
-            cmd=cmd,
-        )
-
-        command_out.additional_properties = d
-        return command_out
+        siren_embedded_entity_properties.additional_properties = d
+        return siren_embedded_entity_properties
 
     @property
     def additional_keys(self) -> list[str]:

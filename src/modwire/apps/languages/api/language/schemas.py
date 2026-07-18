@@ -1,4 +1,5 @@
 from ninja import Schema
+from pydantic import Field
 
 from modwire.shared import languages
 
@@ -20,7 +21,7 @@ class PackageManagerOut(Schema):
     version_constraint: str
     supports_workspaces: bool
     commit_lockfiles: bool
-    commands: dict[languages.PackageManagerCommand, str]
+    commands: dict[languages.PackageManagerCommand, str] = Field(title="PackageManagerCommands")
 
 
 class ToolOut(Schema):
@@ -33,7 +34,7 @@ class ToolOut(Schema):
     homepage_url: str
     config_paths: tuple[str, ...]
     default_enabled: bool
-    commands: dict[languages.ToolCommand, str]
+    commands: dict[languages.ToolCommand, str] = Field(title="ToolCommands")
 
 
 class LanguageOut(Schema):

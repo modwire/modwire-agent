@@ -4,8 +4,6 @@ from .api_key_created_out import ApiKeyCreatedOut
 from .api_key_in import ApiKeyIn
 from .api_key_out import ApiKeyOut
 from .api_key_patch_in import ApiKeyPatchIn
-from .command_out import CommandOut
-from .command_result import CommandResult
 from .content_block import ContentBlock
 from .content_in import ContentIn
 from .content_metadata import ContentMetadata
@@ -17,7 +15,7 @@ from .convergence_plan_out import ConvergencePlanOut
 from .convergence_plan_out_scaffolding import ConvergencePlanOutScaffolding
 from .details import Details
 from .language_out import LanguageOut
-from .list_tools_role import ListToolsRole
+from .package_manager_commands import PackageManagerCommands
 from .package_manager_out import PackageManagerOut
 from .preview_error_out import PreviewErrorOut
 from .preview_error_out_code import PreviewErrorOutCode
@@ -54,6 +52,8 @@ from .section_out import SectionOut
 from .section_patch_in import SectionPatchIn
 from .section_search_result_out import SectionSearchResultOut
 from .siren_action import SirenAction
+from .siren_embedded_entity import SirenEmbeddedEntity
+from .siren_embedded_entity_properties import SirenEmbeddedEntityProperties
 from .siren_entity import SirenEntity
 from .siren_entity_properties import SirenEntityProperties
 from .siren_field import SirenField
@@ -67,10 +67,9 @@ from .template_in import TemplateIn
 from .template_out import TemplateOut
 from .template_override_in import TemplateOverrideIn
 from .template_patch_in import TemplatePatchIn
-from .tool_command_capability import ToolCommandCapability
-from .tool_command_out import ToolCommandOut
+from .tool_commands import ToolCommands
 from .tool_out import ToolOut
-from .tool_role import ToolRole
+from .tool_out_roles_item import ToolOutRolesItem
 from .values import Values
 from .variable_form_property_out import VariableFormPropertyOut
 from .variable_form_property_out_type import VariableFormPropertyOutType
@@ -78,6 +77,8 @@ from .variable_in import VariableIn
 from .variable_out import VariableOut
 from .variable_patch_in import VariablePatchIn
 from .variable_type import VariableType
+from .version_provider_out import VersionProviderOut
+from .version_provider_out_kind import VersionProviderOutKind
 from .write_mode import WriteMode
 
 __all__ = (
@@ -85,8 +86,6 @@ __all__ = (
     "ApiKeyIn",
     "ApiKeyOut",
     "ApiKeyPatchIn",
-    "CommandOut",
-    "CommandResult",
     "ContentBlock",
     "ContentIn",
     "ContentMetadata",
@@ -98,7 +97,7 @@ __all__ = (
     "ConvergencePlanOutScaffolding",
     "Details",
     "LanguageOut",
-    "ListToolsRole",
+    "PackageManagerCommands",
     "PackageManagerOut",
     "PreviewErrorOut",
     "PreviewErrorOutCode",
@@ -135,6 +134,8 @@ __all__ = (
     "SectionPatchIn",
     "SectionSearchResultOut",
     "SirenAction",
+    "SirenEmbeddedEntity",
+    "SirenEmbeddedEntityProperties",
     "SirenEntity",
     "SirenEntityProperties",
     "SirenField",
@@ -148,10 +149,9 @@ __all__ = (
     "TemplateOut",
     "TemplateOverrideIn",
     "TemplatePatchIn",
-    "ToolCommandCapability",
-    "ToolCommandOut",
+    "ToolCommands",
     "ToolOut",
-    "ToolRole",
+    "ToolOutRolesItem",
     "Values",
     "VariableFormPropertyOut",
     "VariableFormPropertyOutType",
@@ -159,5 +159,7 @@ __all__ = (
     "VariableOut",
     "VariablePatchIn",
     "VariableType",
+    "VersionProviderOut",
+    "VersionProviderOutKind",
     "WriteMode",
 )

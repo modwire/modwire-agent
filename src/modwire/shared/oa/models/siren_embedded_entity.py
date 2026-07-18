@@ -10,33 +10,36 @@ from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.siren_action import SirenAction
-    from ..models.siren_embedded_entity import SirenEmbeddedEntity
-    from ..models.siren_entity_properties import SirenEntityProperties
+    from ..models.siren_embedded_entity_properties import SirenEmbeddedEntityProperties
     from ..models.siren_link import SirenLink
 
 
-T = TypeVar("T", bound="SirenEntity")
+T = TypeVar("T", bound="SirenEmbeddedEntity")
 
 
 @_attrs_define
-class SirenEntity:
+class SirenEmbeddedEntity:
     """
     Attributes:
+        rel (list[str]):
         class_ (list[str] | Unset):
-        properties (SirenEntityProperties | Unset):
+        properties (SirenEmbeddedEntityProperties | Unset):
         entities (list[SirenEmbeddedEntity] | Unset):
         actions (list[SirenAction] | Unset):
         links (list[SirenLink] | Unset):
     """
 
+    rel: list[str]
     class_: list[str] | Unset = UNSET
-    properties: SirenEntityProperties | Unset = UNSET
+    properties: SirenEmbeddedEntityProperties | Unset = UNSET
     entities: list[SirenEmbeddedEntity] | Unset = UNSET
     actions: list[SirenAction] | Unset = UNSET
     links: list[SirenLink] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
+        rel = self.rel
+
         class_: list[str] | Unset = UNSET
         if not isinstance(self.class_, Unset):
             class_ = self.class_
@@ -68,7 +71,11 @@ class SirenEntity:
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({})
+        field_dict.update(
+            {
+                "rel": rel,
+            }
+        )
         if class_ is not UNSET:
             field_dict["class"] = class_
         if properties is not UNSET:
@@ -85,19 +92,20 @@ class SirenEntity:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.siren_action import SirenAction
-        from ..models.siren_embedded_entity import SirenEmbeddedEntity
-        from ..models.siren_entity_properties import SirenEntityProperties
+        from ..models.siren_embedded_entity_properties import SirenEmbeddedEntityProperties
         from ..models.siren_link import SirenLink
 
         d = dict(src_dict)
+        rel = cast(list[str], d.pop("rel"))
+
         class_ = cast(list[str], d.pop("class", UNSET))
 
         _properties = d.pop("properties", UNSET)
-        properties: SirenEntityProperties | Unset
+        properties: SirenEmbeddedEntityProperties | Unset
         if isinstance(_properties, Unset):
             properties = UNSET
         else:
-            properties = SirenEntityProperties.from_dict(_properties)
+            properties = SirenEmbeddedEntityProperties.from_dict(_properties)
 
         _entities = d.pop("entities", UNSET)
         entities: list[SirenEmbeddedEntity] | Unset = UNSET
@@ -126,7 +134,8 @@ class SirenEntity:
 
                 links.append(links_item)
 
-        siren_entity = cls(
+        siren_embedded_entity = cls(
+            rel=rel,
             class_=class_,
             properties=properties,
             entities=entities,
@@ -134,8 +143,8 @@ class SirenEntity:
             links=links,
         )
 
-        siren_entity.additional_properties = d
-        return siren_entity
+        siren_embedded_entity.additional_properties = d
+        return siren_embedded_entity
 
     @property
     def additional_keys(self) -> list[str]:

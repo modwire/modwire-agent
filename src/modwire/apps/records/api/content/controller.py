@@ -2,6 +2,7 @@ from typing import Annotated
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from modwire_siren import siren_resource
 from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
@@ -13,6 +14,26 @@ from ...services.content import ContentService
 from .schemas import ContentIn, ContentOut, ContentPatchIn
 
 
+def _content_out(content):
+    return {
+        "id": content.id,
+        "record_slug": content.record_id,
+        "position": content.position,
+        "role": content.role,
+        "content": content.content,
+        "language": content.language,
+        "metadata": content.metadata,
+    }
+
+
+@siren_resource(
+    name="content",
+    path="/api/contents/{content_id}",
+    class_="content",
+    identifier="id",
+    path_parameters={"content_id": "id"},
+    relations={"record_slug": {"rel": "record", "resource": "record", "many": False}},
+)
 @api_controller("/contents", tags=["Contents"])
 class ContentController(ControllerBase):
     @route.get(
@@ -23,7 +44,7 @@ class ContentController(ControllerBase):
     )
     @inject
     def list(self, service: Annotated[ContentService, Inject()]):
-        return service.list()
+        return [_content_out(content) for content in service.list()]
 
     @route.get(
         "/{content_id}",
@@ -33,7 +54,7 @@ class ContentController(ControllerBase):
     )
     @inject
     def get(self, content_id: int, service: Annotated[ContentService, Inject()]):
-        return service.get(content_id)
+        return _content_out(service.get(content_id))
 
     @route.post(
         "",
@@ -44,7 +65,7 @@ class ContentController(ControllerBase):
     @inject
     def create(self, data: ContentIn, service: Annotated[ContentService, Inject()]):
         try:
-            return service.create(**data.model_dump())
+            return _content_out(service.create(**data.model_dump()))
         except (ValidationError, IntegrityError) as error:
             raise validation_error(error) from error
 
@@ -62,7 +83,7 @@ class ContentController(ControllerBase):
         service: Annotated[ContentService, Inject()],
     ):
         try:
-            return service.update(content_id, **data.model_dump())
+            return _content_out(service.update(content_id, **data.model_dump()))
         except (ValidationError, IntegrityError) as error:
             raise validation_error(error) from error
 
@@ -80,7 +101,9 @@ class ContentController(ControllerBase):
         service: Annotated[ContentService, Inject()],
     ):
         try:
-            return service.update(content_id, **data.model_dump(exclude_unset=True, warnings=False))
+            return _content_out(
+                service.update(content_id, **data.model_dump(exclude_unset=True, warnings=False))
+            )
         except (ValidationError, IntegrityError) as error:
             raise validation_error(error) from error
 

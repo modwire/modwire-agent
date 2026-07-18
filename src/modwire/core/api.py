@@ -4,6 +4,8 @@ from pkgutil import walk_packages
 
 from django.apps import apps
 from django.conf import settings
+from modwire_siren import collect_siren_resources, inject_siren_resources
+from modwire_siren.openapi.response_api import enrich_siren_openapi
 from ninja_extra import NinjaExtraAPI
 
 from modwire.apps.tokens.auth import ApiKeyAuth
@@ -12,109 +14,7 @@ from modwire.apps.tokens.auth import ApiKeyAuth
 class SirenAPI(NinjaExtraAPI):
     def get_openapi_schema(self, *args, **kwargs):
         schema = super().get_openapi_schema(*args, **kwargs)
-        components = schema.setdefault("components", {}).setdefault("schemas", {})
-        components.update(
-            {
-                "SirenLink": {
-                    "type": "object",
-                    "required": ["rel", "href"],
-                    "properties": {
-                        "rel": {"type": "array", "items": {"type": "string"}},
-                        "href": {"type": "string", "format": "uri"},
-                        "title": {"type": "string"},
-                        "type": {"type": "string"},
-                    },
-                },
-                "SirenField": {
-                    "description": (
-                        "A Siren action input. Complex inputs include a self-contained JSON Schema in schema."
-                    ),
-                    "type": "object",
-                    "additionalProperties": False,
-                    "required": ["name", "type", "required"],
-                    "properties": {
-                        "name": {"type": "string", "description": "Request property or query parameter name."},
-                        "type": {
-                            "type": "string",
-                            "description": (
-                                "Siren field type. json identifies an array, object, or union described by schema."
-                            ),
-                        },
-                        "required": {"type": "boolean", "description": "Whether the operation requires this field."},
-                        "title": {"type": "string", "description": "Human-readable field label."},
-                        "description": {"type": "string", "description": "Usage and validation guidance."},
-                        "value": {"description": "Advertised default or current value."},
-                        "options": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": False,
-                                "required": ["value", "title"],
-                                "properties": {"value": {}, "title": {"type": "string"}},
-                            },
-                        },
-                        "schema": {
-                            "type": "object",
-                            "description": (
-                                "Self-contained JSON Schema for a complex field; "
-                                "it contains no external component references."
-                            ),
-                        },
-                        "minimum": {"type": "number"},
-                        "maximum": {"type": "number"},
-                        "minLength": {"type": "integer"},
-                        "maxLength": {"type": "integer"},
-                        "pattern": {"type": "string"},
-                    },
-                },
-                "SirenAction": {
-                    "type": "object",
-                    "required": ["name", "href", "method"],
-                    "properties": {
-                        "name": {"type": "string"},
-                        "title": {"type": "string"},
-                        "method": {"type": "string"},
-                        "href": {"type": "string", "format": "uri"},
-                        "type": {"type": "string"},
-                        "fields": {"type": "array", "items": {"$ref": "#/components/schemas/SirenField"}},
-                    },
-                },
-                "SirenEntity": {
-                    "type": "object",
-                    "required": ["class", "links"],
-                    "properties": {
-                        "class": {"type": "array", "items": {"type": "string"}},
-                        "rel": {"type": "array", "items": {"type": "string"}},
-                        "properties": {"type": "object"},
-                        "links": {"type": "array", "items": {"$ref": "#/components/schemas/SirenLink"}},
-                        "entities": {"type": "array", "items": {"$ref": "#/components/schemas/SirenEntity"}},
-                        "actions": {"type": "array", "items": {"$ref": "#/components/schemas/SirenAction"}},
-                    },
-                },
-                "Problem": {
-                    "type": "object",
-                    "required": ["type", "title", "status", "detail"],
-                    "properties": {
-                        "type": {"type": "string"},
-                        "title": {"type": "string"},
-                        "status": {"type": "integer"},
-                        "detail": {},
-                    },
-                },
-            }
-        )
-        for path_item in schema.get("paths", {}).values():
-            for operation in path_item.values():
-                if not isinstance(operation, dict) or "responses" not in operation:
-                    continue
-                for status, response in operation["responses"].items():
-                    if status == "204":
-                        continue
-                    success = str(status).startswith("2")
-                    media_type = "application/vnd.siren+json" if success else "application/problem+json"
-                    model = "SirenEntity" if success else "Problem"
-                    response["content"] = {media_type: {"schema": {"$ref": f"#/components/schemas/{model}"}}}
-        return schema
+        return inject_siren_resources(enrich_siren_openapi(schema), SIREN_RESOURCE_SPECS)
 
 
 api = SirenAPI(title="Modwire Siren API", version=settings.RELEASE_VERSION, auth=ApiKeyAuth())
@@ -150,5 +50,8 @@ def _controllers():
             )
 
 
-for c in _controllers():
+CONTROLLERS = tuple(_controllers())
+SIREN_RESOURCE_SPECS = collect_siren_resources(*CONTROLLERS)
+
+for c in CONTROLLERS:
     api.register_controllers(c)

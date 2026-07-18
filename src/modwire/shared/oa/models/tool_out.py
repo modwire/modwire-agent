@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.tool_role import ToolRole
-from ..types import UNSET, Unset
+from ..models.tool_out_roles_item import ToolOutRolesItem
+
+if TYPE_CHECKING:
+    from ..models.tool_commands import ToolCommands
+
 
 T = TypeVar("T", bound="ToolOut")
 
@@ -17,44 +20,38 @@ class ToolOut:
     """
     Attributes:
         id (str):
-        language (str):
-        roles (list[ToolRole]):
-        config_paths (list[str]):
-        homepage_url (str):
         name (str):
+        roles (list[ToolOutRolesItem]):
         executable (str):
         package_name (str):
-        stable_version (str | Unset):  Default: ''.
-        default_enabled (bool | Unset):  Default: True.
+        stable_version (str):
+        homepage_url (str):
+        config_paths (list[str]):
+        default_enabled (bool):
+        commands (ToolCommands):
     """
 
     id: str
-    language: str
-    roles: list[ToolRole]
-    config_paths: list[str]
-    homepage_url: str
     name: str
+    roles: list[ToolOutRolesItem]
     executable: str
     package_name: str
-    stable_version: str | Unset = ""
-    default_enabled: bool | Unset = True
+    stable_version: str
+    homepage_url: str
+    config_paths: list[str]
+    default_enabled: bool
+    commands: ToolCommands
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         id = self.id
 
-        language = self.language
+        name = self.name
 
         roles = []
         for roles_item_data in self.roles:
             roles_item = roles_item_data.value
             roles.append(roles_item)
-
-        config_paths = self.config_paths
-
-        homepage_url = self.homepage_url
-
-        name = self.name
 
         executable = self.executable
 
@@ -62,68 +59,74 @@ class ToolOut:
 
         stable_version = self.stable_version
 
+        homepage_url = self.homepage_url
+
+        config_paths = self.config_paths
+
         default_enabled = self.default_enabled
+
+        commands = self.commands.to_dict()
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "id": id,
-                "language": language,
-                "roles": roles,
-                "config_paths": config_paths,
-                "homepage_url": homepage_url,
                 "name": name,
+                "roles": roles,
                 "executable": executable,
                 "package_name": package_name,
+                "stable_version": stable_version,
+                "homepage_url": homepage_url,
+                "config_paths": config_paths,
+                "default_enabled": default_enabled,
+                "commands": commands,
             }
         )
-        if stable_version is not UNSET:
-            field_dict["stable_version"] = stable_version
-        if default_enabled is not UNSET:
-            field_dict["default_enabled"] = default_enabled
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.tool_commands import ToolCommands
+
         d = dict(src_dict)
         id = d.pop("id")
 
-        language = d.pop("language")
+        name = d.pop("name")
 
         roles = []
         _roles = d.pop("roles")
         for roles_item_data in _roles:
-            roles_item = ToolRole(roles_item_data)
+            roles_item = ToolOutRolesItem(roles_item_data)
 
             roles.append(roles_item)
-
-        config_paths = cast(list[str], d.pop("config_paths"))
-
-        homepage_url = d.pop("homepage_url")
-
-        name = d.pop("name")
 
         executable = d.pop("executable")
 
         package_name = d.pop("package_name")
 
-        stable_version = d.pop("stable_version", UNSET)
+        stable_version = d.pop("stable_version")
 
-        default_enabled = d.pop("default_enabled", UNSET)
+        homepage_url = d.pop("homepage_url")
+
+        config_paths = cast(list[str], d.pop("config_paths"))
+
+        default_enabled = d.pop("default_enabled")
+
+        commands = ToolCommands.from_dict(d.pop("commands"))
 
         tool_out = cls(
             id=id,
-            language=language,
-            roles=roles,
-            config_paths=config_paths,
-            homepage_url=homepage_url,
             name=name,
+            roles=roles,
             executable=executable,
             package_name=package_name,
             stable_version=stable_version,
+            homepage_url=homepage_url,
+            config_paths=config_paths,
             default_enabled=default_enabled,
+            commands=commands,
         )
 
         tool_out.additional_properties = d

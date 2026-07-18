@@ -2,6 +2,7 @@ from typing import Annotated
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from modwire_siren import siren_resource
 from ninja import Query, Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
@@ -14,6 +15,27 @@ from ...services.record import RecordService
 from .schemas import RecordIn, RecordOut, RecordPatchIn, RecordSummaryOut, SearchIn, SearchOut
 
 
+@siren_resource(
+    name="record_search",
+    path="/api/records/search",
+    class_="record-search",
+    identifier="query",
+    path_parameters={},
+    relations={},
+    collection_only=True,
+)
+@siren_resource(
+    name="record",
+    path="/api/records/{record_slug}",
+    class_="record",
+    identifier="slug",
+    path_parameters={"record_slug": "slug"},
+    relations={
+        "section_slug": {"rel": "section", "resource": "section", "many": False},
+        "tag_slugs": {"rel": "tag", "resource": "tag", "many": True},
+    },
+    collection_operations=("search_records",),
+)
 @api_controller("/records", tags=["Records"])
 class RecordController(ControllerBase):
     @route.get(

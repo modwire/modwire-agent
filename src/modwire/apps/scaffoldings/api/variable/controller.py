@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from modwire_siren import siren_resource
 from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
@@ -12,6 +13,14 @@ from ...services.variable import VariableService
 from .schemas import VariableIn, VariableOut, VariablePatchIn
 
 
+@siren_resource(
+    name="variable",
+    path="/api/variables/{variable_id}",
+    class_="variable",
+    identifier="id",
+    path_parameters={"variable_id": "id"},
+    relations={"scaffolding": {"rel": "scaffolding", "resource": "scaffolding", "many": False}},
+)
 @api_controller("/variables", tags=["Variables"])
 class VariableController(ControllerBase):
     @route.get(

@@ -2,6 +2,7 @@ from typing import Annotated
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from modwire_siren import siren_resource
 from ninja import Query, Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
@@ -14,6 +15,14 @@ from ...services.section import SectionService
 from .schemas import SectionIn, SectionOut, SectionPatchIn
 
 
+@siren_resource(
+    name="section",
+    path="/api/sections/{slug}",
+    class_="section",
+    identifier="slug",
+    path_parameters={"slug": "slug"},
+    relations={"tag_slugs": {"rel": "tag", "resource": "tag", "many": True}},
+)
 @api_controller("/sections", tags=["Sections"])
 class SectionController(ControllerBase):
     @route.get(

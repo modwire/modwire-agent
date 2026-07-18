@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from modwire_siren import siren_resource
 from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 from wireup import Inject
@@ -28,6 +29,49 @@ from .schemas import (
 )
 
 
+@siren_resource(
+    name="scaffolding_preview",
+    path="/api/scaffoldings/{scaffolding_id}/preview",
+    class_="scaffolding-preview",
+    identifier="scaffolding_id",
+    path_parameters={"scaffolding_id": "scaffolding_id"},
+    relations={},
+)
+@siren_resource(
+    name="scaffolding_bundle",
+    path="/api/scaffoldings/{scaffolding_id}/bundle",
+    class_="scaffolding-bundle",
+    identifier="scaffolding_id",
+    path_parameters={"scaffolding_id": "scaffolding_id"},
+    relations={},
+)
+@siren_resource(
+    name="scaffolding_schema",
+    path="/api/scaffoldings/{scaffolding_id}/schema",
+    class_="scaffolding-schema",
+    identifier="scaffolding_id",
+    path_parameters={"scaffolding_id": "scaffolding_id"},
+    relations={},
+)
+@siren_resource(
+    name="scaffolding_convergence",
+    path="/api/scaffoldings/converge",
+    class_="scaffolding-convergence",
+    identifier="name",
+    path_parameters={},
+    relations={},
+    collection_only=True,
+)
+@siren_resource(
+    name="scaffolding",
+    path="/api/scaffoldings/{scaffolding_id}",
+    class_="scaffolding",
+    identifier="id",
+    path_parameters={"scaffolding_id": "id"},
+    relations={},
+    operations=("get_scaffolding_schema", "get_scaffolding_bundle", "preview_scaffolding"),
+    collection_operations=("converge_scaffolding",),
+)
 @api_controller("/scaffoldings", tags=["Scaffoldings"])
 class ScaffoldingController(ControllerBase):
     @route.get(

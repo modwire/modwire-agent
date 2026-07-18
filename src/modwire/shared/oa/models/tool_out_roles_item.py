@@ -1,10 +1,12 @@
 from enum import Enum
 
 
-class ToolRole(str, Enum):
+class ToolOutRolesItem(str, Enum):
     BUILD = "build"
     COVERAGE = "coverage"
     DEVELOPMENT_RUNNER = "development_runner"
+    DIAGRAM_RENDERER = "diagram_renderer"
+    DIAGRAM_VALIDATOR = "diagram_validator"
     DOCUMENTATION = "documentation"
     FORMATTER = "formatter"
     LINTER = "linter"

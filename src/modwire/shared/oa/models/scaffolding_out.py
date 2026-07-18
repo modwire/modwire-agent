@@ -15,12 +15,14 @@ class ScaffoldingOut:
     Attributes:
         id (str):
         language (str):
+        language_id (str):
         name (str):
         description (str):
     """
 
     id: str
     language: str
+    language_id: str
     name: str
     description: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -29,6 +31,8 @@ class ScaffoldingOut:
         id = self.id
 
         language = self.language
+
+        language_id = self.language_id
 
         name = self.name
 
@@ -40,6 +44,7 @@ class ScaffoldingOut:
             {
                 "id": id,
                 "language": language,
+                "language_id": language_id,
                 "name": name,
                 "description": description,
             }
@@ -54,6 +59,8 @@ class ScaffoldingOut:
 
         language = d.pop("language")
 
+        language_id = d.pop("language_id")
+
         name = d.pop("name")
 
         description = d.pop("description")
@@ -61,6 +68,7 @@ class ScaffoldingOut:
         scaffolding_out = cls(
             id=id,
             language=language,
+            language_id=language_id,
             name=name,
             description=description,
         )

@@ -1,5 +1,6 @@
 INSTALL := uv sync
 RUN := uv run
+PY_RUN := PYTHONPATH=src $(RUN)
 ADD := uv add
 REMOVE := uv remove
 OA_SCHEMA ?= .dev/openapi.json
@@ -34,17 +35,17 @@ mz:
 
 oa:
 	mkdir -p .dev src/modwire/shared
-	$(RUN) python -c "import json, os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'modwire.core.settings'); django.setup(); from modwire.core.api import api; print(json.dumps(api.get_openapi_schema()))" > $(OA_SCHEMA)
+	$(PY_RUN) python -c "import json, os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'modwire.core.settings'); django.setup(); from modwire.core.api import api; print(json.dumps(api.get_openapi_schema()))" > $(OA_SCHEMA)
 	rm -rf src/modwire/shared/oa
 	$(RUN) openapi-python-client generate --path $(OA_SCHEMA) --config openapi-python-client.yml --output-path src/modwire/shared/oa --overwrite --meta none
-	$(RUN) python scripts/generate-browser-content-roles.py
-	$(RUN) python scripts/generate-json-schemas.py
+	$(PY_RUN) python scripts/generate-browser-content-roles.py
+	$(PY_RUN) python scripts/generate-json-schemas.py
 
 schemas:
-	$(RUN) python scripts/generate-json-schemas.py
+	$(PY_RUN) python scripts/generate-json-schemas.py
 
 browser-content-roles:
-	$(RUN) python scripts/generate-browser-content-roles.py
+	$(PY_RUN) python scripts/generate-browser-content-roles.py
 
 add:
 	@test -n "$(pkg)" || (echo "usage: make add pkg=<pkg>" && exit 2)
