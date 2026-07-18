@@ -1,9 +1,8 @@
-from wireup import injectable
+from wireup import instance
 
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
-@injectable(as_type=Language, qualifier="python")
 class Python(Language):
     id: str = "python"
     name: str = "Python"
@@ -119,3 +118,6 @@ class Python(Language):
         url="https://endoflife.date/api/python.json",
         result_path=(0, "latest"),
     )
+
+
+python = instance(Python(), as_type=Language, qualifier="python")

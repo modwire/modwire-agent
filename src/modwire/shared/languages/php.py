@@ -1,9 +1,8 @@
-from wireup import injectable
+from wireup import instance
 
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
-@injectable(as_type=Language, qualifier="php")
 class PHP(Language):
     id: str = "php"
     name: str = "PHP"
@@ -103,3 +102,6 @@ class PHP(Language):
         url="https://endoflife.date/api/php.json",
         result_path=(0, "latest"),
     )
+
+
+php = instance(PHP(), as_type=Language, qualifier="php")

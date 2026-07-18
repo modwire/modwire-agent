@@ -1,9 +1,8 @@
-from wireup import injectable
+from wireup import instance
 
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
-@injectable(as_type=Language, qualifier="mermaid")
 class Mermaid(Language):
     id: str = "mermaid"
     name: str = "Mermaid"
@@ -31,3 +30,6 @@ class Mermaid(Language):
         url="https://registry.npmjs.org/mermaid/latest",
         result_path=("version",),
     )
+
+
+mermaid = instance(Mermaid(), as_type=Language, qualifier="mermaid")

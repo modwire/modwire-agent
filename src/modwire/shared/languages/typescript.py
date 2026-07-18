@@ -1,9 +1,8 @@
-from wireup import injectable
+from wireup import instance
 
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
-@injectable(as_type=Language, qualifier="typescript")
 class Typescript(Language):
     id: str = "typescript"
     name: str = "TypeScript"
@@ -130,3 +129,6 @@ class Typescript(Language):
         url="https://registry.npmjs.org/typescript/latest",
         result_path=("version",),
     )
+
+
+typescript = instance(Typescript(), as_type=Language, qualifier="typescript")
