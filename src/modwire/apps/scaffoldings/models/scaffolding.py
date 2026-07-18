@@ -1,9 +1,7 @@
 from django.db import models
 
-from modwire.shared.models import ShortUUIDModel
 
-
-class Scaffolding(ShortUUIDModel):
+class Scaffolding(models.Model):
     language_id = models.CharField(max_length=64)
     name = models.CharField(max_length=120)
     description = models.TextField()

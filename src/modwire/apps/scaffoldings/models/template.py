@@ -1,11 +1,9 @@
 from django.db import models
 
-from modwire.shared.models import ShortUUIDModel
-
 from .scaffolding import Scaffolding
 
 
-class Template(ShortUUIDModel):
+class Template(models.Model):
     class WriteMode(models.TextChoices):
         MANAGED = "managed", "Managed"
         CREATE_IF_MISSING = "create_if_missing", "Create if missing"
