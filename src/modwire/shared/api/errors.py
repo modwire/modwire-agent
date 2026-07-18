@@ -6,12 +6,12 @@ from django.db import IntegrityError
 from ninja.errors import HttpError
 
 
-def validation_error(error: ValidationError | IntegrityError) -> HttpError:
-    return HttpError(400, str(error))
+def validation_error(error: ValidationError | IntegrityError | ValueError) -> HttpError:
+    return HttpError(422, str(error))
 
 
 def validated(call: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
     try:
         return call(*args, **kwargs)
-    except (ValidationError, IntegrityError) as error:
+    except (ValidationError, IntegrityError, ValueError) as error:
         raise validation_error(error) from error
