@@ -36,6 +36,7 @@ from .schemas import (
     identifier="scaffolding_id",
     path_parameters={"scaffolding_id": "scaffolding_id"},
     relations={},
+    singleton=True,
 )
 @siren_resource(
     name="scaffolding_bundle",
@@ -44,6 +45,7 @@ from .schemas import (
     identifier="scaffolding_id",
     path_parameters={"scaffolding_id": "scaffolding_id"},
     relations={},
+    singleton=True,
 )
 @siren_resource(
     name="scaffolding_schema",
@@ -52,6 +54,7 @@ from .schemas import (
     identifier="scaffolding_id",
     path_parameters={"scaffolding_id": "scaffolding_id"},
     relations={},
+    singleton=True,
 )
 @siren_resource(
     name="scaffolding_convergence",
@@ -60,7 +63,8 @@ from .schemas import (
     identifier="name",
     path_parameters={},
     relations={},
-    collection_only=True,
+    singleton=True,
+    root_visible=False,
 )
 @siren_resource(
     name="scaffolding",

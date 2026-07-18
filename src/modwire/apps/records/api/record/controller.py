@@ -22,7 +22,8 @@ from .schemas import RecordIn, RecordOut, RecordPatchIn, RecordSummaryOut, Searc
     identifier="query",
     path_parameters={},
     relations={},
-    collection_only=True,
+    singleton=True,
+    root_visible=False,
 )
 @siren_resource(
     name="record",

@@ -78,20 +78,11 @@ def _projection_configs() -> tuple[_ProjectionConfig, ...]:
         if resource.get("collection-only"):
             configs.extend(_collection_only_configs(resource_path, path_item, resource))
             continue
+        if resource.get("singleton"):
+            configs.append(_entity_config(resource_path, path_item, resource))
+            continue
 
-        configs.append(
-            _ProjectionConfig(
-                path=resource_path,
-                methods=_methods(path_item),
-                kind="entity",
-                resource_name=resource["name"],
-                operation_ids=_merge_operation_ids(
-                    _operation_ids(path_item),
-                    tuple(resource.get("operations", ())),
-                ),
-                path_parameters=dict(resource.get("path-parameters", {})),
-            )
-        )
+        configs.append(_entity_config(resource_path, path_item, resource))
         collection_path = _parent_path(resource_path)
         if collection_path in paths and not _has_placeholders(collection_path):
             collection_path_item = paths[collection_path]
@@ -145,6 +136,20 @@ def _collection_only_configs(
             path_parameters=dict(resource.get("path-parameters", {})),
         )
         for method, operation in _method_operations(path_item)
+    )
+
+
+def _entity_config(path: str, path_item: dict[str, Any], resource: dict[str, Any]) -> _ProjectionConfig:
+    return _ProjectionConfig(
+        path=path,
+        methods=_methods(path_item),
+        kind="entity",
+        resource_name=resource["name"],
+        operation_ids=_merge_operation_ids(
+            _operation_ids(path_item),
+            tuple(resource.get("operations", ())),
+        ),
+        path_parameters=dict(resource.get("path-parameters", {})),
     )
 
 
@@ -266,7 +271,7 @@ def _pagination(request, data: list[Any]):
         if request.GET:
             return CustomPagination(
                 count=len(data),
-                links=(PaginationLinkInput(rel="self", query=dict(request.GET.items())),),
+                links=(PaginationLinkInput(rel="self", query=_query_pairs(request.GET)),),
             )
         return None
     limit = max(int(request.GET.get("limit", 1)), 1)
@@ -274,19 +279,29 @@ def _pagination(request, data: list[Any]):
     if set(request.GET) <= {"limit", "offset"}:
         return OffsetPagination(limit=limit, offset=offset, count=len(data), has_next=len(data) == limit)
 
-    links = [PaginationLinkInput(rel="self", query=dict(request.GET.items()))]
-    first = request.GET.copy()
-    first["offset"] = 0
-    links.append(PaginationLinkInput(rel="first", query=dict(first.items())))
+    links = [PaginationLinkInput(rel="self", query=_query_pairs(request.GET))]
+    links.append(PaginationLinkInput(rel="first", query=_query_pairs(request.GET, offset=0)))
     if offset > 0:
-        previous = request.GET.copy()
-        previous["offset"] = max(0, offset - limit)
-        links.append(PaginationLinkInput(rel="previous", query=dict(previous.items())))
+        links.append(
+            PaginationLinkInput(
+                rel="previous",
+                query=_query_pairs(request.GET, offset=max(0, offset - limit)),
+            )
+        )
     if len(data) == limit:
-        next_page = request.GET.copy()
-        next_page["offset"] = offset + limit
-        links.append(PaginationLinkInput(rel="next", query=dict(next_page.items())))
+        links.append(PaginationLinkInput(rel="next", query=_query_pairs(request.GET, offset=offset + limit)))
     return CustomPagination(count=len(data), links=tuple(links))
+
+
+def _query_pairs(query, **overrides) -> tuple[tuple[str, Any], ...]:
+    pairs = [
+        (key, value)
+        for key, values in query.lists()
+        if key not in overrides
+        for value in values
+    ]
+    pairs.extend(overrides.items())
+    return tuple(pairs)
 
 
 def _project_response(request, data, status_code: int) -> HttpResponse:

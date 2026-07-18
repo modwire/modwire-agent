@@ -76,8 +76,9 @@ class TestRecordResource(RecordResourceFactory):
     def test_record_lifecycle_search_and_slash_slug_resolution_are_endpoint_contracts(self, client, auth):
         api = self.api(client, auth)
         tag = self.create_tag(api, "API")
+        second_tag = self.create_tag(api, "Guide")
         section = self.create_section(api, tag_slugs=[tag["slug"]])
-        record = self.create_record(api, section["slug"], [tag["slug"]])
+        record = self.create_record(api, section["slug"], [tag["slug"], second_tag["slug"]])
 
         assert record["slug"] == "endpoint-docs/endpoint-intro"
 
@@ -115,6 +116,42 @@ class TestRecordResource(RecordResourceFactory):
         assert any(result["slug"] == record["slug"] for result in search.properties["results"])
 
         assert api.delete(f"/api/records/{record['slug']}").content == b""
+
+    def test_record_pagination_preserves_repeated_filter_query_values(self, client, auth):
+        api = self.api(client, auth)
+        first_tag = self.create_tag(api, "Alpha")
+        second_tag = self.create_tag(api, "Beta")
+        section = self.create_section(api, tag_slugs=[first_tag["slug"], second_tag["slug"]])
+        self.create_record(api, section["slug"], [first_tag["slug"], second_tag["slug"]], "Repeated Query")
+
+        document = self.siren(
+            api.get(
+                f"/api/records?limit=1&offset=0&tag={first_tag['slug']}&tag={second_tag['slug']}"
+            )
+        )
+
+        assert f"tag={first_tag['slug']}" in document.links["next"]
+        assert f"tag={second_tag['slug']}" in document.links["next"]
+
+    def test_search_result_singleton_has_static_self_link(self, client, auth):
+        api = self.api(client, auth)
+
+        document = self.siren(
+            api.post(
+                "/api/records/search",
+                {
+                    "query": "anything",
+                    "mode": "fts",
+                    "target": "all",
+                    "limit": 10,
+                    "offset": 0,
+                    "section_slugs": [],
+                    "tag_slugs": [],
+                },
+            )
+        ).assert_classes("record-search")
+
+        assert document.links["self"].endswith("/api/records/search")
 
     def test_record_without_tags_is_rejected_as_problem_document(self, client, auth):
         api = self.api(client, auth)

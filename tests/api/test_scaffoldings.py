@@ -24,12 +24,14 @@ class TestScaffoldingAggregate(ScaffoldingResourceFactory):
         schema = self.siren(api.get(f"/api/scaffoldings/{scaffolding['id']}/schema")).assert_classes(
             "scaffolding-schema"
         )
+        assert schema.links["self"].endswith(f"/api/scaffoldings/{scaffolding['id']}/schema")
         assert "project_name" in schema.properties["properties"]
         assert schema.properties["required"] == ["project_name"]
 
         bundle = self.siren(api.get(f"/api/scaffoldings/{scaffolding['id']}/bundle")).assert_classes(
             "scaffolding-bundle"
         )
+        assert bundle.links["self"].endswith(f"/api/scaffoldings/{scaffolding['id']}/bundle")
         assert bundle.properties["variables"][0]["id"] == variable["id"]
         assert bundle.properties["templates"][0]["id"] == template["id"]
 
@@ -41,6 +43,7 @@ class TestScaffoldingAggregate(ScaffoldingResourceFactory):
         ).assert_classes("scaffolding-preview")
         assert preview.properties["files"][0]["path"] == "README.md"
         assert "Ada" in preview.properties["files"][0]["source"]
+        assert preview.links["self"].endswith(f"/api/scaffoldings/{scaffolding['id']}/preview")
 
         convergence = self.siren(
             api.post(
@@ -71,6 +74,7 @@ class TestScaffoldingAggregate(ScaffoldingResourceFactory):
         ).assert_classes("scaffolding-convergence")
         assert convergence.properties["dry_run"] is True
         assert convergence.properties["plan"]["scaffolding"] == "create"
+        assert convergence.links["self"].endswith("/api/scaffoldings/converge")
 
         assert api.delete(f"/api/templates/{template['id']}").content == b""
         assert api.delete(f"/api/variables/{variable['id']}").content == b""

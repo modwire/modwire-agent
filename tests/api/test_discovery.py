@@ -28,6 +28,8 @@ class TestApiDiscovery(EndpointAssertions):
 
         assert root.properties["version"] == openapi["info"]["version"]
         assert {"self", "records", "scaffoldings", "browser", "service-desc"}.issubset(root.links)
+        assert "record-search" not in root.links
+        assert "scaffolding-convergence" not in root.links
         assert {"SirenEntity", "Problem"}.issubset(openapi["components"]["schemas"])
         assert openapi["paths"]["/api/records/{record_slug}"]["x-siren-resource"]["name"] == "record"
 

@@ -816,15 +816,15 @@ wheels = [
 
 [[package]]
 name = "modwire-siren"
-version = "1.4.0"
+version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jsonschema" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ad/e4/5d530c23cfb199ed6b23eb7a0c2daf00fc9f919a4ad2c4201923cbe80ac8/modwire_siren-1.4.0.tar.gz", hash = "sha256:6d3f54ecb139aacee8cc491f0e00d5ef787f73ab93c9d1e462e10136406ad78f", size = 65224, upload-time = "2026-07-18T15:14:58.24Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/d3/b55cc0a59f583b8f851910a655683aed4d3ef803980c6a957fb080da7e30/modwire_siren-1.5.0.tar.gz", hash = "sha256:5b29695d24dde810f5688f28a7eff2f4582ab395ad5ffda01f33b09df3e13b7d", size = 67062, upload-time = "2026-07-18T16:27:35.426Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0e/3d/5a18189a149aae88e7132cef0197051cedad77363526f7ec4fcdeb6e66b2/modwire_siren-1.4.0-py3-none-any.whl", hash = "sha256:1842ef33a08957debd24884c31cc9d95d068591491ca3561a9d53113db216252", size = 66687, upload-time = "2026-07-18T15:14:56.739Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/88/c35de01f7394f2a4f2a387e44c6fa71f03f49a540ee91f3b2506a03c92c0/modwire_siren-1.5.0-py3-none-any.whl", hash = "sha256:1013c6105554717a22743b6bc6551f67cb61630cdbc7a7dd9f95a38a77be5797", size = 67610, upload-time = "2026-07-18T16:27:34.243Z" },
 ]
 
 [[package]]
