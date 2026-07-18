@@ -9,7 +9,7 @@ from modwire_siren.openapi.response_api import enrich_siren_openapi
 from ninja_extra import NinjaExtraAPI
 
 from modwire.apps.tokens.auth import ApiKeyAuth
-from modwire.shared.api.hypermedia import collect_resources, collect_siren_resources
+from modwire.shared.api.hypermedia import collect_resources, siren_specs
 
 
 class SirenAPI(NinjaExtraAPI):
@@ -51,9 +51,17 @@ def _controllers():
             )
 
 
+def _resource_specs():
+    for app in apps.get_app_configs():
+        module = _import(f"{app.name}.api.resources", app.name)
+        if not module:
+            continue
+        yield from getattr(module, "SIREN_RESOURCES", ())
+
+
 CONTROLLERS = tuple(_controllers())
-RESOURCE_SPECS = collect_resources(*CONTROLLERS)
-SIREN_RESOURCE_SPECS = collect_siren_resources(*CONTROLLERS)
+RESOURCE_SPECS = (*tuple(_resource_specs()), *collect_resources(*CONTROLLERS))
+SIREN_RESOURCE_SPECS = siren_specs(RESOURCE_SPECS)
 
 for c in CONTROLLERS:
     api.register_controllers(c)
