@@ -12,7 +12,7 @@ from ...models.template import Template
 
 
 class ScaffoldingIn(StrictSchema):
-    language_id: ShortUUID
+    language_id: str
     name: str
     description: str
 
@@ -63,7 +63,7 @@ class ScaffoldingConvergenceOut(Schema):
 
 class ScaffoldingOut(ModelSchema):
     id: ShortUUID
-    language: ShortUUID
+    language: str
 
     @staticmethod
     def resolve_language(obj):
