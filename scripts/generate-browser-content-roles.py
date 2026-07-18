@@ -8,17 +8,17 @@ import django
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "browser/src/models/recordContent.generated.ts"
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))
 
 
 def render() -> str:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "modwire.core.settings")
     django.setup()
 
-    from records.models.content import Content
+    from modwire.apps.records.models.content import Content
 
     members = "\n".join(f'  {role.name}: "{role.value}",' for role in Content.Role)
-    return f'''// Generated from records.models.content.Content.Role. Do not edit by hand.
+    return f'''// Generated from modwire.apps.records.models.content.Content.Role. Do not edit by hand.
 export const CONTENT_ROLE = {{
 {members}
 }} as const;

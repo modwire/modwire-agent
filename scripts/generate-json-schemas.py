@@ -9,15 +9,15 @@ import django
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "schemas"
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))
 
 
 def render() -> dict[str, str]:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "modwire.core.settings")
     django.setup()
 
-    from records.api.content.schemas import ContentIn, ContentOut, ContentPatchIn
-    from records.api.schemas.content import ContentBlock, ContentMetadata
+    from modwire.apps.records.api.content.schemas import ContentIn, ContentOut, ContentPatchIn
+    from modwire.apps.records.api.schemas.content import ContentBlock, ContentMetadata
 
     models = {
         "content-block.schema.json": ContentBlock,

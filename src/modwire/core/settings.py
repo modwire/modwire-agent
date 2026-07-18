@@ -1,0 +1,98 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import os
+from pathlib import Path
+
+import dj_database_url
+import structlog
+from wireup.integration.django import WireupSettings
+
+from .registry import installed_apps, service_modules
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = PACKAGE_DIR.parent.parent
+APPS_DIR = PACKAGE_DIR / "apps"
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
+DEBUG = os.getenv("DEBUG", "0") == "1"
+ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
+RELEASE_VERSION = os.getenv("MODWIRE_MCP_VERSION", "0.0.0+dev")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "health_check",
+    "ninja_extra",
+    "pgvector.django",
+    "wireup.integration.django.apps.WireupConfig",
+] + installed_apps()
+MIDDLEWARE = [
+    "wireup.integration.django.wireup_middleware",
+    "modwire.shared.api.siren.SirenMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+WIREUP = WireupSettings(injectables=service_modules(APPS_DIR), auto_inject_views=False)
+ROOT_URLCONF = "modwire.core.urls"
+TEMPLATES = [{
+    "BACKEND": "django.template.backends.django.DjangoTemplates",
+    "DIRS": [],
+    "APP_DIRS": True,
+    "OPTIONS": {"context_processors": [
+        "django.template.context_processors.debug",
+        "django.template.context_processors.request",
+        "django.contrib.auth.context_processors.auth",
+        "django.contrib.messages.context_processors.messages",
+    ]},
+}]
+WSGI_APPLICATION = "modwire.core.wsgi.application"
+database = dj_database_url.config(default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"))
+if database_host := os.getenv("DATABASE_HOST"):
+    database["HOST"] = database_host
+if database_port := os.getenv("DATABASE_PORT"):
+    database["PORT"] = database_port
+DATABASES = {"default": database}
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
+USE_I18N = USE_TZ = True
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / ".dev" / "static"
+STATICFILES_DIRS = [BASE_DIR / "browser" / "dist"] if (BASE_DIR / "browser" / "dist").is_dir() else []
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+RECORDS_EMBEDDING_DIMENSIONS = 384
+RECORDS_EMBEDDINGS_ENABLED = os.getenv("RECORDS_EMBEDDINGS_ENABLED", "1") == "1"
+RECORDS_EMBEDDING_PROVIDER = os.getenv("RECORDS_EMBEDDING_PROVIDER", "deterministic")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"json": {
+        "()": "structlog.stdlib.ProcessorFormatter",
+        "processor": structlog.processors.JSONRenderer(),
+    }},
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "json"}},
+    "root": {"handlers": ["console"], "level": os.getenv("LOG_LEVEL", "INFO")},
+}
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)

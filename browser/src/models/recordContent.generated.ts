@@ -1,4 +1,4 @@
-// Generated from records.models.content.Content.Role. Do not edit by hand.
+// Generated from modwire.apps.records.models.content.Content.Role. Do not edit by hand.
 export const CONTENT_ROLE = {
   HEADING: "heading",
   SUBHEADING: "subheading",

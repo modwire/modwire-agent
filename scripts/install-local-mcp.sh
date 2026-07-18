@@ -26,7 +26,7 @@ if ! test -s "${secret_path}" || ! curl --fail --silent --output /dev/null \
     temporary_secret="$(mktemp "${secret_path}.XXXXXX")"
     trap 'rm -f "${temporary_secret}"' EXIT HUP INT TERM
     docker compose exec -T scaffolding-api python manage.py shell --no-imports -c \
-      'from tokens.models.api_key import ApiKey; _, key = ApiKey.generate("local-mcp-adapter"); print(key)' \
+      'from modwire.apps.tokens.models.api_key import ApiKey; _, key = ApiKey.generate("local-mcp-adapter"); print(key)' \
       >"${temporary_secret}"
     test -s "${temporary_secret}"
     chmod 600 "${temporary_secret}"
