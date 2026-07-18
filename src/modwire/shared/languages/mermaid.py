@@ -1,36 +1,33 @@
-import json
-from urllib.request import Request
-
 from wireup import injectable
 
-from .base import LanguageDefinition, ToolDefinition
+from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
-@injectable(as_type=LanguageDefinition, qualifier="mermaid")
-class Mermaid(LanguageDefinition):
-    name = "Mermaid"
-    executable = "mmdc"
-    source_extensions = (".mermaid", ".mmd")
-    package_managers = ()
-    tools = (
-        ToolDefinition(
+@injectable(as_type=Language, qualifier="mermaid")
+class Mermaid(Language):
+    id: str = "mermaid"
+    name: str = "Mermaid"
+    executable: str = "mmdc"
+    source_extensions: tuple[str, ...] = (".mermaid", ".mmd")
+    aliases: tuple[str, ...] = ()
+    package_managers: tuple[PackageManager, ...] = ()
+    tools: tuple[Tool, ...] = (
+        Tool(
+            id="mermaid-cli",
             name="Mermaid CLI",
             roles=("diagram_renderer", "diagram_validator"),
             executable="mmdc",
             package_name="@mermaid-js/mermaid-cli",
+            stable_version="",
             homepage_url="https://mermaid.js.org/",
             config_paths=("mermaid.config.json",),
             default_enabled=True,
             commands={"render": "mmdc -i {input} -o {output}"},
         ),
     )
-
-    @property
-    def version_request(self) -> Request:
-        return Request(
-            "https://registry.npmjs.org/mermaid/latest",
-            headers={"Accept": "application/json", "User-Agent": "modwire-languages-cms/1.0"},
-        )
-
-    def on_version_response(self, response) -> str:
-        return json.load(response)["version"]
+    stable_version: str = ""
+    version_provider: VersionProvider = VersionProvider(
+        kind="npm",
+        url="https://registry.npmjs.org/mermaid/latest",
+        result_path=("version",),
+    )

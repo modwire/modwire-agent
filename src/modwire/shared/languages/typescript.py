@@ -1,18 +1,18 @@
-import json
-from urllib.request import Request
-
 from wireup import injectable
 
-from .base import LanguageDefinition, PackageManagerDefinition, ToolDefinition
+from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
-@injectable(as_type=LanguageDefinition, qualifier="typescript")
-class Typescript(LanguageDefinition):
-    name = "TypeScript"
-    executable = "tsc"
-    source_extensions = (".tsx", ".ts", ".jsx", ".js")
-    package_managers = (
-        PackageManagerDefinition(
+@injectable(as_type=Language, qualifier="typescript")
+class Typescript(Language):
+    id: str = "typescript"
+    name: str = "TypeScript"
+    executable: str = "tsc"
+    source_extensions: tuple[str, ...] = (".tsx", ".ts", ".jsx", ".js")
+    aliases: tuple[str, ...] = ("ts",)
+    package_managers: tuple[PackageManager, ...] = (
+        PackageManager(
+            id="npm",
             name="NPM",
             executable="npm",
             manifest_paths=("package.json",),
@@ -38,85 +38,95 @@ class Typescript(LanguageDefinition):
             },
         ),
     )
-    tools = (
-        ToolDefinition(
-            "TypeScript",
-            ("type_checker", "build"),
-            "tsc",
-            "typescript",
-            "https://www.typescriptlang.org/",
-            ("tsconfig.json",),
-            True,
-            {"check": "tsc --noEmit", "build": "tsc"},
+    tools: tuple[Tool, ...] = (
+        Tool(
+            id="typescript",
+            name="TypeScript",
+            roles=("type_checker", "build"),
+            executable="tsc",
+            package_name="typescript",
+            stable_version="",
+            homepage_url="https://www.typescriptlang.org/",
+            config_paths=("tsconfig.json",),
+            default_enabled=True,
+            commands={"check": "tsc --noEmit", "build": "tsc"},
         ),
-        ToolDefinition(
-            "ESLint",
-            ("linter",),
-            "eslint",
-            "eslint",
-            "https://eslint.org/",
-            ("eslint.config.js",),
-            True,
-            {"check": "eslint .", "fix": "eslint . --fix"},
+        Tool(
+            id="eslint",
+            name="ESLint",
+            roles=("linter",),
+            executable="eslint",
+            package_name="eslint",
+            stable_version="",
+            homepage_url="https://eslint.org/",
+            config_paths=("eslint.config.js",),
+            default_enabled=True,
+            commands={"check": "eslint .", "fix": "eslint . --fix"},
         ),
-        ToolDefinition(
-            "Prettier",
-            ("formatter",),
-            "prettier",
-            "prettier",
-            "https://prettier.io/",
-            (".prettierrc",),
-            True,
-            {"check": "prettier . --check", "fix": "prettier . --write"},
+        Tool(
+            id="prettier",
+            name="Prettier",
+            roles=("formatter",),
+            executable="prettier",
+            package_name="prettier",
+            stable_version="",
+            homepage_url="https://prettier.io/",
+            config_paths=(".prettierrc",),
+            default_enabled=True,
+            commands={"check": "prettier . --check", "fix": "prettier . --write"},
         ),
-        ToolDefinition(
-            "Vitest",
-            ("test_runner",),
-            "vitest",
-            "vitest",
-            "https://vitest.dev/",
-            ("vitest.config.ts",),
-            True,
-            {"test": "vitest run", "serve": "vitest"},
+        Tool(
+            id="vitest",
+            name="Vitest",
+            roles=("test_runner",),
+            executable="vitest",
+            package_name="vitest",
+            stable_version="",
+            homepage_url="https://vitest.dev/",
+            config_paths=("vitest.config.ts",),
+            default_enabled=True,
+            commands={"test": "vitest run", "serve": "vitest"},
         ),
-        ToolDefinition(
-            "Vitest V8",
-            ("coverage",),
-            "vitest",
-            "@vitest/coverage-v8",
-            "https://vitest.dev/guide/coverage",
-            ("vitest.config.ts",),
-            True,
-            {"coverage": "vitest run --coverage"},
+        Tool(
+            id="vitest-v8",
+            name="Vitest V8",
+            roles=("coverage",),
+            executable="vitest",
+            package_name="@vitest/coverage-v8",
+            stable_version="",
+            homepage_url="https://vitest.dev/guide/coverage",
+            config_paths=("vitest.config.ts",),
+            default_enabled=True,
+            commands={"coverage": "vitest run --coverage"},
         ),
-        ToolDefinition(
-            "tsx",
-            ("development_runner",),
-            "tsx",
-            "tsx",
-            "https://tsx.is/",
-            (),
-            True,
-            {"serve": "tsx watch {entrypoint}"},
+        Tool(
+            id="tsx",
+            name="tsx",
+            roles=("development_runner",),
+            executable="tsx",
+            package_name="tsx",
+            stable_version="",
+            homepage_url="https://tsx.is/",
+            config_paths=(),
+            default_enabled=True,
+            commands={"serve": "tsx watch {entrypoint}"},
         ),
-        ToolDefinition(
-            "TypeDoc",
-            ("documentation",),
-            "typedoc",
-            "typedoc",
-            "https://typedoc.org/",
-            ("typedoc.json",),
-            False,
-            {"build": "typedoc"},
+        Tool(
+            id="typedoc",
+            name="TypeDoc",
+            roles=("documentation",),
+            executable="typedoc",
+            package_name="typedoc",
+            stable_version="",
+            homepage_url="https://typedoc.org/",
+            config_paths=("typedoc.json",),
+            default_enabled=False,
+            commands={"build": "typedoc"},
         ),
     )
-
-    @property
-    def version_request(self) -> Request:
-        return Request(
-            "https://registry.npmjs.org/typescript/latest",
-            headers={"Accept": "application/json", "User-Agent": "modwire-languages-cms/1.0"},
-        )
-
-    def on_version_response(self, response) -> str:
-        return json.load(response)["version"]
+    stable_version: str = ""
+    version_provider: VersionProvider = VersionProvider(
+        kind="npm",
+        url="https://registry.npmjs.org/typescript/latest",
+        result_path=("version",),
+    )
