@@ -52,6 +52,16 @@ class ResourceSpec:
     singleton: bool = False
     root_visible: bool | None = None
 
+    def __post_init__(self):
+        object.__setattr__(
+            self,
+            "relations",
+            {
+                field: RelationSpec.from_input(relation)
+                for field, relation in self.relations.items()
+            },
+        )
+
     def to_modwire_siren(self) -> SirenResourceSpec:
         if self.path is None:
             raise ValueError(f"Siren resource {self.name!r} must be resolved before export")

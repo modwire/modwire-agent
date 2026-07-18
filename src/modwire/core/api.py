@@ -53,10 +53,13 @@ def _controllers():
 
 def _resource_specs():
     for app in apps.get_app_configs():
-        module = _import(f"{app.name}.api.resources", app.name)
-        if not module:
+        pkg = _import(f"{app.name}.api", app.name)
+        if not pkg:
             continue
-        yield from getattr(module, "SIREN_RESOURCES", ())
+        for mod in _mods(pkg, app.name):
+            if not mod.__name__.endswith(".resource"):
+                continue
+            yield from getattr(mod, "SIREN_RESOURCES", ())
 
 
 CONTROLLERS = tuple(_controllers())

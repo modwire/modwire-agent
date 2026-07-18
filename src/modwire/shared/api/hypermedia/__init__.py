@@ -1,4 +1,4 @@
-from .controller import CrudResource, ResourceController
+from .controller import CollectionController, CollectionResource, CrudResource, QuerySpec, ResourceController
 from .projection import ProjectionCatalog, ProjectionConfig
 from .resources import (
     RelationSpec,
@@ -13,6 +13,9 @@ __all__ = [
     "ProjectionCatalog",
     "ProjectionConfig",
     "CrudResource",
+    "CollectionController",
+    "CollectionResource",
+    "QuerySpec",
     "ResourceController",
     "RelationSpec",
     "ResourceSpec",

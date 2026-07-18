@@ -1,8 +1,9 @@
 from modwire.apps.records.api.errors import validation_error
-from modwire.apps.records.api.tag.schemas import TagIn, TagOut, TagPatchIn
 from modwire.apps.records.services.tag import TagService
 from modwire.shared.api.hypermedia import CrudResource, ResourceSpec
 from modwire.shared.api.types import Slug
+
+from .schemas import TagIn, TagOut, TagPatchIn
 
 tag = CrudResource(
     name="tag",

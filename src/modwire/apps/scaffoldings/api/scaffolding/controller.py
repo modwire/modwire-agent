@@ -1,93 +1,34 @@
 from typing import Annotated
 
 from ninja import Status
-from ninja_extra import ControllerBase, api_controller, route
+from ninja_extra import route
 from wireup import Inject
 from wireup.integration.django import inject
 
 from modwire.shared.api.errors import validated
-from modwire.shared.api.hypermedia import siren_resource
+from modwire.shared.api.hypermedia import ResourceController
 from modwire.shared.api.types import ShortUUID
 
 from ...services.bundle import ScaffoldingBundleService
 from ...services.convergence import ScaffoldingConvergenceService
 from ...services.preview import ScaffoldingPreviewService
 from ...services.preview_errors import PreviewFailed
-from ...services.scaffolding import ScaffoldingService
 from ...services.schema import ScaffoldingSchemaService
+from ...services.scaffolding import ScaffoldingService
+from .resource import scaffolding
 from .schemas import (
     ScaffoldingBundleOut,
     ScaffoldingConvergenceIn,
     ScaffoldingConvergenceOut,
     ScaffoldingFormSchemaOut,
-    ScaffoldingIn,
-    ScaffoldingOut,
-    ScaffoldingPatchIn,
     ScaffoldingPreviewErrorOut,
     ScaffoldingPreviewIn,
     ScaffoldingPreviewOut,
 )
 
 
-@siren_resource(
-    name="scaffolding_preview",
-    path="/api/scaffoldings/{scaffolding_id}/preview",
-    class_="scaffolding-preview",
-    identifier="scaffolding_id",
-    path_parameters={"scaffolding_id": "scaffolding_id"},
-    relations={},
-    singleton=True,
-)
-@siren_resource(
-    name="scaffolding_bundle",
-    path="/api/scaffoldings/{scaffolding_id}/bundle",
-    class_="scaffolding-bundle",
-    identifier="scaffolding_id",
-    path_parameters={"scaffolding_id": "scaffolding_id"},
-    relations={},
-    singleton=True,
-)
-@siren_resource(
-    name="scaffolding_schema",
-    path="/api/scaffoldings/{scaffolding_id}/schema",
-    class_="scaffolding-schema",
-    identifier="scaffolding_id",
-    path_parameters={"scaffolding_id": "scaffolding_id"},
-    relations={},
-    singleton=True,
-)
-@siren_resource(
-    name="scaffolding_convergence",
-    path="/api/scaffoldings/converge",
-    class_="scaffolding-convergence",
-    identifier="name",
-    path_parameters={},
-    relations={},
-    singleton=True,
-    root_visible=False,
-)
-@siren_resource(
-    name="scaffolding",
-    path="/api/scaffoldings/{scaffolding_id}",
-    class_="scaffolding",
-    identifier="id",
-    path_parameters={"scaffolding_id": "id"},
-    relations={},
-    operations=("get_scaffolding_schema", "get_scaffolding_bundle", "preview_scaffolding"),
-    collection_operations=("converge_scaffolding",),
-)
-@api_controller("/scaffoldings", tags=["Scaffoldings"])
-class ScaffoldingController(ControllerBase):
-    @route.get(
-        "",
-        response=list[ScaffoldingOut],
-        operation_id="list_scaffoldings",
-        summary="List scaffoldings.",
-    )
-    @inject
-    def list(self, service: Annotated[ScaffoldingService, Inject()]):
-        return service.list()
-
+@ResourceController(scaffolding)
+class ScaffoldingController:
     @route.post(
         "/converge",
         response=ScaffoldingConvergenceOut,
@@ -101,16 +42,6 @@ class ScaffoldingController(ControllerBase):
         service: Annotated[ScaffoldingConvergenceService, Inject()],
     ):
         return validated(service.converge, **data.model_dump())
-
-    @route.get(
-        "/{scaffolding_id}",
-        response=ScaffoldingOut,
-        operation_id="get_scaffolding",
-        summary="Get scaffolding.",
-    )
-    @inject
-    def get(self, scaffolding_id: ShortUUID, service: Annotated[ScaffoldingService, Inject()]):
-        return service.get(scaffolding_id)
 
     @route.get(
         "/{scaffolding_id}/schema",
@@ -159,54 +90,3 @@ class ScaffoldingController(ControllerBase):
             )
         except PreviewFailed as error:
             return Status(422, {"errors": [item.as_dict() for item in error.errors]})
-
-    @route.post(
-        "",
-        response=ScaffoldingOut,
-        operation_id="create_scaffolding",
-        summary="Create scaffolding.",
-    )
-    @inject
-    def create(self, data: ScaffoldingIn, service: Annotated[ScaffoldingService, Inject()]):
-        return validated(service.create, **data.model_dump())
-
-    @route.put(
-        "/{scaffolding_id}",
-        response=ScaffoldingOut,
-        operation_id="update_scaffolding",
-        summary="Update scaffolding.",
-    )
-    @inject
-    def update(
-        self,
-        scaffolding_id: ShortUUID,
-        data: ScaffoldingIn,
-        service: Annotated[ScaffoldingService, Inject()],
-    ):
-        return validated(service.update, scaffolding_id, **data.model_dump())
-
-    @route.patch(
-        "/{scaffolding_id}",
-        response=ScaffoldingOut,
-        operation_id="partial_update_scaffolding",
-        summary="Partially update scaffolding.",
-    )
-    @inject
-    def partial_update(
-        self,
-        scaffolding_id: ShortUUID,
-        data: ScaffoldingPatchIn,
-        service: Annotated[ScaffoldingService, Inject()],
-    ):
-        return validated(service.update, scaffolding_id, **data.model_dump(exclude_unset=True, warnings=False))
-
-    @route.delete(
-        "/{scaffolding_id}",
-        response={204: None},
-        operation_id="delete_scaffolding",
-        summary="Delete scaffolding.",
-    )
-    @inject
-    def delete(self, scaffolding_id: ShortUUID, service: Annotated[ScaffoldingService, Inject()]):
-        service.delete(scaffolding_id)
-        return Status(204, None)

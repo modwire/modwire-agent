@@ -37,6 +37,10 @@ class Content(TimeStampedModel):
     def __str__(self):
         return f"{self.record_id}#{self.position}:{self.role}"
 
+    @property
+    def record_slug(self) -> str:
+        return self.record_id
+
     def clean(self):
         super().clean()
         if self.role == self.Role.LIST:
