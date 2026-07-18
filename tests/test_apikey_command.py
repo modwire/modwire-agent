@@ -3,11 +3,9 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 
-from tokens.models.api_key import ApiKey
-
 
 @pytest.mark.django_db
-def test_apikey_command_generates_infinite_header_key():
+def test_apikey_command_generates_a_key_that_authenticates_api_requests(client):
     output = StringIO()
 
     call_command("apikey", stdout=output)
@@ -15,7 +13,5 @@ def test_apikey_command_generates_infinite_header_key():
     lines = output.getvalue().splitlines()
     key = next(line.removeprefix("key=") for line in lines if line.startswith("key="))
 
-    api_key = ApiKey.authenticate(key)
-    assert api_key is not None
-    assert api_key.name == "api key"
     assert "header=apikey" in lines
+    assert client.get("/api/", HTTP_APIKEY=key).status_code == 200
