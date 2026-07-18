@@ -76,17 +76,15 @@ the host-side PostgreSQL port) with the original `uv run` commands above. Its
 default HTTP port remains `8000`, separate from the container runtime on
 `8100`.
 
-## MCP scaffolding adapter
+## MCP adapter
 
 The deterministic aggregate convergence contract and operational package adoption
 deltas are documented in [docs/scaffolding-convergence.md](docs/scaffolding-convergence.md).
 
-The MCP adapter is a separate stateless service. It discovers the scaffolding
-collection from the Siren API root and executes only actions advertised by the
-canonical scaffold resource. It does not import Django or Modwire CLI modules,
-mount a workspace, connect to PostgreSQL, or construct scaffolding routes.
-Its image uses a separate dependency group and contains neither the Django
-application nor its database dependencies.
+The MCP adapter is a separate stateless service. Its previous traversal layer
+has been removed and the service currently exposes an empty tool catalog plus a
+health endpoint. API traversal and tool contracts need a fresh design before
+being re-enabled.
 
 Place a dedicated API key in the ignored file configured by
 `MCP_ADAPTER_API_KEY_FILE` (the default is
@@ -99,29 +97,7 @@ make mcp-check
 ```
 
 The Streamable HTTP endpoint is `http://127.0.0.1:8200/mcp`. The health
-endpoint reports the adapter version, API reachability, and the number of
-relations and actions advertised at the Siren root without returning the API
-key. The adapter exposes one stable tool, `modwire`, with two operations:
-
-- `inspect` follows a path of advertised Siren relations and collection items;
-- `execute` follows the same kind of path and submits values to an action
-  advertised by the selected resource.
-
-For example, inspect the scaffolding collection with:
-
-```json
-{
-  "request": {
-    "kind": "inspect",
-    "path": [{"kind": "relation", "relation": "scaffoldings"}]
-  }
-}
-```
-
-The returned Siren document supplies item identities, links, actions, and
-runtime field schemas. Clients inspect those controls before choosing the next
-step. Adding an API capability therefore does not alter the MCP tool catalog or
-require another MCP client restart or tool-schema discovery cycle.
+endpoint reports adapter version and configured API URL only.
 
 The `services` Docker network is internal. `mcp-adapter` uses it to reach the
 API and joins a separate edge bridge for its loopback-published MCP port.
@@ -145,10 +121,9 @@ workflow, and registers one global Codex entry named `modwire` at
 mode-600 ignored file and is not printed. Re-running the installer preserves
 the same API identity while the secret remains valid.
 
-Codex loads MCP configuration when a session starts. Open a new session once
-after installing this one-tool adapter; subsequent API capability additions are
-discovered through Siren without another session restart. Diagnose each runtime
-layer independently with:
+Codex loads MCP configuration when a session starts. Open a new session after
+installing or changing the adapter. Diagnose each runtime layer independently
+with:
 
 ```sh
 make mcp-diagnose
@@ -174,27 +149,6 @@ capability through its contract; it will not import CLI internals or gain a
 workspace mount itself. Scaffolding discovery, bundles, and previews do not
 depend on the CLI runner.
 
-## Hypermedia API browser
+## API
 
-The authenticated API entry point is `GET /api/`. Successful API responses use
-the Siren media type (`application/vnd.siren+json`) and advertise the links and
-actions that are valid for the current resource. Clients can start with one URL
-and traverse relations instead of constructing endpoint URLs:
-
-```sh
-curl -H "apikey: $MODWIRE_API_KEY" -H "Accept: application/vnd.siren+json" http://localhost:8000/api/
-```
-
-Build the React browser and then open `http://localhost:8000/browser/`:
-
-```sh
-cd browser
-npm install
-npm run build
-cd ..
-uv run python manage.py runserver
-```
-
-For frontend development, run Django on port 8000 and `npm run dev` in
-`browser/`; Vite proxies `/api` to Django. The browser prompts for an API key and
-stores it only in the current tab's `sessionStorage`.
+The authenticated API entry point is `GET /api/`.

@@ -1,35 +1,15 @@
-import json
-from collections.abc import Callable
-from contextlib import AbstractAsyncContextManager
-
 from mcp.server.fastmcp import FastMCP
-from mcp.server.fastmcp.exceptions import ToolError
 from mcp.server.transport_security import TransportSecuritySettings
-from modwire_siren import SirenClientError, SirenTransport
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .hypermedia import InspectRequest, ModwireHypermedia, ModwireRequest, ModwireResult
 from .settings import AdapterSettings
-from .transport import HttpxSirenTransport
-
-TransportFactory = Callable[[], AbstractAsyncContextManager[SirenTransport]]
 
 
-def create_server(
-    settings: AdapterSettings,
-    transport_factory: TransportFactory | None = None,
-) -> FastMCP:
-    transport_factory = transport_factory or (
-        lambda: HttpxSirenTransport(settings.api_key())
-    )
-    hypermedia = ModwireHypermedia(settings.api_url, transport_factory)
+def create_server(settings: AdapterSettings) -> FastMCP:
     server = FastMCP(
         "Modwire",
-        instructions=(
-            "Navigate the Modwire Siren API from its root. Inspect advertised links, "
-            "actions, and field schemas before executing an action."
-        ),
+        instructions="Modwire MCP adapter placeholder. API traversal will be rebuilt from a fresh contract.",
         host=settings.host,
         port=settings.port,
         streamable_http_path="/mcp",
@@ -42,42 +22,17 @@ def create_server(
         ),
     )
 
-    @server.tool()
-    async def modwire(request: ModwireRequest) -> ModwireResult:
-        """Inspect or execute controls advertised by the Modwire Siren API."""
-        return await _call(hypermedia.handle(request))
-
     @server.custom_route("/health", methods=["GET"])
     async def health(_: Request) -> JSONResponse:
-        try:
-            result = await hypermedia.handle(InspectRequest(kind="inspect"))
-        except SirenClientError as error:
-            return JSONResponse(
-                {
-                    "version": settings.version,
-                    "api_reachable": False,
-                    "error": error.as_dict(),
-                },
-                status_code=503,
-            )
-        document = result.document
         return JSONResponse(
             {
                 "version": settings.version,
-                "api_reachable": True,
-                "root_links": len(document.get("links", [])),
-                "root_actions": len(document.get("actions", [])),
+                "api_url": settings.api_url,
+                "api_traversal": "pending",
             }
         )
 
     return server
-
-
-async def _call(awaitable):
-    try:
-        return await awaitable
-    except SirenClientError as error:
-        raise ToolError(json.dumps(error.as_dict(), sort_keys=True)) from error
 
 
 def main() -> None:

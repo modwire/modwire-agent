@@ -24,7 +24,6 @@ and `.modwire/shape.yaml` files. Module and `shared` initializers use
 | CLI | `modwire_cli` / `application` | Add both `.modwire` files plus new `application` and `shared` package initializers. |
 | Extraction | `modwire_extraction` / `code` | Add both `.modwire` files and `shared`; preserve the existing `code` initializer. |
 | Mermaid | `modwire_mermaid` / `architecture` | Add both `.modwire` files and `shared`; preserve the existing `architecture` initializer. |
-| Siren | `modwire_siren` / `client` | Add both `.modwire` files and `shared`; preserve the existing `client` initializer. |
 
 `modwire-agent` is the scaffolding application and MCP transport host. It is
 intentionally not a target profile for this repository scaffold.

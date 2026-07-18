@@ -1,25 +1,11 @@
 from typing import Literal
 
-from ninja import Field, ModelSchema, Schema
+from ninja import Field, Schema
 from pydantic import JsonValue
-from pydantic_core import PydanticUndefined
 
 from modwire.shared.api.schema import StrictSchema
-from modwire.shared.api.types import ShortUUID
 
-from ...models.scaffolding import Scaffolding
 from ...models.template import Template
-
-
-class ScaffoldingIn(StrictSchema):
-    language_id: str
-    name: str
-    description: str
-
-
-class ScaffoldingPatchIn(StrictSchema):
-    name: str = Field(default_factory=lambda: PydanticUndefined)
-    description: str = Field(default_factory=lambda: PydanticUndefined)
 
 
 class ScaffoldingConvergenceVariableIn(StrictSchema):
@@ -36,7 +22,10 @@ class ScaffoldingConvergenceTemplateIn(StrictSchema):
     write_mode: Template.WriteMode = Template.WriteMode.MANAGED
 
 
-class ScaffoldingConvergenceIn(ScaffoldingIn):
+class ScaffoldingConvergenceIn(StrictSchema):
+    language_id: str
+    name: str
+    description: str
     variables: list[ScaffoldingConvergenceVariableIn]
     templates: list[ScaffoldingConvergenceTemplateIn]
     dry_run: bool = True
@@ -61,21 +50,8 @@ class ScaffoldingConvergenceOut(Schema):
     plan: ConvergencePlanOut
 
 
-class ScaffoldingOut(ModelSchema):
-    id: ShortUUID
-    language: str
-
-    @staticmethod
-    def resolve_language(obj):
-        return obj.language_id
-
-    class Meta:
-        model = Scaffolding
-        fields = "__all__"
-
-
 class TemplateOverrideIn(StrictSchema):
-    template_id: ShortUUID
+    template_id: str
     relative_path: str
     file_content: str
 
@@ -86,7 +62,7 @@ class ScaffoldingPreviewIn(StrictSchema):
 
 
 class PreviewFileOut(Schema):
-    template_id: ShortUUID
+    template_id: str
     path: str
     source: str
     html: str
@@ -134,7 +110,7 @@ class ScaffoldingFormSchemaOut(Schema):
 
 
 class ScaffoldingBundleVariableOut(Schema):
-    id: ShortUUID
+    id: str
     name: str
     type: Literal["str", "int", "float", "bool", "list", "dict"]
     description: str
@@ -143,22 +119,14 @@ class ScaffoldingBundleVariableOut(Schema):
 
 
 class ScaffoldingBundleTemplateOut(Schema):
-    id: ShortUUID
+    id: str
     relative_path: str
     file_content: str
     write_mode: Template.WriteMode
 
 
 class ScaffoldingBundleOut(Schema):
-    id: ShortUUID
+    id: str
     name: str
     variables: list[ScaffoldingBundleVariableOut]
     templates: list[ScaffoldingBundleTemplateOut]
-
-    @staticmethod
-    def resolve_variables(obj):
-        return obj.variables.order_by("name")
-
-    @staticmethod
-    def resolve_templates(obj):
-        return obj.templates.order_by("relative_path")

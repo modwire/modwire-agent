@@ -14,12 +14,6 @@ owns, what the agent may reuse, and what must remain outside its boundary.
 3. [modwire-architecture](modwire-architecture.md) — architecture rules and
    deterministic topology insights.
 4. [modwire-mermaid](modwire-mermaid.md) — typed, deterministic diagram source.
-5. [modwire-siren](modwire-siren.md) — Python Siren and OpenAPI integration.
-6. [@modwire/siren-client](modwire-siren-client.md) — strict TypeScript Siren
-   client.
-7. [@modwire/siren-ui](modwire-siren-ui.md) — framework-neutral Siren UI
-   engine.
-8. [@modwire/siren-react](modwire-siren-react.md) — React presentation adapter.
 
 ## Planned components
 

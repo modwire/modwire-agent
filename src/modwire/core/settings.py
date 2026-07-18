@@ -36,7 +36,6 @@ INSTALLED_APPS = [
 ] + installed_apps()
 MIDDLEWARE = [
     "wireup.integration.django.wireup_middleware",
-    "modwire.shared.api.siren.SirenMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -70,7 +69,7 @@ TIME_ZONE = "UTC"
 USE_I18N = USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / ".dev" / "static"
-STATICFILES_DIRS = [BASE_DIR / "browser" / "dist"] if (BASE_DIR / "browser" / "dist").is_dir() else []
+STATICFILES_DIRS = []
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 RECORDS_EMBEDDING_DIMENSIONS = 384
 RECORDS_EMBEDDINGS_ENABLED = os.getenv("RECORDS_EMBEDDINGS_ENABLED", "1") == "1"

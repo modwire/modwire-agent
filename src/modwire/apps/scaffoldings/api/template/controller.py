@@ -1,8 +1,6 @@
-from modwire.shared.api.hypermedia import ResourceController
-
-from .resource import template
+from ninja_extra import ControllerBase, api_controller
 
 
-@ResourceController(template)
-class TemplateController:
+@api_controller("/templates", tags=["Templates"])
+class TemplateController(ControllerBase):
     pass

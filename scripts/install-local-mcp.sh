@@ -21,7 +21,6 @@ docker compose up --detach --wait scaffolding-api
 mkdir -p "$(dirname "${secret_path}")"
 if ! test -s "${secret_path}" || ! curl --fail --silent --output /dev/null \
   --header "apikey: $(cat "${secret_path}" 2>/dev/null || true)" \
-  --header "Accept: application/vnd.siren+json" \
   "${api_url}"; then
     temporary_secret="$(mktemp "${secret_path}.XXXXXX")"
     trap 'rm -f "${temporary_secret}"' EXIT HUP INT TERM

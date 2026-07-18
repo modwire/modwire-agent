@@ -1,8 +1,6 @@
-from modwire.shared.api.hypermedia import ResourceController
-
-from .resource import tag
+from ninja_extra import ControllerBase, api_controller
 
 
-@ResourceController(tag)
-class TagController:
+@api_controller("/tags", tags=["Tags"])
+class TagController(ControllerBase):
     pass

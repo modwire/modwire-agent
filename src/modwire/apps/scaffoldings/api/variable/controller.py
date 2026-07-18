@@ -1,8 +1,6 @@
-from modwire.shared.api.hypermedia import ResourceController
-
-from .resource import variable
+from ninja_extra import ControllerBase, api_controller
 
 
-@ResourceController(variable)
-class VariableController:
+@api_controller("/variables", tags=["Variables"])
+class VariableController(ControllerBase):
     pass

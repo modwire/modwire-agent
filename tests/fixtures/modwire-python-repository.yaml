@@ -79,6 +79,3 @@ targets:
   mermaid:
     package_name: modwire_mermaid
     module_name: architecture
-  siren:
-    package_name: modwire_siren
-    module_name: client

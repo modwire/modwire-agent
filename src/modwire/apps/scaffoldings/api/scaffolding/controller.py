@@ -2,20 +2,18 @@ from typing import Annotated
 
 from ninja import Status
 from ninja_extra import route
+from ninja_extra.controllers import ControllerBase, api_controller
 from wireup import Inject
 from wireup.integration.django import inject
 
 from modwire.shared.api.errors import validated
-from modwire.shared.api.hypermedia import ResourceController
-from modwire.shared.api.types import ShortUUID
 
 from ...services.bundle import ScaffoldingBundleService
 from ...services.convergence import ScaffoldingConvergenceService
 from ...services.preview import ScaffoldingPreviewService
 from ...services.preview_errors import PreviewFailed
-from ...services.schema import ScaffoldingSchemaService
 from ...services.scaffolding import ScaffoldingService
-from .resource import scaffolding
+from ...services.schema import ScaffoldingSchemaService
 from .schemas import (
     ScaffoldingBundleOut,
     ScaffoldingConvergenceIn,
@@ -27,8 +25,8 @@ from .schemas import (
 )
 
 
-@ResourceController(scaffolding)
-class ScaffoldingController:
+@api_controller("/scaffoldings", tags=["Scaffoldings"])
+class ScaffoldingController(ControllerBase):
     @route.post(
         "/converge",
         response=ScaffoldingConvergenceOut,
@@ -53,7 +51,7 @@ class ScaffoldingController:
     @inject
     def schema(
         self,
-        scaffolding_id: ShortUUID,
+        scaffolding_id: str,
         scaffoldings: Annotated[ScaffoldingService, Inject()],
         schemas: Annotated[ScaffoldingSchemaService, Inject()],
     ):
@@ -66,7 +64,7 @@ class ScaffoldingController:
         summary="Get a generic scaffolding bundle for a local generator.",
     )
     @inject
-    def bundle(self, scaffolding_id: ShortUUID, service: Annotated[ScaffoldingBundleService, Inject()]):
+    def bundle(self, scaffolding_id: str, service: Annotated[ScaffoldingBundleService, Inject()]):
         return service.get(scaffolding_id)
 
     @route.post(
@@ -78,7 +76,7 @@ class ScaffoldingController:
     @inject
     def preview(
         self,
-        scaffolding_id: ShortUUID,
+        scaffolding_id: str,
         data: ScaffoldingPreviewIn,
         service: Annotated[ScaffoldingPreviewService, Inject()],
     ):

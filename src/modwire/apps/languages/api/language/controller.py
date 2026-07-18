@@ -1,8 +1,6 @@
-from modwire.shared.api.hypermedia import CollectionController
-
-from .resource import language
+from ninja_extra import ControllerBase, api_controller
 
 
-@CollectionController(language)
-class LanguageController:
+@api_controller("/languages", tags=["Languages"])
+class LanguageController(ControllerBase):
     pass
