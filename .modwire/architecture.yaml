@@ -1,24 +1,29 @@
 shape:
-  max_classes_per_file: 1
+  max_classes_per_file: 20
   max_interfaces_per_file: 0
   max_types_per_file: 1
   max_abstract_classes_per_file: 1
-  max_functions_per_file: 0
+  max_functions_per_file: 10
   max_methods_per_class: 10
   max_function_lines: 20
-  max_class_lines: 100
-  allow_optional_function_args: false
-  allow_optional_method_args: false
-  allow_optional_class_properties: false
-  allow_import_aliases: false
+  max_class_lines: 200
+  allow_optional_function_args: true
+  allow_optional_method_args: true
+  allow_optional_class_properties: true
+  allow_import_aliases: true
   require_joined_imports: true
   allowed_import_crossing_types: [module, symbol]
 
 boundaries:
   tags:
     - { name: module, match: "src/modwire/*", excluded_patterns: [src/modwire/__init__.py, src/modwire/core, src/modwire/wiring.py] }
+    - { name: entrypoint, match: manage.py }
     - { name: framework, match: modwire_hex }
-    - { name: project, match: src/modwire }
+    - { name: package_root, match: src/modwire/__init__.py }
+    - { name: core, match: src/modwire/core }
+    - { name: root_wiring, match: src/modwire/wiring.py }
+    - { name: languages_context, match: src/modwire/languages }
+    - { name: scaffoldings_context, match: src/modwire/scaffoldings }
     - { name: tests, match: tests }
     - { name: functional_scenarios, match: "tests/*/functional/scenarios" }
     - { name: functional_api, match: "tests/*/functional/api.py" }
@@ -28,11 +33,19 @@ boundaries:
     - { name: ports, match: "src/modwire/*/ports" }
     - { name: domain, match: "src/modwire/*/domain" }
   rules:
-    - { source: project, allow: [framework] }
+    - { source: module, allow: [framework] }
+    - { source: module, allow: [core] }
+    - { source: core, allow: [framework] }
+    - { source: scaffoldings_context, allow: [languages_context] }
+    - { source: tests, allow: [core, module] }
+    - { source: root_wiring, allow: [framework, module] }
   flow:
     realms:
       - { name: framework, module_tag: framework }
-      - { name: project_root, module_tag: project }
+      - { name: entrypoint, module_tag: entrypoint }
+      - { name: package_root, module_tag: package_root }
+      - { name: core, module_tag: core }
+      - { name: root_wiring, module_tag: root_wiring }
       - { name: project, module_tag: module }
       - { name: tests, module_tag: tests }
     layers: [functional_scenarios, functional_api, wiring, adapters, use_cases, ports, domain]

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from ninja import Schema
 
-from modwire.scaffoldings.adapters.http.schema import StrictSchema
+from modwire.core.schema import StrictSchema
 
 
 class ApiKeyIn(StrictSchema):

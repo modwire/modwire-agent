@@ -1,6 +1,3 @@
-from ninja import Schema
-from pydantic import ConfigDict
+from modwire.core.schema import StrictSchema
 
-
-class StrictSchema(Schema):
-    model_config = ConfigDict(extra="forbid")
+__all__ = ["StrictSchema"]
