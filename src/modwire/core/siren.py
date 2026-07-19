@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from functools import cache
 from typing import Any
 
 from django.conf import settings
@@ -5,38 +7,32 @@ from django.http import HttpResponse
 from modwire_siren import ModwireSirenFactory, SirenResourceSpec, inject_siren_resources
 from modwire_siren.integrations.django import to_django_response
 from modwire_siren.integrations.ninja_extra import NinjaExtraSirenResponse
-from ninja_extra import NinjaExtraAPI
+from ninja_extra import ControllerBase, NinjaExtraAPI
 
 
-class SirenResourceRegistry:
-    def __init__(self) -> None:
-        self._resources: dict[str, SirenResourceSpec] = {}
+@dataclass(frozen=True, slots=True)
+class SirenModule:
+    """One module's complete contribution to the Siren API."""
 
-    @property
-    def resources(self) -> tuple[SirenResourceSpec, ...]:
-        return tuple(self._resources.values())
-
-    def register(self, *resources: SirenResourceSpec) -> None:
-        for resource in resources:
-            if resource.name in self._resources:
-                raise ValueError(f"Siren resource is already registered: {resource.name}")
-            self._resources[resource.name] = resource
-
-    def enrich_openapi(self, schema: dict[str, Any]) -> dict[str, Any]:
-        return inject_siren_resources(schema, self.resources)
+    name: str
+    resources: tuple[SirenResourceSpec, ...]
+    controllers: tuple[type[ControllerBase], ...]
 
 
-resources = SirenResourceRegistry()
+@cache
+def siren_modules() -> tuple[SirenModule, ...]:
+    from modwire.languages.adapters.siren.module import SIREN_MODULE as languages
+    from modwire.records.adapters.siren.module import SIREN_MODULE as records
+
+    return languages, records
 
 
-def register_module_resources() -> None:
-    from modwire.languages.adapters.siren.resources import LANGUAGE_RESOURCES
-    from modwire.records.adapters.siren.resources import RECORD_RESOURCES
-
-    resources.register(*LANGUAGE_RESOURCES, *RECORD_RESOURCES)
+def siren_resources() -> tuple[SirenResourceSpec, ...]:
+    return tuple(resource for module in siren_modules() for resource in module.resources)
 
 
-register_module_resources()
+def siren_controllers() -> tuple[type[ControllerBase], ...]:
+    return tuple(controller for module in siren_modules() for controller in module.controllers)
 
 
 class SirenNinja:
@@ -46,8 +42,6 @@ class SirenNinja:
     def api(cls) -> NinjaExtraAPI:
         if cls._api is None:
             from modwire.core.siren_controller import SirenRootController
-            from modwire.languages.adapters.siren.controller import LanguagesSirenController
-            from modwire.records.adapters.siren.controller import RecordsSirenController
 
             configuration = dict(settings.MODWIRE["NINJA"])
             configuration.update(
@@ -58,7 +52,7 @@ class SirenNinja:
                 docs_url=None,
             )
             cls._api = NinjaExtraAPI(**configuration)
-            cls._api.register_controllers(SirenRootController, LanguagesSirenController, RecordsSirenController)
+            cls._api.register_controllers(SirenRootController, *siren_controllers())
         return cls._api
 
 
@@ -69,7 +63,7 @@ def project_siren(request: Any):
 
 
 def siren_openapi_schema() -> dict[str, Any]:
-    return resources.enrich_openapi(SirenNinja.api().get_openapi_schema())
+    return inject_siren_resources(SirenNinja.api().get_openapi_schema(), siren_resources())
 
 
 def siren_response(document: dict[str, Any]) -> HttpResponse:
