@@ -3,7 +3,7 @@ from django.test import TestCase
 
 
 class ScaffoldingPreviewApiTests(TestCase):
-    def converge(self):
+    def converge(self, templates: list[dict[str, str]] | None = None):
         return self.client.post(
             "/api/scaffoldings/converge",
             data={
@@ -19,7 +19,7 @@ class ScaffoldingPreviewApiTests(TestCase):
                         "required": True,
                     }
                 ],
-                "templates": [
+                "templates": templates or [
                     {
                         "relative_path": "{{ package_name }}/main.py",
                         "file_content": "print('{{ package_name }}')\n",
@@ -160,6 +160,32 @@ class ScaffoldingPreviewApiTests(TestCase):
                         code="invalid_rendered_path",
                         details=IsPartialDict(template_id=bundle.json()["templates"][0]["id"]),
                     )
+                )
+            ),
+        )
+
+    def test_rejects_templates_that_render_to_the_same_path(self) -> None:
+        convergence = self.converge(
+            [
+                {"relative_path": "{{ package_name }}.py", "file_content": "one"},
+                {"relative_path": "modwire.py", "file_content": "two"},
+            ]
+        )
+        scaffolding_id = convergence.json()["id"]
+
+        response = self.client.post(
+            f"/api/scaffoldings/{scaffolding_id}/preview",
+            data={"values": {"package_name": "modwire"}},
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json(),
+            IsPartialDict(
+                errors=IsList(
+                    IsPartialDict(code="rendered_path_collision"),
+                    IsPartialDict(code="rendered_path_collision"),
                 )
             ),
         )

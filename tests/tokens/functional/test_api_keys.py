@@ -36,3 +36,12 @@ class ApiKeyScenarios(TestCase):
 
         self.assertEqual(blank.status_code, 422)
         self.assertEqual(extra.status_code, 422)
+
+    def test_issues_independent_secrets_for_each_request(self) -> None:
+        first = self.client.post("/api/api_keys", data={"name": "first"}, content_type="application/json")
+        second = self.client.post("/api/api_keys", data={"name": "second"}, content_type="application/json")
+
+        self.assertEqual(first.status_code, 201)
+        self.assertEqual(second.status_code, 201)
+        self.assertNotEqual(first.json()["id"], second.json()["id"])
+        self.assertNotEqual(first.json()["key"], second.json()["key"])

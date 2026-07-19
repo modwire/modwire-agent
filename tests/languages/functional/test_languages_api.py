@@ -27,3 +27,25 @@ class LanguagesApiScenarios(TestCase):
             IsPartialDict(id="python", name="Python", source_extensions=[".py"], aliases=["py"]),
         )
         self.assertEqual(unknown.status_code, 404)
+
+    def test_exposes_each_catalog_entry_with_its_version_provider_and_tools(self) -> None:
+        response = self.client.get("/api/languages/typescript")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            IsPartialDict(
+                id="typescript",
+                version_provider=IsPartialDict(kind="npm", result_path=["version"]),
+                package_managers=IsList(IsPartialDict(id="npm", supports_workspaces=True)),
+                tools=IsList(
+                    IsPartialDict(id="typescript"),
+                    IsPartialDict(id="eslint"),
+                    IsPartialDict(id="prettier"),
+                    IsPartialDict(id="vitest"),
+                    IsPartialDict(id="vitest-v8"),
+                    IsPartialDict(id="tsx"),
+                    IsPartialDict(id="typedoc"),
+                ),
+            ),
+        )

@@ -1,5 +1,5 @@
-from django.test import TestCase
 from dirty_equals import IsPartialDict, IsStr
+from django.test import TestCase
 
 
 class ScaffoldingConvergenceScenarios(TestCase):
