@@ -1,3 +1,3 @@
-from .api_key_store import ApiKeyStore
+from .api_key import ApiKeyStore
 
 __all__ = ["ApiKeyStore"]

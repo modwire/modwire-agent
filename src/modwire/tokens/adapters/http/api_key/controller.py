@@ -4,7 +4,7 @@ from ninja.errors import HttpError
 from ninja_extra import route
 from ninja_extra.controllers import ControllerBase, api_controller
 
-from ....use_cases.issue_api_key import IssueApiKey
+from ....use_cases.api_key.issue_api_key import IssueApiKey
 from .schemas import ApiKeyCreatedOut, ApiKeyIn
 
 

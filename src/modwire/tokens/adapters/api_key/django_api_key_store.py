@@ -1,7 +1,7 @@
 from modwire_hex.django import DjangoRepository
 
 from ...domain.api_key import ApiKey
-from ...ports.api_key_store import ApiKeyStore
+from ...ports.api_key.api_key_store import ApiKeyStore
 from ..django.models import api_key
 
 
