@@ -1,0 +1,2 @@
+class InvalidPlanDefinition(ValueError):
+    pass

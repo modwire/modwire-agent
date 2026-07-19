@@ -3,7 +3,7 @@ name = "modwire-agent"
 version = "0.1.0"
 description = "Modwire agent runtime and MCP adapter."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dependencies = [
     "copier>=9.16.0",
     "dj-database-url",
@@ -14,6 +14,8 @@ dependencies = [
     "gunicorn",
     "mermaid-cli>=0.1.3",
     "modwire-architecture>=6.0.0,<7",
+    "modwire-cli>=1.1.0",
+    "modwire-hex",
     "modwire-mermaid>=1.0.1,<2",
     "pgvector",
     "psycopg[binary]",

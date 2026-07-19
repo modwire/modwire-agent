@@ -1,6 +1,6 @@
 import pytest
 
-from modwire.apps.tokens.models.api_key import ApiKey
+from modwire.tokens.adapters.django.models.api_key import ApiKey
 
 
 @pytest.fixture

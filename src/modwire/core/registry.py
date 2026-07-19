@@ -14,13 +14,14 @@ class LocalApp:
 
 
 LOCAL_APPS = (
-    LocalApp("languages", "modwire.apps.languages", "LanguagesConfig"),
-    LocalApp("records", "modwire.apps.records", "RecordsConfig"),
-    LocalApp("scaffoldings", "modwire.apps.scaffoldings", "ScaffoldingsConfig"),
-    LocalApp("tokens", "modwire.apps.tokens", "TokensConfig"),
+    LocalApp("languages", "modwire.languages.adapters.http", "LanguagesHttpConfig"),
+    LocalApp("records", "modwire.records.adapters.http", "RecordsHttpConfig"),
+    LocalApp("plans", "modwire.plans.adapters.http", "PlansHttpConfig"),
+    LocalApp("scaffoldings", "modwire.scaffoldings.adapters.http", "ScaffoldingsHttpConfig"),
+    LocalApp("tokens", "modwire.tokens.adapters.http", "TokensHttpConfig"),
 )
 
-SHARED_INJECTABLES = ("modwire.shared.languages",)
+SHARED_INJECTABLES: tuple[str, ...] = ()
 
 
 def installed_apps() -> list[str]:

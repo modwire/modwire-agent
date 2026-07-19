@@ -1,0 +1,2 @@
+class InvalidStageSubmission(ValueError):
+    pass

@@ -7,9 +7,6 @@ from pathlib import Path
 
 import dj_database_url
 import structlog
-from wireup.integration.django import WireupSettings
-
-from .registry import installed_apps, service_modules
 
 PACKAGE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = PACKAGE_DIR.parent.parent
@@ -32,10 +29,19 @@ INSTALLED_APPS = [
     "health_check",
     "ninja_extra",
     "pgvector.django",
-    "wireup.integration.django.apps.WireupConfig",
-] + installed_apps()
+    "modwire_hex.django.apps.ModwireConfig",
+    "modwire.languages.adapters.http.apps.LanguagesHttpConfig",
+    "modwire.tokens.adapters.django.apps.TokensDjangoConfig",
+    "modwire.tokens.adapters.http.apps.TokensHttpConfig",
+    "modwire.scaffoldings.adapters.django.apps.ScaffoldingsDjangoConfig",
+    "modwire.scaffoldings.adapters.http.apps.ScaffoldingsHttpConfig",
+    "modwire.records.adapters.django.apps.RecordsConfig",
+    "modwire.records.adapters.http.apps.RecordsHttpConfig",
+    "modwire.plans.adapters.django.apps.PlansConfig",
+    "modwire.plans.adapters.http.apps.PlansHttpConfig",
+]
 MIDDLEWARE = [
-    "wireup.integration.django.wireup_middleware",
+    "modwire_hex.django.middleware.RequestScopeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -44,7 +50,10 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-WIREUP = WireupSettings(injectables=service_modules(APPS_DIR), auto_inject_views=False)
+MODWIRE = {
+    "APPLICATION": "modwire.wiring.application",
+    "NINJA": {"title": "Modwire API", "version": RELEASE_VERSION},
+}
 ROOT_URLCONF = "modwire.core.urls"
 TEMPLATES = [{
     "BACKEND": "django.template.backends.django.DjangoTemplates",

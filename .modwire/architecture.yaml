@@ -16,17 +16,17 @@ shape:
 
 boundaries:
   tags:
-    - { name: module, match: "src/testproj/*", excluded_patterns: [src/testproj/__init__.py, src/testproj/settings.py, src/testproj/urls.py, src/testproj/wiring.py] }
-    - { name: framework, match: src/modwire_hex }
-    - { name: project, match: src/testproj }
+    - { name: module, match: "src/modwire/*", excluded_patterns: [src/modwire/__init__.py, src/modwire/core, src/modwire/wiring.py] }
+    - { name: framework, match: modwire_hex }
+    - { name: project, match: src/modwire }
     - { name: tests, match: tests }
     - { name: functional_scenarios, match: "tests/*/functional/scenarios" }
     - { name: functional_api, match: "tests/*/functional/api.py" }
-    - { name: wiring, match: "src/testproj/*/wiring.py" }
-    - { name: adapters, match: "src/testproj/*/adapters" }
-    - { name: use_cases, match: "src/testproj/*/use_cases" }
-    - { name: ports, match: "src/testproj/*/ports" }
-    - { name: domain, match: "src/testproj/*/domain" }
+    - { name: wiring, match: "src/modwire/*/wiring.py" }
+    - { name: adapters, match: "src/modwire/*/adapters" }
+    - { name: use_cases, match: "src/modwire/*/use_cases" }
+    - { name: ports, match: "src/modwire/*/ports" }
+    - { name: domain, match: "src/modwire/*/domain" }
   rules:
     - { source: tests, disallow: [project] }
     - { source: project, allow: [framework] }
