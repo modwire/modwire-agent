@@ -7,8 +7,8 @@ COPY . .
 RUN uv sync --frozen --no-dev
 
 FROM python:3.12-slim AS runtime
-ARG MODWIRE_MCP_VERSION=0.0.0+dev
-ENV PATH="/app/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 VIRTUAL_ENV="/app/.venv" PYTHONPATH="/app/src:/app" MODWIRE_MCP_VERSION="$MODWIRE_MCP_VERSION"
+ARG MODWIRE_RUNTIME_VERSION=0.0.0+dev
+ENV PATH="/app/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 VIRTUAL_ENV="/app/.venv" PYTHONPATH="/app/src:/app" MODWIRE_RUNTIME_VERSION="$MODWIRE_RUNTIME_VERSION"
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app /app
