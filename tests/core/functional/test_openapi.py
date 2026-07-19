@@ -1,0 +1,17 @@
+from django.test import SimpleTestCase
+from modwire_hex.django import DjangoNinja
+
+
+class OpenApiScenarios(SimpleTestCase):
+    def test_assigns_a_unique_operation_id_to_every_operation(self) -> None:
+        schema = DjangoNinja.api().get_openapi_schema()
+        operations = [
+            operation
+            for path_item in schema["paths"].values()
+            for method, operation in path_item.items()
+            if method.lower() in {"delete", "get", "patch", "post", "put"}
+        ]
+        operation_ids = [operation.get("operationId") for operation in operations]
+
+        self.assertTrue(all(isinstance(operation_id, str) and operation_id for operation_id in operation_ids))
+        self.assertEqual(len(operation_ids), len(set(operation_ids)))

@@ -16,7 +16,7 @@ from .schemas.proposal_status_input import ProposalStatusInput
 
 @api_controller("/content-proposals", tags=["records"])
 class ContentProposalsController(ControllerBase):
-    @route.patch("/{proposal_id}", response={200: ContentProposalOutput})
+    @route.patch("/{proposal_id}", response={200: ContentProposalOutput}, operation_id="resolve_content_proposal")
     def resolve(self, request: Any, proposal_id: UUID, payload: ProposalStatusInput) -> tuple[int, ContentProposalOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))

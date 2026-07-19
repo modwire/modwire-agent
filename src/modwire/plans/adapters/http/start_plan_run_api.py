@@ -13,7 +13,7 @@ from .schemas.plan_run_output import PlanRunOutput
 
 @api_controller("/plans/runs", tags=["plans"])
 class StartPlanRunController(ControllerBase):
-    @route.post("", response={201: PlanRunOutput})
+    @route.post("", response={201: PlanRunOutput}, operation_id="start_plan_run")
     def start(self, request: Any, payload: PlanRunInput) -> tuple[int, PlanRunOutput]:
         try:
             run = DjangoRequest.resolve(request, StartPlanRun).execute(UUID(payload.definition_id), payload.initial_input)

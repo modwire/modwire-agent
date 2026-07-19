@@ -26,12 +26,12 @@ from .actor_headers import ActorHeaders
 
 @api_controller("/sections", tags=["records"])
 class SectionsController(ControllerBase):
-    @route.get("", response={200: list[SectionOutput]})
+    @route.get("", response={200: list[SectionOutput]}, operation_id="list_sections")
     def list_sections(self, request: Any) -> tuple[int, list[SectionOutput]]:
         sections = DjangoRequest.resolve(request, ListSections).execute()
         return 200, [SectionOutput(id=str(section.identifier), title=section.title, allowed_kinds=list(section.allowed_kinds)) for section in sections]
 
-    @route.get("/{section_id}", response={200: SectionDetailsOutput})
+    @route.get("/{section_id}", response={200: SectionDetailsOutput}, operation_id="get_section_details")
     def get_details(self, request: Any, section_id: UUID) -> tuple[int, SectionDetailsOutput]:
         try:
             section = DjangoRequest.resolve(request, GetSectionDetails).execute(section_id)
@@ -40,7 +40,7 @@ class SectionsController(ControllerBase):
         records = [SectionRecordOutput(id=str(record.identifier), title=record.title, kind=record.kind, status=record.status) for record in section.records]
         return 200, SectionDetailsOutput(id=str(section.identifier), title=section.title, allowed_kinds=list(section.allowed_kinds), records=records)
 
-    @route.post("", response={201: SectionOutput})
+    @route.post("", response={201: SectionOutput}, operation_id="create_section")
     def create(self, request: Any, payload: SectionInput) -> tuple[int, SectionOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
@@ -49,7 +49,7 @@ class SectionsController(ControllerBase):
             raise HttpError(422, str(error)) from error
         return 201, SectionOutput(id=str(section.identifier), title=section.title, allowed_kinds=[str(kind) for kind in section.allowed_kinds])
 
-    @route.put("/{section_id}/placements", response={200: SectionPlacementsOutput})
+    @route.put("/{section_id}/placements", response={200: SectionPlacementsOutput}, operation_id="replace_section_placements")
     def replace_placements(self, request: Any, section_id: UUID, payload: SectionPlacementsInput) -> tuple[int, SectionPlacementsOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
@@ -58,7 +58,7 @@ class SectionsController(ControllerBase):
             raise HttpError(422, str(error)) from error
         return 200, SectionPlacementsOutput(record_ids=[str(placement.record_id) for placement in section.placements])
 
-    @route.post("/{section_id}/records", response={201: RecordOutput})
+    @route.post("/{section_id}/records", response={201: RecordOutput}, operation_id="create_section_record")
     def create_record(self, request: Any, section_id: UUID, payload: RecordInput) -> tuple[int, RecordOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))

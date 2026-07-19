@@ -17,7 +17,7 @@ from .schemas.plan_definition_output import PlanDefinitionOutput
 
 @api_controller("/plans/definitions", tags=["plans"])
 class PublishDefinitionController(ControllerBase):
-    @route.post("", response={201: PlanDefinitionOutput})
+    @route.post("", response={201: PlanDefinitionOutput}, operation_id="publish_plan_definition")
     def publish(self, request: Any, payload: PlanDefinitionInput) -> tuple[int, PlanDefinitionOutput]:
         try:
             stages = [StageDefinition(stage.id, stage.input_schema, stage.submission_schema) for stage in payload.stages]

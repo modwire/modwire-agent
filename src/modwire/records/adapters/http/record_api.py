@@ -34,7 +34,7 @@ from .actor_headers import ActorHeaders
 
 @api_controller("/records", tags=["records"])
 class RecordsController(ControllerBase):
-    @route.delete("/{record_id}", response={204: None})
+    @route.delete("/{record_id}", response={204: None}, operation_id="archive_record")
     def archive(self, request: Any, record_id: UUID) -> tuple[int, None]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
@@ -43,7 +43,7 @@ class RecordsController(ControllerBase):
             raise HttpError(422, str(error)) from error
         return 204, None
 
-    @route.patch("/{record_id}", response={200: RecordOutput})
+    @route.patch("/{record_id}", response={200: RecordOutput}, operation_id="rename_record")
     def rename(self, request: Any, record_id: UUID, payload: RecordTitleInput) -> tuple[int, RecordOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
@@ -52,7 +52,7 @@ class RecordsController(ControllerBase):
             raise HttpError(422, str(error)) from error
         return 200, RecordOutput(id=str(record.identifier), title=record.title, kind=record.kind, status=record.status)
 
-    @route.get("/{record_id}/content-proposals", response={200: list[ContentProposalDetailsOutput]})
+    @route.get("/{record_id}/content-proposals", response={200: list[ContentProposalDetailsOutput]}, operation_id="list_record_content_proposals")
     def list_content_proposals(self, request: Any, record_id: UUID) -> tuple[int, list[ContentProposalDetailsOutput]]:
         try:
             proposals = DjangoRequest.resolve(request, ListContentProposals).execute(record_id)
@@ -60,7 +60,7 @@ class RecordsController(ControllerBase):
             raise HttpError(404, str(error)) from error
         return 200, [ContentProposalDetailsOutput(id=str(proposal.identifier), markdown=proposal.markdown, proposed_by_id=proposal.proposed_by.identifier, proposed_by_type=proposal.proposed_by.kind, status=proposal.status) for proposal in proposals]
 
-    @route.get("/{record_id}", response={200: RecordDetailsOutput})
+    @route.get("/{record_id}", response={200: RecordDetailsOutput}, operation_id="get_record_details")
     def get_details(self, request: Any, record_id: UUID) -> tuple[int, RecordDetailsOutput]:
         try:
             record = DjangoRequest.resolve(request, GetRecordDetails).execute(record_id)
@@ -68,7 +68,7 @@ class RecordsController(ControllerBase):
             raise HttpError(404, str(error)) from error
         return 200, RecordDetailsOutput(id=str(record.identifier), title=record.title, kind=record.kind, status=record.status, tags=list(record.tag_names))
 
-    @route.post("/{record_id}/content-proposals", response={201: ContentProposalOutput})
+    @route.post("/{record_id}/content-proposals", response={201: ContentProposalOutput}, operation_id="propose_record_content")
     def propose_content(self, request: Any, record_id: UUID, payload: ContentInput) -> tuple[int, ContentProposalOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
@@ -77,17 +77,17 @@ class RecordsController(ControllerBase):
             raise HttpError(422, str(error)) from error
         return 201, ContentProposalOutput(id=str(proposal.identifier), status=proposal.status)
 
-    @route.get("", response={200: list[RoutedRecordOutput]})
+    @route.get("", response={200: list[RoutedRecordOutput]}, operation_id="list_published_records")
     def list_published(self, request: Any, tag: Annotated[list[str], Query(...)]) -> tuple[int, list[RoutedRecordOutput]]:
         records = DjangoRequest.resolve(request, BuildKnowledgeRoute).execute(tag)
         return 200, [RoutedRecordOutput(id=str(record.identifier), title=record.title, reason=f"tag: {record.matched_tag}") for record in records]
 
-    @route.get("/{record_id}/content-revisions", response={200: list[ContentRevisionOutput]})
+    @route.get("/{record_id}/content-revisions", response={200: list[ContentRevisionOutput]}, operation_id="list_record_content_revisions")
     def list_content_revisions(self, request: Any, record_id: UUID) -> tuple[int, list[ContentRevisionOutput]]:
         revisions = DjangoRequest.resolve(request, ListContentRevisions).execute(record_id)
         return 200, [ContentRevisionOutput(id=str(revision.identifier), actor_id=revision.actor.identifier, actor_type=revision.actor.kind, markdown=revision.markdown, schema_version=revision.schema_version) for revision in revisions]
 
-    @route.put("/{record_id}/tags", response={204: None})
+    @route.put("/{record_id}/tags", response={204: None}, operation_id="assign_record_tags")
     def assign_tags(self, request: Any, record_id: UUID, payload: TagAssignmentInput) -> tuple[int, None]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
@@ -96,7 +96,7 @@ class RecordsController(ControllerBase):
             raise HttpError(422, str(error)) from error
         return 204, None
 
-    @route.put("/{record_id}/content", response={200: ContentOutput})
+    @route.put("/{record_id}/content", response={200: ContentOutput}, operation_id="replace_record_content")
     def replace_content(self, request: Any, record_id: UUID, payload: ContentInput) -> tuple[int, ContentOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
@@ -105,7 +105,7 @@ class RecordsController(ControllerBase):
             raise HttpError(422, str(error)) from error
         return 200, ContentOutput(id=str(revision.identifier), schema_version=revision.schema_version)
 
-    @route.post("/{record_id}/publish", response={200: dict[str, str]})
+    @route.post("/{record_id}/publish", response={200: dict[str, str]}, operation_id="publish_record")
     def publish(self, request: Any, record_id: UUID) -> tuple[int, dict[str, str]]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))

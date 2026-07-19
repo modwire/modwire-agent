@@ -15,12 +15,12 @@ from .schemas.tag_output import TagOutput
 
 @api_controller("/tags", tags=["records"])
 class TagsController(ControllerBase):
-    @route.get("", response={200: list[TagOutput]})
+    @route.get("", response={200: list[TagOutput]}, operation_id="list_tags")
     def list_tags(self, request: Any) -> tuple[int, list[TagOutput]]:
         tags = DjangoRequest.resolve(request, ListTags).execute()
         return 200, [TagOutput(id=str(tag.identifier), name=tag.name) for tag in tags]
 
-    @route.post("", response={201: TagOutput})
+    @route.post("", response={201: TagOutput}, operation_id="create_tag")
     def create(self, request: Any, payload: TagInput) -> tuple[int, TagOutput]:
         try:
             actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))

@@ -13,7 +13,7 @@ from .schemas.stage_submission_input import StageSubmissionInput
 
 @api_controller("/plans/runs", tags=["plans"])
 class SubmitStageResultController(ControllerBase):
-    @route.post("/{run_id}/submissions", response={200: PlanRunOutput})
+    @route.post("/{run_id}/submissions", response={200: PlanRunOutput}, operation_id="submit_stage_result")
     def submit(self, request: Any, run_id: UUID, payload: StageSubmissionInput) -> tuple[int, PlanRunOutput]:
         try:
             run = DjangoRequest.resolve(request, SubmitStageResult).execute(run_id, payload.payload)
