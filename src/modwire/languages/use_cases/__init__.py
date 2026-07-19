@@ -1,3 +1,3 @@
-from .language_catalog import LanguageCatalogService
+from .language import GetCurrentLanguageVersion, GetLanguage, ListLanguages
 
-__all__ = ["LanguageCatalogService"]
+__all__ = ["GetCurrentLanguageVersion", "GetLanguage", "ListLanguages"]

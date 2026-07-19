@@ -2,7 +2,6 @@ from .contracts import Language, PackageManagerCommand, ToolCommand, ToolRole, V
 
 __all__ = [
     "Language",
-    "LanguageCatalogService",
     "PackageManagerCommand",
     "ToolCommand",
     "ToolRole",

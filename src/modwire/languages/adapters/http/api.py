@@ -1,3 +1,3 @@
-from .language.controller import LanguageController
+from .languages_api import LanguagesController
 
-__all__ = ["LanguageController"]
+__all__ = ["LanguagesController"]

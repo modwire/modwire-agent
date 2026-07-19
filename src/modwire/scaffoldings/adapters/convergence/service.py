@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from django.db import transaction
 
 from modwire.languages.domain.contracts import Language
-from modwire.languages.use_cases import LanguageCatalogService
+from modwire.languages.use_cases.language.get_language import GetLanguage
 
 from ...ports.scaffolding_convergence import ScaffoldingConvergence
 from ..django.models.scaffolding import Scaffolding
@@ -15,7 +15,7 @@ from .writer import ScaffoldingAggregateWriter
 
 @dataclass(frozen=True)
 class DjangoScaffoldingConvergence(ScaffoldingConvergence):
-    catalog: LanguageCatalogService
+    languages: GetLanguage
     validator: ScaffoldingAggregateValidator
     planner: ScaffoldingConvergencePlanner
     writer: ScaffoldingAggregateWriter
@@ -27,7 +27,7 @@ class DjangoScaffoldingConvergence(ScaffoldingConvergence):
         variables = request["variables"]
         templates = request["templates"]
         dry_run = bool(request["dry_run"])
-        language = self.catalog.find(language_id)
+        language = self.languages.execute(language_id)
         current = self._current(language, name)
         desired = self.validator.validate(language, current, name, description, variables, templates)
         plan = self.planner.plan(current, desired)

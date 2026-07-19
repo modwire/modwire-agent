@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 
-from modwire.languages.use_cases import LanguageCatalogService
+from modwire.languages.use_cases.language.get_language import GetLanguage
 
 from ...ports.scaffolding_catalog import ScaffoldingCatalog
 from ..django.models.scaffolding import Scaffolding
@@ -9,8 +9,8 @@ from ..django.models.scaffolding import Scaffolding
 class DjangoScaffoldingStore(ScaffoldingCatalog):
     model = Scaffolding
 
-    def __init__(self, catalog: LanguageCatalogService):
-        self.catalog = catalog
+    def __init__(self, languages: GetLanguage):
+        self.languages = languages
 
     def list(self):
         return self.model.objects.order_by("name")
@@ -19,7 +19,7 @@ class DjangoScaffoldingStore(ScaffoldingCatalog):
         return get_object_or_404(self.model, id=scaffolding_id)
 
     def create(self, language_id: str, name: str, description: str):
-        language = self.catalog.find(language_id)
+        language = self.languages.execute(language_id)
         scaffolding = self.model(
             language_id=language.id,
             name=name,
@@ -32,7 +32,7 @@ class DjangoScaffoldingStore(ScaffoldingCatalog):
     def update(self, scaffolding_id: str, **data):
         instance = self.get(scaffolding_id)
         if "language_id" in data:
-            instance.language_id = self.catalog.find(data.pop("language_id")).id
+            instance.language_id = self.languages.execute(data.pop("language_id")).id
         for field, value in data.items():
             setattr(instance, field, value)
         instance.full_clean()

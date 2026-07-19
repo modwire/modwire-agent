@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 
-
 from .contracts import Language, LanguageCatalog
 from .mermaid import Mermaid
 from .php import PHP
