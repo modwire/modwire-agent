@@ -1,0 +1,40 @@
+shape:
+  max_classes_per_file: 1
+  max_interfaces_per_file: 0
+  max_types_per_file: 1
+  max_abstract_classes_per_file: 1
+  max_functions_per_file: 0
+  max_methods_per_class: 10
+  max_function_lines: 20
+  max_class_lines: 100
+  allow_optional_function_args: false
+  allow_optional_method_args: false
+  allow_optional_class_properties: false
+  allow_import_aliases: false
+  require_joined_imports: true
+  allowed_import_crossing_types: [module, symbol]
+
+boundaries:
+  tags:
+    - { name: module, match: "src/testproj/*", excluded_patterns: [src/testproj/__init__.py, src/testproj/settings.py, src/testproj/urls.py, src/testproj/wiring.py] }
+    - { name: framework, match: src/modwire_hex }
+    - { name: project, match: src/testproj }
+    - { name: tests, match: tests }
+    - { name: functional_scenarios, match: "tests/*/functional/scenarios" }
+    - { name: functional_api, match: "tests/*/functional/api.py" }
+    - { name: wiring, match: "src/testproj/*/wiring.py" }
+    - { name: adapters, match: "src/testproj/*/adapters" }
+    - { name: use_cases, match: "src/testproj/*/use_cases" }
+    - { name: ports, match: "src/testproj/*/ports" }
+    - { name: domain, match: "src/testproj/*/domain" }
+  rules:
+    - { source: tests, disallow: [project] }
+    - { source: project, allow: [framework] }
+  flow:
+    realms:
+      - { name: framework, module_tag: framework }
+      - { name: project_root, module_tag: project }
+      - { name: project, module_tag: module }
+      - { name: tests, module_tag: tests }
+    layers: [functional_scenarios, functional_api, wiring, adapters, use_cases, ports, domain]
+    analyzers: [backward-flow, no-cycles, no-reentry]

@@ -1,8 +1,0 @@
-# Agent untouchable begin
-max_functions_per_file: 0
-allow_optional_function_args: False
-allow_optional_method_args: False
-allow_optional_class_properties: False
-allow_import_aliases: False
-require_joined_imports: True
-# Agent untouchable end
