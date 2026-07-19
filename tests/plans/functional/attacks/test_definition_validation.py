@@ -2,6 +2,13 @@ from ..api import PlanApiTestCase
 
 
 class DefinitionValidationAttacks(PlanApiTestCase):
+    def test_rejects_undeclared_definition_fields(self) -> None:
+        definition = self.definition({"untrusted": True})
+
+        response = self.publish(definition)
+
+        self.assertEqual(response.status_code, 422)
+
     def test_rejects_invalid_protocol_graphs(self) -> None:
         cases = {
             "blank-name": self.definition({"name": " "}),

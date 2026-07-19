@@ -1,6 +1,6 @@
-from ninja import Schema
+from .strict import StrictSchema
 
 
-class SectionInput(Schema):
+class SectionInput(StrictSchema):
     title: str
     allowed_kinds: list[str]

@@ -1,6 +1,6 @@
-from ninja import Schema
+from .strict import StrictSchema
 
 
-class RecordInput(Schema):
+class RecordInput(StrictSchema):
     title: str
     kind: str

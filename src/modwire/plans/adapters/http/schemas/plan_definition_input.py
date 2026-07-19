@@ -1,4 +1,4 @@
-from ninja import Schema
+from .strict import StrictSchema
 
 from .stage_definition_input import StageDefinitionInput
 from .transition_definition_input import TransitionDefinitionInput
@@ -7,7 +7,7 @@ from .operation_definition_input import OperationDefinitionInput
 from .artifact_definition_input import ArtifactDefinitionInput
 
 
-class PlanDefinitionInput(Schema):
+class PlanDefinitionInput(StrictSchema):
     name: str
     start_stage_id: str
     stages: list[StageDefinitionInput]

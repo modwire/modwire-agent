@@ -1,5 +1,5 @@
-from ninja import Schema
+from .strict import StrictSchema
 
 
-class TagInput(Schema):
+class TagInput(StrictSchema):
     name: str
