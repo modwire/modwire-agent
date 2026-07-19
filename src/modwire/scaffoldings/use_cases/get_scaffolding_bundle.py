@@ -1,13 +1,12 @@
+from .get_scaffolding import GetScaffolding
 
-from .scaffolding import ScaffoldingService
 
+class GetScaffoldingBundle:
+    def __init__(self, get_scaffolding: GetScaffolding):
+        self.get_scaffolding = get_scaffolding
 
-class ScaffoldingBundleService:
-    def __init__(self, scaffoldings: ScaffoldingService):
-        self.scaffoldings = scaffoldings
-
-    def get(self, scaffolding_id: str):
-        scaffolding = self.scaffoldings.get(scaffolding_id)
+    def execute(self, scaffolding_id: str) -> dict:
+        scaffolding = self.get_scaffolding.execute(scaffolding_id)
         return {
             "id": scaffolding.id,
             "name": scaffolding.name,

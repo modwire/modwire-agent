@@ -5,12 +5,11 @@ from ninja_extra.controllers import ControllerBase, api_controller
 
 from modwire.scaffoldings.adapters.http.errors import validated
 
-from ....use_cases.bundle import ScaffoldingBundleService
+from ....domain.preview import PreviewFailed
 from ....use_cases.converge_scaffolding import ConvergeScaffolding
-from ....use_cases.preview import ScaffoldingPreviewService
-from ....use_cases.preview_errors import PreviewFailed
-from ....use_cases.scaffolding import ScaffoldingService
-from ....use_cases.schema import ScaffoldingSchemaService
+from ....use_cases.get_scaffolding_bundle import GetScaffoldingBundle
+from ....use_cases.get_scaffolding_schema import GetScaffoldingSchema
+from ....use_cases.preview_scaffolding import PreviewScaffolding
 from .schemas import (
     ScaffoldingBundleOut,
     ScaffoldingConvergenceIn,
@@ -50,9 +49,8 @@ class ScaffoldingController(ControllerBase):
         request,
         scaffolding_id: str,
     ):
-        scaffoldings = DjangoRequest.resolve(request, ScaffoldingService)
-        schemas = DjangoRequest.resolve(request, ScaffoldingSchemaService)
-        return schemas.build(scaffoldings.get(scaffolding_id))
+        activity = DjangoRequest.resolve(request, GetScaffoldingSchema)
+        return activity.execute(scaffolding_id)
 
     @route.get(
         "/{scaffolding_id}/bundle",
@@ -61,8 +59,8 @@ class ScaffoldingController(ControllerBase):
         summary="Get a generic scaffolding bundle for a local generator.",
     )
     def bundle(self, request, scaffolding_id: str):
-        service = DjangoRequest.resolve(request, ScaffoldingBundleService)
-        return service.get(scaffolding_id)
+        activity = DjangoRequest.resolve(request, GetScaffoldingBundle)
+        return activity.execute(scaffolding_id)
 
     @route.post(
         "/{scaffolding_id}/preview",
@@ -76,9 +74,9 @@ class ScaffoldingController(ControllerBase):
         scaffolding_id: str,
         data: ScaffoldingPreviewIn,
     ):
-        service = DjangoRequest.resolve(request, ScaffoldingPreviewService)
+        activity = DjangoRequest.resolve(request, PreviewScaffolding)
         try:
-            return service.preview(
+            return activity.execute(
                 scaffolding_id,
                 data.values,
                 [override.model_dump(exclude_none=True) for override in data.template_overrides],

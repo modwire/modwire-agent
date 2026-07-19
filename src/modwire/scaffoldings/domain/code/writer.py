@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 from .package import CodePackage
 
 
@@ -18,9 +17,7 @@ class CodePackageWriter:
         for path, contents in package.files.items():
             target = (root / path).resolve()
             if not target.is_relative_to(root):
-                raise ValueError(
-                    f"Code package file path escapes destination: {path}"
-                )
+                raise ValueError(f"Code package file path escapes destination: {path}")
             if target.exists() and not overwrite:
                 raise FileExistsError(target)
 

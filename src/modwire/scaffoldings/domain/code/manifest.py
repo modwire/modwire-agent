@@ -90,6 +90,4 @@ class CopierManifest(BaseModel):
         try:
             return type_mapping[annotation]
         except KeyError as error:
-            raise TypeError(
-                f"Unsupported Copier question type: {annotation!r}"
-            ) from error
+            raise TypeError(f"Unsupported Copier question type: {annotation!r}") from error

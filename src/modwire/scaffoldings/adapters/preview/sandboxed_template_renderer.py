@@ -4,9 +4,7 @@ from typing import Any
 from jinja2 import StrictUndefined, TemplateError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
 
-from modwire.scaffoldings.domain.code.package import CodePackage
-
-from .preview_errors import PreviewError, PreviewFailed
+from ...domain.preview import PreviewError, PreviewFailed
 
 
 def _words(value: Any) -> list[str]:
@@ -35,30 +33,10 @@ class SandboxedTemplateRenderer:
         try:
             return self.environment.from_string(source).render(context)
         except TemplateError as error:
-            raise PreviewFailed(
-                [
-                    PreviewError(
-                        code="jinja_syntax" if isinstance(error, TemplateSyntaxError) else "jinja_render",
-                        message=str(error),
-                        context={
-                            "template_id": template_id,
-                            "template_path": template_path,
-                            **({"line": error.lineno} if getattr(error, "lineno", None) is not None else {}),
-                        },
-                    )
-                ]
-            ) from error
-
-    def validate_path(self, path: str, *, template_id: str, template_path: str) -> None:
-        try:
-            CodePackage._validate_file_path(path)
-        except ValueError as error:
-            raise PreviewFailed(
-                [
-                    PreviewError(
-                        "invalid_rendered_path",
-                        str(error),
-                        {"template_id": template_id, "template_path": template_path},
-                    )
-                ]
-            ) from error
+            context = {
+                "template_id": template_id,
+                "template_path": template_path,
+                **({"line": error.lineno} if getattr(error, "lineno", None) is not None else {}),
+            }
+            code = "jinja_syntax" if isinstance(error, TemplateSyntaxError) else "jinja_render"
+            raise PreviewFailed([PreviewError(code, str(error), context)]) from error

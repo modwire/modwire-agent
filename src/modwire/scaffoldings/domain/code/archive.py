@@ -21,16 +21,11 @@ class CopierArchive(BaseModel):
         templates_directory = archive_file.parent / "templates"
 
         if not templates_directory.is_dir():
-            raise FileNotFoundError(
-                f"Templates directory not found: "
-                f"{templates_directory}"
-            )
+            raise FileNotFoundError(f"Templates directory not found: {templates_directory}")
 
         return cls(
             manifest=manifest_type.to_copier_config(),
-            templates=CodePackage.from_directory(
-                templates_directory
-            ),
+            templates=CodePackage.from_directory(templates_directory),
         )
 
     def write_to_directory(self, root: Path) -> None:
@@ -69,12 +64,11 @@ class CopierArchive(BaseModel):
                 defaults=True,
                 overwrite=True,
                 quiet=True,
-                unsafe=bool(
-                    self.manifest.get("_jinja_extensions")
-                ),
+                unsafe=bool(self.manifest.get("_jinja_extensions")),
             )
 
             return CodePackage.from_directory(output)
+
 
 """
 _min_copier_version: "9.0.0"

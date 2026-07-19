@@ -1,6 +1,5 @@
 from collections.abc import Callable
 
-
 from ..django.models.scaffolding import Scaffolding
 from ..django.models.template import Template
 from ..django.models.variable import Variable
@@ -10,9 +9,9 @@ from .contracts import ChangeSet, ConvergencePlan, DesiredScaffolding
 class ScaffoldingConvergencePlanner:
     def plan(self, current: Scaffolding | None, desired: DesiredScaffolding) -> ConvergencePlan:
         return {
-            "scaffolding": "create" if current is None else (
-                "update" if current.description != desired.scaffolding.description else "unchanged"
-            ),
+            "scaffolding": "create"
+            if current is None
+            else ("update" if current.description != desired.scaffolding.description else "unchanged"),
             "variables": self._variable_changes(current, desired.variables),
             "templates": self._template_changes(current, desired.templates),
         }
@@ -25,15 +24,18 @@ class ScaffoldingConvergencePlanner:
             existing,
             requested,
             lambda before, after: (
-                before.type,
-                before.description,
-                before.default_value,
-                before.required,
-            ) != (
-                after.type,
-                after.description,
-                after.default_value,
-                after.required,
+                (
+                    before.type,
+                    before.description,
+                    before.default_value,
+                    before.required,
+                )
+                != (
+                    after.type,
+                    after.description,
+                    after.default_value,
+                    after.required,
+                )
             ),
         )
 
@@ -44,8 +46,7 @@ class ScaffoldingConvergencePlanner:
         return ScaffoldingConvergencePlanner._changes(
             existing,
             requested,
-            lambda before, after: (before.file_content, before.write_mode)
-            != (after.file_content, after.write_mode),
+            lambda before, after: (before.file_content, before.write_mode) != (after.file_content, after.write_mode),
         )
 
     @staticmethod

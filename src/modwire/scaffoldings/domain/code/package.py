@@ -20,26 +20,18 @@ class CodePackage(BaseModel):
             raise ValueError("Code package file path cannot be empty.")
 
         if "\\" in path:
-            raise ValueError(
-                f"Code package path must use POSIX separators: {path!r}"
-            )
+            raise ValueError(f"Code package path must use POSIX separators: {path!r}")
 
         if path.startswith("/"):
-            raise ValueError(
-                f"Code package path must be relative: {path!r}"
-            )
+            raise ValueError(f"Code package path must be relative: {path!r}")
 
         if path.endswith("/"):
-            raise ValueError(
-                f"Code package path must point to a file: {path!r}"
-            )
+            raise ValueError(f"Code package path must point to a file: {path!r}")
 
         parts = path.split("/")
 
         if any(part in {"", ".", ".."} for part in parts):
-            raise ValueError(
-                f"Code package path contains an invalid segment: {path!r}"
-            )
+            raise ValueError(f"Code package path contains an invalid segment: {path!r}")
 
     @classmethod
     def from_directory(cls, root: Path) -> Self:
@@ -52,9 +44,7 @@ class CodePackage(BaseModel):
 
         for path in sorted(root.rglob("*")):
             if path.is_symlink():
-                raise ValueError(
-                    f"Symbolic links are not supported: {path}"
-                )
+                raise ValueError(f"Symbolic links are not supported: {path}")
 
             if not path.is_file():
                 continue

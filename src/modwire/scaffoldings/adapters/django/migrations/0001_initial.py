@@ -7,60 +7,118 @@ import modwire.scaffoldings.adapters.django.models.identifiers
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Scaffolding',
+            name="Scaffolding",
             fields=[
-                ('id', models.CharField(default=modwire.scaffoldings.adapters.django.models.identifiers.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=120)),
-                ('description', models.TextField()),
-                ('language_id', models.CharField(max_length=64)),
+                (
+                    "id",
+                    models.CharField(
+                        default=modwire.scaffoldings.adapters.django.models.identifiers.short_uuid,
+                        editable=False,
+                        max_length=22,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(max_length=120)),
+                ("description", models.TextField()),
+                ("language_id", models.CharField(max_length=64)),
             ],
             options={
-                'ordering': ('name',),
+                "ordering": ("name",),
             },
         ),
         migrations.CreateModel(
-            name='Template',
+            name="Template",
             fields=[
-                ('id', models.CharField(default=modwire.scaffoldings.adapters.django.models.identifiers.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
-                ('relative_path', models.CharField(max_length=255)),
-                ('file_content', models.TextField()),
-                ('scaffolding', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='templates', to='scaffoldings.scaffolding')),
+                (
+                    "id",
+                    models.CharField(
+                        default=modwire.scaffoldings.adapters.django.models.identifiers.short_uuid,
+                        editable=False,
+                        max_length=22,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("relative_path", models.CharField(max_length=255)),
+                ("file_content", models.TextField()),
+                (
+                    "scaffolding",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="templates",
+                        to="scaffoldings.scaffolding",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('relative_path',),
+                "ordering": ("relative_path",),
             },
         ),
         migrations.CreateModel(
-            name='Variable',
+            name="Variable",
             fields=[
-                ('id', models.CharField(default=modwire.scaffoldings.adapters.django.models.identifiers.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=120)),
-                ('type', models.CharField(choices=[('str', 'Str'), ('int', 'Int'), ('float', 'Float'), ('bool', 'Bool'), ('yaml', 'Yaml')], max_length=8)),
-                ('description', models.CharField(max_length=100)),
-                ('default_value', models.JSONField(default=list)),
-                ('scaffolding', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='variables', to='scaffoldings.scaffolding')),
+                (
+                    "id",
+                    models.CharField(
+                        default=modwire.scaffoldings.adapters.django.models.identifiers.short_uuid,
+                        editable=False,
+                        max_length=22,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(max_length=120)),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("str", "Str"),
+                            ("int", "Int"),
+                            ("float", "Float"),
+                            ("bool", "Bool"),
+                            ("yaml", "Yaml"),
+                        ],
+                        max_length=8,
+                    ),
+                ),
+                ("description", models.CharField(max_length=100)),
+                ("default_value", models.JSONField(default=list)),
+                (
+                    "scaffolding",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="variables",
+                        to="scaffoldings.scaffolding",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('name',),
+                "ordering": ("name",),
             },
         ),
         migrations.AddConstraint(
-            model_name='scaffolding',
-            constraint=models.UniqueConstraint(fields=('language_id', 'name'), name='unique_scaffolding_name_per_language'),
+            model_name="scaffolding",
+            constraint=models.UniqueConstraint(
+                fields=("language_id", "name"), name="unique_scaffolding_name_per_language"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='template',
-            constraint=models.UniqueConstraint(fields=('scaffolding', 'relative_path'), name='unique_template_path_per_scaffolding'),
+            model_name="template",
+            constraint=models.UniqueConstraint(
+                fields=("scaffolding", "relative_path"), name="unique_template_path_per_scaffolding"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='variable',
-            constraint=models.UniqueConstraint(fields=('scaffolding', 'name'), name='unique_variable_name_per_scaffolding'),
+            model_name="variable",
+            constraint=models.UniqueConstraint(
+                fields=("scaffolding", "name"), name="unique_variable_name_per_scaffolding"
+            ),
         ),
     ]

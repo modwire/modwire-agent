@@ -5,7 +5,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import TextLexer, get_lexer_for_filename
 from pygments.util import ClassNotFound
 
-from .preview_errors import PreviewError, PreviewFailed
+from ...domain.preview import PreviewError, PreviewFailed
 
 
 class SyntaxHighlightingService:

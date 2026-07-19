@@ -5,9 +5,9 @@ from django.db import transaction
 from modwire.languages.domain.contracts import Language
 from modwire.languages.use_cases import LanguageCatalogService
 
-from ..django.models.scaffolding import Scaffolding
 from ...ports.scaffolding_convergence import ScaffoldingConvergence
-from .contracts import ConvergencePlan, ConvergenceResult, TemplateSpec, VariableSpec
+from ..django.models.scaffolding import Scaffolding
+from .contracts import ConvergencePlan, ConvergenceResult
 from .planner import ScaffoldingConvergencePlanner
 from .validator import ScaffoldingAggregateValidator
 from .writer import ScaffoldingAggregateWriter

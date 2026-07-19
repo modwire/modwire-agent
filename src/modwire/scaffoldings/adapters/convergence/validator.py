@@ -4,7 +4,6 @@ from typing import Literal
 from django.core.exceptions import ValidationError
 
 from modwire.languages.domain.contracts import Language
-from modwire.languages.use_cases import LanguageCatalogService
 
 from ..django.models.scaffolding import Scaffolding
 from ..django.models.template import Template
