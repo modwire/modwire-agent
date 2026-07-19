@@ -8,6 +8,7 @@ dependencies = [
     "copier>=9.16.0",
     "dj-database-url",
     "django",
+    "django-cors-headers",
     "django-health-check",
     "django-model-utils",
     "django-ninja-extra",

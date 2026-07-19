@@ -7,6 +7,7 @@ from pathlib import Path
 
 import dj_database_url
 import structlog
+from corsheaders.defaults import default_headers, default_methods
 
 PACKAGE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = PACKAGE_DIR.parent.parent
@@ -14,6 +15,8 @@ APPS_DIR = PACKAGE_DIR / "apps"
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
 DEBUG = os.getenv("DEBUG", "0") == "1"
 ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
+LOCAL_HOSTS = {"localhost", "127.0.0.1", "[::1]", "::1", "testserver"}
+LOCAL_DEVELOPMENT = DEBUG or bool(ALLOWED_HOSTS) and all(host in LOCAL_HOSTS for host in ALLOWED_HOSTS)
 RELEASE_VERSION = os.getenv("MODWIRE_RUNTIME_VERSION", "0.0.0+dev")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
@@ -26,6 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "health_check",
     "ninja_extra",
     "pgvector.django",
@@ -42,6 +46,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     "modwire_hex.django.middleware.RequestScopeMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -50,6 +55,10 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+if LOCAL_DEVELOPMENT:
+    CORS_ALLOW_ALL_ORIGINS = True
+    CORS_ALLOW_HEADERS = [*default_headers, "x-actor-id", "x-actor-type"]
+    CORS_ALLOW_METHODS = list(default_methods)
 MODWIRE = {
     "APPLICATION": "modwire.wiring.application",
     "NINJA": {"title": "Modwire API", "version": RELEASE_VERSION},
