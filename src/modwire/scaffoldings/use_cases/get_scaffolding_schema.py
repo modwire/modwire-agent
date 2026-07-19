@@ -1,11 +1,13 @@
+from dataclasses import dataclass
+
 from ..domain.preview import ScaffoldingPreviewPolicy
 from .get_scaffolding import GetScaffolding
 
 
+@dataclass(frozen=True, slots=True)
 class GetScaffoldingSchema:
-    def __init__(self, get_scaffolding: GetScaffolding, policy: ScaffoldingPreviewPolicy):
-        self.get_scaffolding = get_scaffolding
-        self.policy = policy
+    get_scaffolding: GetScaffolding
+    policy: ScaffoldingPreviewPolicy
 
     def execute(self, scaffolding_id: str) -> dict:
         scaffolding = self.get_scaffolding.execute(scaffolding_id)

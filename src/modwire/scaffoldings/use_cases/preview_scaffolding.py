@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any
 
 from ..adapters.preview import SandboxedTemplateRenderer, SyntaxHighlightingService
@@ -5,18 +6,12 @@ from ..domain.preview import ScaffoldingPreviewPolicy
 from .get_scaffolding import GetScaffolding
 
 
+@dataclass(frozen=True, slots=True)
 class PreviewScaffolding:
-    def __init__(
-        self,
-        get_scaffolding: GetScaffolding,
-        policy: ScaffoldingPreviewPolicy,
-        renderer: SandboxedTemplateRenderer,
-        highlighter: SyntaxHighlightingService,
-    ):
-        self.get_scaffolding = get_scaffolding
-        self.policy = policy
-        self.renderer = renderer
-        self.highlighter = highlighter
+    get_scaffolding: GetScaffolding
+    policy: ScaffoldingPreviewPolicy
+    renderer: SandboxedTemplateRenderer
+    highlighter: SyntaxHighlightingService
 
     def execute(
         self,

@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from django.shortcuts import get_object_or_404
 
 from modwire.languages.use_cases.language.get_language import GetLanguage
@@ -6,11 +8,10 @@ from ...ports.scaffolding_catalog import ScaffoldingCatalog
 from ..django.models.scaffolding import Scaffolding
 
 
+@dataclass(frozen=True, slots=True)
 class DjangoScaffoldingStore(ScaffoldingCatalog):
     model = Scaffolding
-
-    def __init__(self, languages: GetLanguage):
-        self.languages = languages
+    languages: GetLanguage
 
     def list(self):
         return self.model.objects.order_by("name")

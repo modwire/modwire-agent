@@ -1,9 +1,11 @@
+from dataclasses import dataclass
+
 from .get_scaffolding import GetScaffolding
 
 
+@dataclass(frozen=True, slots=True)
 class GetScaffoldingBundle:
-    def __init__(self, get_scaffolding: GetScaffolding):
-        self.get_scaffolding = get_scaffolding
+    get_scaffolding: GetScaffolding
 
     def execute(self, scaffolding_id: str) -> dict:
         scaffolding = self.get_scaffolding.execute(scaffolding_id)
