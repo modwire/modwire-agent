@@ -1,9 +1,10 @@
 shape:
-  max_classes_per_file: 20
+# agent untouchable start
+  max_classes_per_file: 1
   max_interfaces_per_file: 0
   max_types_per_file: 1
   max_abstract_classes_per_file: 1
-  max_functions_per_file: 10
+  max_functions_per_file: 0
   max_methods_per_class: 10
   max_function_lines: 20
   max_class_lines: 200
@@ -13,6 +14,7 @@ shape:
   allow_import_aliases: true
   require_joined_imports: true
   allowed_import_crossing_types: [module, symbol]
+# agent untouchable end
 
 boundaries:
   tags:

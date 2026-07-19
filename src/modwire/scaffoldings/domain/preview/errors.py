@@ -17,7 +17,8 @@ class PreviewError:
         return result
 
 
-class PreviewFailed(DomainError):
-    def __init__(self, errors: list[PreviewError]):
-        self.errors = errors
-        super().__init__("Scaffolding preview failed.")
+PreviewFailed = type(
+    "PreviewFailed",
+    (DomainError,),
+    {"__init__": lambda self, errors: (setattr(self, "errors", errors), DomainError.__init__(self, "Scaffolding preview failed."))[1]},
+)

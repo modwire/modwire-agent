@@ -10,37 +10,9 @@ from modwire.languages.domain.contracts import (
 )
 
 
-class VersionProviderOut(Schema):
-    kind: VersionProviderKind
-    url: str
-    result_path: tuple[VersionPathItem, ...]
-
-
-class PackageManagerOut(Schema):
-    id: str
-    name: str
-    executable: str
-    manifest_paths: tuple[str, ...]
-    lockfile_paths: tuple[str, ...]
-    registry_url: str
-    package_url_type: str
-    version_constraint: str
-    supports_workspaces: bool
-    commit_lockfiles: bool
-    commands: dict[PackageManagerCommand, str] = Field(title="PackageManagerCommands")
-
-
-class ToolOut(Schema):
-    id: str
-    name: str
-    roles: tuple[ToolRole, ...]
-    executable: str
-    package_name: str
-    stable_version: str
-    homepage_url: str
-    config_paths: tuple[str, ...]
-    default_enabled: bool
-    commands: dict[ToolCommand, str] = Field(title="ToolCommands")
+VersionProviderOut = type("VersionProviderOut", (Schema,), {"__annotations__": {"kind": VersionProviderKind, "url": str, "result_path": tuple[VersionPathItem, ...]}})
+PackageManagerOut = type("PackageManagerOut", (Schema,), {"__annotations__": {"id": str, "name": str, "executable": str, "manifest_paths": tuple[str, ...], "lockfile_paths": tuple[str, ...], "registry_url": str, "package_url_type": str, "version_constraint": str, "supports_workspaces": bool, "commit_lockfiles": bool, "commands": dict[PackageManagerCommand, str]}, "commands": Field(title="PackageManagerCommands")})
+ToolOut = type("ToolOut", (Schema,), {"__annotations__": {"id": str, "name": str, "roles": tuple[ToolRole, ...], "executable": str, "package_name": str, "stable_version": str, "homepage_url": str, "config_paths": tuple[str, ...], "default_enabled": bool, "commands": dict[ToolCommand, str]}, "commands": Field(title="ToolCommands")})
 
 
 class LanguageOut(Schema):

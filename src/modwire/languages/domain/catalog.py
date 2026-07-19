@@ -12,6 +12,8 @@ class SharedLanguageCatalog(LanguageCatalog):
         super().__init__(languages=tuple(sorted(languages, key=lambda language: language.name)))
 
 
-class BuiltInLanguageCatalog(SharedLanguageCatalog):
-    def __init__(self):
-        super().__init__((Python(), PHP(), Typescript(), Mermaid()))
+BuiltInLanguageCatalog = type(
+    "BuiltInLanguageCatalog",
+    (SharedLanguageCatalog,),
+    {"__init__": lambda self: SharedLanguageCatalog.__init__(self, (Python(), PHP(), Typescript(), Mermaid()))},
+)

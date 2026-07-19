@@ -1,16 +1,10 @@
+import builtins
+
 from django.db import models
 
 from .identifiers import short_uuid
 from .scaffolding import Scaffolding
-
-
-class VariableType(models.TextChoices):
-    STR = "str"
-    INT = "int"
-    FLOAT = "float"
-    BOOL = "bool"
-    LIST = "list"
-    DICT = "dict"
+from .variable_type import VariableType
 
 
 class Variable(models.Model):
@@ -22,11 +16,4 @@ class Variable(models.Model):
     default_value = models.JSONField(default=list, blank=True)
     required = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ("name",)
-        constraints = [
-            models.UniqueConstraint(
-                fields=("scaffolding", "name"),
-                name="unique_variable_name_per_scaffolding",
-            ),
-        ]
+    Meta = builtins.type("Meta", (), {"ordering": ("name",), "constraints": [models.UniqueConstraint(fields=("scaffolding", "name"), name="unique_variable_name_per_scaffolding")]})

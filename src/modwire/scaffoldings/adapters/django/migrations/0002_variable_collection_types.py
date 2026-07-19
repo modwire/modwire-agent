@@ -1,27 +1,14 @@
 from django.db import migrations, models
 
 
-def split_yaml_types(apps, schema_editor):
-    variable = apps.get_model("scaffoldings", "Variable")
-    ambiguous = []
-    for item in variable.objects.filter(type="yaml").iterator():
-        if type(item.default_value) is list:
-            item.type = "list"
-        elif type(item.default_value) is dict:
-            item.type = "dict"
-        else:
-            ambiguous.append(str(item.id))
-            continue
-        item.save(update_fields=("type",))
-    if ambiguous:
-        raise RuntimeError("Cannot infer collection type for YAML variables: " + ", ".join(ambiguous))
-
-
 class Migration(migrations.Migration):
     dependencies = [("scaffoldings", "0001_initial")]
 
     operations = [
-        migrations.RunPython(split_yaml_types, migrations.RunPython.noop),
+        migrations.RunSQL(
+            "UPDATE scaffoldings_variable SET type = CASE jsonb_typeof(default_value) WHEN 'array' THEN 'list' WHEN 'object' THEN 'dict' ELSE type END WHERE type = 'yaml'",
+            migrations.RunSQL.noop,
+        ),
         migrations.AlterField(
             model_name="variable",
             name="type",

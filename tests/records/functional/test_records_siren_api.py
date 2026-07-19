@@ -4,6 +4,55 @@ from .api import RecordsApiTestCase
 
 
 class RecordsSirenApiScenarios(RecordsApiTestCase):
+    def test_agent_can_create_and_enrich_records_through_siren_actions(self) -> None:
+        headers = self.agent_headers()
+        section_response = self.client.post(
+            "/siren/sections",
+            data={"title": "Agent work", "allowed_kinds": ["rule"]},
+            content_type="application/json",
+            headers=headers,
+        )
+        self.assertEqual(section_response.status_code, 200)
+        section = section_response.json()["properties"]
+        self.assertEqual(section["title"], "Agent work")
+
+        record_response = self.client.post(
+            f"/siren/sections/{section['id']}/records",
+            data={"title": "Agent-created rule", "kind": "rule"},
+            content_type="application/json",
+            headers=headers,
+        )
+        self.assertEqual(record_response.status_code, 200)
+        record = record_response.json()["properties"]
+        self.assertEqual(record["title"], "Agent-created rule")
+
+        tag_response = self.client.post(
+            "/siren/tags",
+            data={"name": "agent"},
+            content_type="application/json",
+            headers=headers,
+        )
+        self.assertEqual(tag_response.status_code, 200)
+        tag_id = tag_response.json()["entities"][0]["properties"]["id"]
+
+        tagged = self.client.put(
+            f"/siren/records/{record['id']}/tags",
+            data={"tag_ids": [tag_id]},
+            content_type="application/json",
+            headers=headers,
+        )
+        self.assertEqual(tagged.status_code, 200)
+        self.assertEqual(tagged.json()["properties"]["tags"], ["agent"])
+
+        content = self.client.put(
+            f"/siren/records/{record['id']}/content",
+            data={"markdown": self.valid_rule_markdown()},
+            content_type="application/json",
+            headers=headers,
+        )
+        self.assertEqual(content.status_code, 200)
+        self.assertEqual(content.json()["properties"]["id"], record["id"])
+
     def test_browses_a_published_record_by_tag(self) -> None:
         section = self.create_section("Architecture", ["rule"])
         record = self.create_record(section["id"], "Siren contract", "rule")
