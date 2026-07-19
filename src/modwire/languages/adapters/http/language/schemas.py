@@ -1,13 +1,19 @@
 from ninja import Schema
 from pydantic import Field
 
-from modwire.languages import domain as languages
+from modwire.languages.domain.contracts import (
+    PackageManagerCommand,
+    ToolCommand,
+    ToolRole,
+    VersionPathItem,
+    VersionProviderKind,
+)
 
 
 class VersionProviderOut(Schema):
-    kind: languages.VersionProviderKind
+    kind: VersionProviderKind
     url: str
-    result_path: tuple[languages.VersionPathItem, ...]
+    result_path: tuple[VersionPathItem, ...]
 
 
 class PackageManagerOut(Schema):
@@ -21,20 +27,20 @@ class PackageManagerOut(Schema):
     version_constraint: str
     supports_workspaces: bool
     commit_lockfiles: bool
-    commands: dict[languages.PackageManagerCommand, str] = Field(title="PackageManagerCommands")
+    commands: dict[PackageManagerCommand, str] = Field(title="PackageManagerCommands")
 
 
 class ToolOut(Schema):
     id: str
     name: str
-    roles: tuple[languages.ToolRole, ...]
+    roles: tuple[ToolRole, ...]
     executable: str
     package_name: str
     stable_version: str
     homepage_url: str
     config_paths: tuple[str, ...]
     default_enabled: bool
-    commands: dict[languages.ToolCommand, str] = Field(title="ToolCommands")
+    commands: dict[ToolCommand, str] = Field(title="ToolCommands")
 
 
 class LanguageOut(Schema):

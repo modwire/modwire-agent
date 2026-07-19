@@ -31,6 +31,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     { include-group = "mcp-adapter" },
+    "dirty-equals>=0.11",
     "openapi-python-client",
     "pytest",
     "pytest-django",

@@ -2,7 +2,7 @@ from modwire_hex.django import DjangoRequest
 from ninja_extra import route
 from ninja_extra.controllers import ControllerBase, api_controller
 
-from ....use_cases.api_key import ApiKeyService
+from ....use_cases.issue_api_key import IssueApiKey
 from .schemas import ApiKeyCreatedOut, ApiKeyIn
 
 
@@ -10,10 +10,10 @@ from .schemas import ApiKeyCreatedOut, ApiKeyIn
 class ApiKeyController(ControllerBase):
     @route.post("", response=ApiKeyCreatedOut, operation_id="create_api_key", summary="Generate an API key.")
     def create(self, request, data: ApiKeyIn):
-        service = DjangoRequest.resolve(request, ApiKeyService)
-        key, secret = service.generate(data.name)
+        service = DjangoRequest.resolve(request, IssueApiKey)
+        key, secret = service.execute(data.name)
         return {
-            "id": key.id,
+            "id": key.identifier,
             "name": key.name,
             "created_at": key.created_at,
             "updated_at": key.updated_at,

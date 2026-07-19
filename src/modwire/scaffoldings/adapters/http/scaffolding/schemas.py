@@ -5,8 +5,6 @@ from pydantic import JsonValue
 
 from modwire.scaffoldings.adapters.http.schema import StrictSchema
 
-from modwire.scaffoldings.adapters.django.models.template import Template
-
 
 class ScaffoldingConvergenceVariableIn(StrictSchema):
     name: str
@@ -19,7 +17,7 @@ class ScaffoldingConvergenceVariableIn(StrictSchema):
 class ScaffoldingConvergenceTemplateIn(StrictSchema):
     relative_path: str
     file_content: str
-    write_mode: Template.WriteMode = Template.WriteMode.MANAGED
+    write_mode: Literal["managed", "create_if_missing"] = "managed"
 
 
 class ScaffoldingConvergenceIn(StrictSchema):
@@ -67,7 +65,7 @@ class PreviewFileOut(Schema):
     source: str
     html: str
     language: str
-    write_mode: Template.WriteMode
+    write_mode: Literal["managed", "create_if_missing"]
 
 
 class ScaffoldingPreviewOut(Schema):
@@ -122,7 +120,7 @@ class ScaffoldingBundleTemplateOut(Schema):
     id: str
     relative_path: str
     file_content: str
-    write_mode: Template.WriteMode
+    write_mode: Literal["managed", "create_if_missing"]
 
 
 class ScaffoldingBundleOut(Schema):

@@ -1,18 +1,17 @@
 from typing import Any
 
 
-from ..adapters.django.models.variable import VariableType
 from .preview_errors import PreviewError, PreviewFailed
 
 
 class VariableValidationService:
     json_types = {
-        VariableType.STR: "string",
-        VariableType.INT: "integer",
-        VariableType.FLOAT: "number",
-        VariableType.BOOL: "boolean",
-        VariableType.LIST: "array",
-        VariableType.DICT: "object",
+        "str": "string",
+        "int": "integer",
+        "float": "number",
+        "bool": "boolean",
+        "list": "array",
+        "dict": "object",
     }
 
     def validate(self, variables, values: dict[str, Any]) -> dict[str, Any]:

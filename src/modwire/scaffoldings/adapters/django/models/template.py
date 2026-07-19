@@ -1,9 +1,11 @@
 from django.db import models
 
+from .identifiers import short_uuid
 from .scaffolding import Scaffolding
 
 
 class Template(models.Model):
+    id = models.CharField(primary_key=True, max_length=22, default=short_uuid, editable=False)
     class WriteMode(models.TextChoices):
         MANAGED = "managed", "Managed"
         CREATE_IF_MISSING = "create_if_missing", "Create if missing"

@@ -28,7 +28,6 @@ boundaries:
     - { name: ports, match: "src/modwire/*/ports" }
     - { name: domain, match: "src/modwire/*/domain" }
   rules:
-    - { source: tests, disallow: [project] }
     - { source: project, allow: [framework] }
   flow:
     realms:

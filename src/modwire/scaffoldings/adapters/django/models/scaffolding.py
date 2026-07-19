@@ -1,7 +1,10 @@
 from django.db import models
 
+from .identifiers import short_uuid
+
 
 class Scaffolding(models.Model):
+    id = models.CharField(primary_key=True, max_length=22, default=short_uuid, editable=False)
     language_id = models.CharField(max_length=64)
     name = models.CharField(max_length=120)
     description = models.TextField()

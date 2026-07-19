@@ -6,7 +6,7 @@ from ninja_extra.controllers import ControllerBase, api_controller
 from modwire.scaffoldings.adapters.http.errors import validated
 
 from ....use_cases.bundle import ScaffoldingBundleService
-from ....use_cases.convergence import ScaffoldingConvergenceService
+from ....use_cases.converge_scaffolding import ConvergeScaffolding
 from ....use_cases.preview import ScaffoldingPreviewService
 from ....use_cases.preview_errors import PreviewFailed
 from ....use_cases.scaffolding import ScaffoldingService
@@ -35,8 +35,8 @@ class ScaffoldingController(ControllerBase):
         request,
         data: ScaffoldingConvergenceIn,
     ):
-        service = DjangoRequest.resolve(request, ScaffoldingConvergenceService)
-        return validated(service.converge, **data.model_dump())
+        service = DjangoRequest.resolve(request, ConvergeScaffolding)
+        return validated(service.execute, data.model_dump())
 
     @route.get(
         "/{scaffolding_id}/schema",
