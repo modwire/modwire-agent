@@ -4,6 +4,47 @@ from .api import RecordsApiTestCase
 
 
 class RecordsSirenApiScenarios(RecordsApiTestCase):
+    def test_searches_records_through_siren(self) -> None:
+        section = self.create_section("Search", ["rule"])
+        record = self.create_record(section["id"], "HTTP contract", "rule")
+        self.replace_content(record["id"], self.valid_rule_markdown())
+        self.publish_record(record["id"])
+
+        text = self.client.get("/siren/records/search/text?q=HTTP")
+        semantic = self.client.get("/siren/records/search/semantic?q=HTTP%20contract")
+
+        self.assertEqual(text.status_code, 200)
+        self.assertEqual(text.json()["entities"][0]["properties"]["reason"], "text")
+        self.assertEqual(semantic.status_code, 200)
+        self.assertEqual(semantic.json()["entities"][0]["properties"]["reason"], "semantic")
+
+    def test_manages_record_history_proposals_and_lifecycle_through_siren(self) -> None:
+        section = self.create_section("Siren management", ["rule"])
+        record = self.create_record(section["id"], "Original", "rule")
+        headers = self.agent_headers()
+
+        renamed = self.client.patch(f"/siren/records/{record['id']}", data={"title": "Renamed"}, content_type="application/json", headers=headers)
+        self.assertEqual(renamed.status_code, 200)
+        self.assertEqual(renamed.json()["properties"]["title"], "Renamed")
+
+        replaced = self.client.put(f"/siren/records/{record['id']}/content", data={"markdown": self.valid_rule_markdown()}, content_type="application/json", headers=headers)
+        self.assertEqual(replaced.status_code, 200)
+        revisions = self.client.get(f"/siren/records/{record['id']}/content-revisions")
+        self.assertEqual(revisions.status_code, 200)
+        self.assertEqual(revisions.json()["entities"][0]["properties"]["markdown"], self.valid_rule_markdown())
+
+        proposal = self.client.post(f"/siren/records/{record['id']}/content-proposals", data={"markdown": self.valid_rule_markdown()}, content_type="application/json", headers=headers)
+        self.assertEqual(proposal.status_code, 200)
+        proposals = self.client.get(f"/siren/records/{record['id']}/content-proposals")
+        self.assertEqual(proposals.status_code, 200)
+        proposal_id = proposals.json()["entities"][0]["properties"]["id"]
+        resolved = self.client.patch(f"/siren/records/{record['id']}/content-proposals/{proposal_id}", data={"status": "accepted"}, content_type="application/json", headers=self.user_headers())
+        self.assertEqual(resolved.status_code, 200)
+        self.assertEqual(resolved.json()["properties"]["status"], "accepted")
+
+        archived = self.client.delete(f"/siren/records/{record['id']}", headers=headers)
+        self.assertEqual(archived.status_code, 204)
+
     def test_agent_can_create_and_enrich_records_through_siren_actions(self) -> None:
         headers = self.agent_headers()
         section_response = self.client.post(

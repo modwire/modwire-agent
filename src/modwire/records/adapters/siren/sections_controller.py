@@ -21,7 +21,7 @@ from ..http.schemas.record_input import RecordInput
 from ..http.schemas.section_input import SectionInput
 from ..http.schemas.section_placements_input import SectionPlacementsInput
 from .contract import CREATE_SECTION_OPERATION, CREATE_SECTION_RECORD_OPERATION, GET_SECTION_OPERATION, LIST_SECTIONS_OPERATION, REPLACE_SECTION_PLACEMENTS_OPERATION, SECTION_COLLECTION_ROUTE, SECTION_IDENTIFIER_PARAMETER, SECTION_RESOURCE_NAME
-from .controller import RecordsSirenController
+from .record_document import record_document
 
 
 @api_controller(SECTION_COLLECTION_ROUTE, tags=["records"])
@@ -50,7 +50,7 @@ class SectionsSirenController(ControllerBase):
     def create_record(self, request: Any, section_id: UUID, payload: RecordInput):
         try: record = DjangoRequest.resolve(request, CreateRecord).execute(section_id, payload.title, payload.kind, ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy)))
         except (InvalidActor, InvalidSection) as error: raise HttpError(422, str(error)) from error
-        return RecordsSirenController._record_document(request, record.identifier)
+        return record_document(request, record.identifier)
 
     @staticmethod
     def _document(request: Any, section_id: UUID):
