@@ -32,14 +32,14 @@ class DjangoScaffoldingConvergence(ScaffoldingConvergence):
         desired = self.validator.validate(language, current, name, description, variables, templates)
         plan = self.planner.plan(current, desired)
         if dry_run:
-            return self._result(name, True, plan)
+            return self._result(None, name, True, plan)
 
         with transaction.atomic():
             current = self._current(language, name, lock=True)
             desired = self.validator.validate(language, current, name, description, variables, templates)
             plan = self.planner.plan(current, desired)
-            self.writer.apply(language, current, desired)
-        return self._result(name, False, plan)
+            scaffolding = self.writer.apply(language, current, desired)
+        return self._result(scaffolding.id, name, False, plan)
 
     @staticmethod
     def _current(language: Language, name: str, *, lock: bool = False) -> Scaffolding | None:
@@ -47,9 +47,20 @@ class DjangoScaffoldingConvergence(ScaffoldingConvergence):
         return query.select_for_update().first() if lock else query.first()
 
     @staticmethod
-    def _result(name: str, dry_run: bool, plan: ConvergencePlan) -> ConvergenceResult:
+    def _result(
+        identifier: str | None,
+        name: str,
+        dry_run: bool,
+        plan: ConvergencePlan,
+    ) -> ConvergenceResult:
         groups = (plan["variables"], plan["templates"])
         changed = plan["scaffolding"] != "unchanged" or any(
             changes[operation] for changes in groups for operation in ("create", "update", "delete")
         )
-        return {"name": name, "dry_run": dry_run, "changed": changed, "plan": plan}
+        return {
+            "id": identifier,
+            "name": name,
+            "dry_run": dry_run,
+            "changed": changed,
+            "plan": plan,
+        }

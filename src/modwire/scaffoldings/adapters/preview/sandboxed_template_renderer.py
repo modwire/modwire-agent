@@ -15,7 +15,11 @@ def _words(value: Any) -> list[str]:
 
 class SandboxedTemplateRenderer:
     def __init__(self):
-        self.environment = SandboxedEnvironment(undefined=StrictUndefined, autoescape=False)
+        self.environment = SandboxedEnvironment(
+            undefined=StrictUndefined,
+            autoescape=False,
+            keep_trailing_newline=True,
+        )
         self.environment.filters.update(
             snake=lambda value: "_".join(_words(value)),
             kebab=lambda value: "-".join(_words(value)),

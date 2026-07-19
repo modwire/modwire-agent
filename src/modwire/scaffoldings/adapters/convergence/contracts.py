@@ -35,6 +35,7 @@ class ConvergencePlan(TypedDict):
 
 
 class ConvergenceResult(TypedDict):
+    id: str | None
     name: str
     dry_run: bool
     changed: bool

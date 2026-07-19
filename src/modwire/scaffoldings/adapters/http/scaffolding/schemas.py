@@ -42,6 +42,7 @@ class ConvergencePlanOut(Schema):
 
 
 class ScaffoldingConvergenceOut(Schema):
+    id: str | None
     name: str
     dry_run: bool
     changed: bool

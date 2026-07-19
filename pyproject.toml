@@ -59,12 +59,15 @@ line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["B", "E", "F", "I", "UP"]
+select = ["B", "E", "F", "I", "TID251", "UP"]
 ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "*/migrations/*.py" = ["E501"]
 "src/modwire/core/settings.py" = ["E402"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"src.modwire" = { msg = "Import application modules from 'modwire', never from 'src.modwire'." }
 
 [tool.coverage.run]
 data_file = ".dev/coverage"
