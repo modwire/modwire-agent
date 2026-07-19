@@ -11,7 +11,7 @@ from modwire.languages.adapters.siren.contract import (
 
 class SirenRegistryScenarios(SimpleTestCase):
     def test_registers_the_languages_siren_resource(self) -> None:
-        (language,) = resources.resources
+        language = next(resource for resource in resources.resources if resource.name == RESOURCE_NAME)
 
         self.assertEqual(language.name, RESOURCE_NAME)
         self.assertEqual(language.path, ENTITY_PATH)

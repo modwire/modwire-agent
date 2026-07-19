@@ -31,8 +31,9 @@ resources = SirenResourceRegistry()
 
 def register_module_resources() -> None:
     from modwire.languages.adapters.siren.resources import LANGUAGE_RESOURCES
+    from modwire.records.adapters.siren.resources import RECORD_RESOURCES
 
-    resources.register(*LANGUAGE_RESOURCES)
+    resources.register(*LANGUAGE_RESOURCES, *RECORD_RESOURCES)
 
 
 register_module_resources()
@@ -46,6 +47,7 @@ class SirenNinja:
         if cls._api is None:
             from modwire.core.siren_controller import SirenRootController
             from modwire.languages.adapters.siren.controller import LanguagesSirenController
+            from modwire.records.adapters.siren.controller import RecordsSirenController
 
             configuration = dict(settings.MODWIRE["NINJA"])
             configuration.update(
@@ -56,7 +58,7 @@ class SirenNinja:
                 docs_url=None,
             )
             cls._api = NinjaExtraAPI(**configuration)
-            cls._api.register_controllers(SirenRootController, LanguagesSirenController)
+            cls._api.register_controllers(SirenRootController, LanguagesSirenController, RecordsSirenController)
         return cls._api
 
 
