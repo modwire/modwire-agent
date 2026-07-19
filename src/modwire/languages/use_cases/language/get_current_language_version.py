@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ...ports.version_reader import VersionReader
+from ...ports.language.version_reader import VersionReader
 from .get_language import GetLanguage
 
 

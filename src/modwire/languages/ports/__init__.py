@@ -1,3 +1,3 @@
-from .version_reader import VersionReader
+from .language import VersionReader
 
 __all__ = ["VersionReader"]

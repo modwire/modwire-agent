@@ -2,7 +2,7 @@ import json
 from urllib.request import Request, urlopen
 
 from ...domain.contracts import Language
-from ...ports.version_reader import VersionReader
+from ...ports.language.version_reader import VersionReader
 
 
 class HttpVersionReader(VersionReader):
