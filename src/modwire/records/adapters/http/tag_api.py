@@ -1,13 +1,11 @@
 from typing import Any
 
 from modwire_hex.django import DjangoRequest
-from ninja.errors import HttpError
 from ninja_extra import ControllerBase, api_controller, route
 
+from ...domain.collaboration.policy import ActorPolicy
 from ...use_cases.tag.create_tag import CreateTag
 from ...use_cases.tag.list_tags import ListTags
-from ...domain.collaboration.invalid import InvalidActor
-from ...domain.collaboration.policy import ActorPolicy
 from .actor_headers import ActorHeaders
 from .schemas.tag_input import TagInput
 from .schemas.tag_output import TagOutput
@@ -22,9 +20,6 @@ class TagsController(ControllerBase):
 
     @route.post("", response={201: TagOutput}, operation_id="create_tag")
     def create(self, request: Any, payload: TagInput) -> tuple[int, TagOutput]:
-        try:
-            actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
-            tag = DjangoRequest.resolve(request, CreateTag).execute(payload.name, actor)
-        except InvalidActor as error:
-            raise HttpError(422, str(error)) from error
+        actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
+        tag = DjangoRequest.resolve(request, CreateTag).execute(payload.name, actor)
         return 201, TagOutput(id=str(tag.identifier), name=tag.name)

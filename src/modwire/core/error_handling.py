@@ -19,6 +19,7 @@ def configure_exception_handlers(api: Any) -> None:
     api.add_exception_handler(DomainError, domain_error_response)
     api.add_exception_handler(NinjaValidationError, validation_error_response)
     api.add_exception_handler(DjangoValidationError, validation_error_response)
+    api.add_exception_handler(ValueError, validation_error_response)
     api.add_exception_handler(Http404, not_found_response)
     api.add_exception_handler(LookupError, not_found_response)
     api.add_exception_handler(HttpError, http_error_response)
