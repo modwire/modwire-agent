@@ -429,7 +429,6 @@ dependencies = [
     { name = "modwire-cli" },
     { name = "modwire-hex" },
     { name = "modwire-mermaid" },
-    { name = "modwire-siren" },
     { name = "pgvector" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
@@ -464,7 +463,6 @@ requires-dist = [
     { name = "modwire-cli", specifier = ">=1.1.0" },
     { name = "modwire-hex" },
     { name = "modwire-mermaid", specifier = ">=1.0.1,<2" },
-    { name = "modwire-siren", specifier = ">=1.5.0" },
     { name = "pgvector" },
     { name = "psycopg", extras = ["binary"] },
     { name = "pydantic" },
@@ -553,19 +551,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/cd/9a/499218753365c0159eaadf41337c7c9e8dfa226a03b0050b5fa511f54080/modwire_mermaid-1.0.1.tar.gz", hash = "sha256:40536d85414150a73f5cf935ad2ba10eeed074c1826e708e8aadb16eeaec4cfb", size = 31766, upload-time = "2026-07-11T16:31:52.43Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/06/89/aa42b1c20c3c22899d7ab08b817a7958dc13f759cf473a2728c988e9b6ac/modwire_mermaid-1.0.1-py3-none-any.whl", hash = "sha256:cf76bb9b3fb363d0b39af287b1a04baa53545fea1217dcf5da6fb274c3d288ab", size = 42798, upload-time = "2026-07-11T16:31:51.171Z" },
-]
-
-[[package]]
-name = "modwire-siren"
-version = "1.5.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "jsonschema" },
-    { name = "pydantic" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/37/d3/b55cc0a59f583b8f851910a655683aed4d3ef803980c6a957fb080da7e30/modwire_siren-1.5.0.tar.gz", hash = "sha256:5b29695d24dde810f5688f28a7eff2f4582ab395ad5ffda01f33b09df3e13b7d", size = 67062, upload-time = "2026-07-18T16:27:35.426Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/88/c35de01f7394f2a4f2a387e44c6fa71f03f49a540ee91f3b2506a03c92c0/modwire_siren-1.5.0-py3-none-any.whl", hash = "sha256:1013c6105554717a22743b6bc6551f67cb61630cdbc7a7dd9f95a38a77be5797", size = 67610, upload-time = "2026-07-18T16:27:34.243Z" },
 ]
 
 [[package]]

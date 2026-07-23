@@ -3,8 +3,6 @@ from django.urls import path
 from health_check.views import HealthCheckView
 from modwire_hex.django import DjangoNinja
 
-from .siren import SirenNinja
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
@@ -12,5 +10,4 @@ urlpatterns = [
         HealthCheckView.as_view(checks=("health_check.checks.Database",)),
     ),
     path("api/", DjangoNinja.api().urls),
-    path("siren/", SirenNinja.api().urls),
 ]
