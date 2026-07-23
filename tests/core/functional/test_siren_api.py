@@ -92,15 +92,53 @@ class SirenApiTests(TestCase):
                 "start_plan_run",
             },
         )
-        self.assertEqual(
-            actions["list_published_records"],
-            {
-                "name": "list_published_records",
-                "href": "http://testserver/siren/records",
-                "method": "GET",
-                "fields": [{"name": "tag", "type": "array", "required": True}],
-            },
-        )
+        expected_actions = {
+            "create_api_key": ("POST", "application/json", [("name", "string", True)]),
+            "converge_scaffolding": (
+                "POST",
+                "application/json",
+                [
+                    ("language_id", "string", True),
+                    ("name", "string", True),
+                    ("description", "string", True),
+                    ("variables", "array", True),
+                    ("templates", "array", True),
+                    ("dry_run", "boolean", False),
+                ],
+            ),
+            "create_section": (
+                "POST",
+                "application/json",
+                [("title", "string", True), ("allowed_kinds", "array", True)],
+            ),
+            "create_tag": ("POST", "application/json", [("name", "string", True)]),
+            "list_published_records": ("GET", None, [("tag", "array", True)]),
+            "publish_plan_definition": (
+                "POST",
+                "application/json",
+                [
+                    ("name", "string", True),
+                    ("start_stage_id", "string", True),
+                    ("stages", "array", True),
+                    ("transitions", "array", True),
+                    ("gates", "array", True),
+                    ("operations", "array", True),
+                    ("artifacts", "array", False),
+                ],
+            ),
+            "start_plan_run": (
+                "POST",
+                "application/json",
+                [("definition_id", "string", True), ("initial_input", "object", True)],
+            ),
+        }
+        for name, (method, media_type, fields) in expected_actions.items():
+            self.assertEqual(actions[name]["method"], method)
+            self.assertEqual(actions[name].get("type"), media_type)
+            self.assertEqual(
+                [(field["name"], field["type"], field["required"]) for field in actions[name]["fields"]],
+                fields,
+            )
 
         for link in response.json()["links"]:
             linked_response = self.client.get(urlparse(link["href"]).path)
