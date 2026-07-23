@@ -3,16 +3,18 @@ from ..api import PlanApiTestCase
 
 class TerminalPlanScenarios(PlanApiTestCase):
     def test_completes_a_single_terminal_stage(self) -> None:
-        definition = self.definition({
-            "stages": [
-                {
-                    "id": "frame",
-                    "input_schema": {"type": "object", "required": ["goal"]},
-                    "submission_schema": {"type": "object", "required": ["outcome"]},
-                }
-            ],
-            "transitions": [],
-        })
+        definition = self.definition(
+            {
+                "stages": [
+                    {
+                        "id": "frame",
+                        "input_schema": {"type": "object", "required": ["goal"]},
+                        "submission_schema": {"type": "object", "required": ["outcome"]},
+                    }
+                ],
+                "transitions": [],
+            }
+        )
 
         published = self.publish(definition)
         run = self.start(published.json()["id"], {"goal": "replace scaffoldings"})

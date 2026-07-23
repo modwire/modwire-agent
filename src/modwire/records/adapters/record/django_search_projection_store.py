@@ -11,4 +11,11 @@ class DjangoSearchProjectionStore(SearchProjectionStore):
             return
         model = RecordModel.objects.prefetch_related("tags").get(identifier=record.identifier)
         text = " ".join((model.title, revision.markdown, *[tag.name for tag in model.tags.all()]))
-        ContentSearchProjectionModel.objects.update_or_create(record_id=record.identifier, defaults={"revision_id": revision.identifier, "embedding": DeterministicEmbeddings().embed(text), "indexed_version": revision.schema_version})
+        ContentSearchProjectionModel.objects.update_or_create(
+            record_id=record.identifier,
+            defaults={
+                "revision_id": revision.identifier,
+                "embedding": DeterministicEmbeddings().embed(text),
+                "indexed_version": revision.schema_version,
+            },
+        )

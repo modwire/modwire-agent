@@ -20,5 +20,10 @@ class PreviewError:
 PreviewFailed = type(
     "PreviewFailed",
     (DomainError,),
-    {"__init__": lambda self, errors: (setattr(self, "errors", errors), DomainError.__init__(self, "Scaffolding preview failed."))[1]},
+    {
+        "__init__": lambda self, errors: (
+            setattr(self, "errors", errors),
+            DomainError.__init__(self, "Scaffolding preview failed."),
+        )[1]
+    },
 )

@@ -10,4 +10,10 @@ class DjangoRecordDetailsReader(RecordDetailsReader):
             record = RecordModel.objects.prefetch_related("tags").get(identifier=record_id)
         except RecordModel.DoesNotExist as error:
             raise LookupError(f"Record {record_id!r} was not found.") from error
-        return RecordDetails(identifier=record.identifier, title=record.title, kind=record.kind, status=record.status, tag_names=tuple(tag.name for tag in record.tags.all()))
+        return RecordDetails(
+            identifier=record.identifier,
+            title=record.title,
+            kind=record.kind,
+            status=record.status,
+            tag_names=tuple(tag.name for tag in record.tags.all()),
+        )

@@ -1,4 +1,3 @@
-
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
@@ -128,5 +127,3 @@ class Typescript(Language):
         url="https://registry.npmjs.org/typescript/latest",
         result_path=("version",),
     )
-
-

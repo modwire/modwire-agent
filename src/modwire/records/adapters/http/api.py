@@ -26,22 +26,36 @@ class SectionsController(ControllerBase):
     @route.get("", response={200: list[SectionOutput]}, operation_id="list_sections")
     def list_sections(self, request: Any) -> tuple[int, list[SectionOutput]]:
         sections = DjangoRequest.resolve(request, ListSections).execute()
-        return 200, [SectionOutput(id=str(section.identifier), title=section.title, allowed_kinds=list(section.allowed_kinds)) for section in sections]
+        return 200, [
+            SectionOutput(id=str(section.identifier), title=section.title, allowed_kinds=list(section.allowed_kinds))
+            for section in sections
+        ]
 
     @route.get("/{section_id}", response={200: SectionDetailsOutput}, operation_id="get_section_details")
     def get_details(self, request: Any, section_id: UUID) -> tuple[int, SectionDetailsOutput]:
         section = DjangoRequest.resolve(request, GetSectionDetails).execute(section_id)
-        records = [SectionRecordOutput(id=str(record.identifier), title=record.title, kind=record.kind, status=record.status) for record in section.records]
-        return 200, SectionDetailsOutput(id=str(section.identifier), title=section.title, allowed_kinds=list(section.allowed_kinds), records=records)
+        records = [
+            SectionRecordOutput(id=str(record.identifier), title=record.title, kind=record.kind, status=record.status)
+            for record in section.records
+        ]
+        return 200, SectionDetailsOutput(
+            id=str(section.identifier), title=section.title, allowed_kinds=list(section.allowed_kinds), records=records
+        )
 
     @route.post("", response={201: SectionOutput}, operation_id="create_section")
     def create(self, request: Any, payload: SectionInput) -> tuple[int, SectionOutput]:
         actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
         section = DjangoRequest.resolve(request, CreateSection).execute(payload.title, payload.allowed_kinds, actor)
-        return 201, SectionOutput(id=str(section.identifier), title=section.title, allowed_kinds=[str(kind) for kind in section.allowed_kinds])
+        return 201, SectionOutput(
+            id=str(section.identifier), title=section.title, allowed_kinds=[str(kind) for kind in section.allowed_kinds]
+        )
 
-    @route.put("/{section_id}/placements", response={200: SectionPlacementsOutput}, operation_id="replace_section_placements")
-    def replace_placements(self, request: Any, section_id: UUID, payload: SectionPlacementsInput) -> tuple[int, SectionPlacementsOutput]:
+    @route.put(
+        "/{section_id}/placements", response={200: SectionPlacementsOutput}, operation_id="replace_section_placements"
+    )
+    def replace_placements(
+        self, request: Any, section_id: UUID, payload: SectionPlacementsInput
+    ) -> tuple[int, SectionPlacementsOutput]:
         actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
         section = DjangoRequest.resolve(request, ReorderSection).execute(section_id, payload.record_ids, actor)
         return 200, SectionPlacementsOutput(record_ids=[str(placement.record_id) for placement in section.placements])
@@ -50,4 +64,6 @@ class SectionsController(ControllerBase):
     def create_record(self, request: Any, section_id: UUID, payload: RecordInput) -> tuple[int, RecordOutput]:
         actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
         record = DjangoRequest.resolve(request, CreateRecord).execute(section_id, payload.title, payload.kind, actor)
-        return 201, RecordOutput(id=str(record.identifier), title=record.title, kind=str(record.kind), status=str(record.status))
+        return 201, RecordOutput(
+            id=str(record.identifier), title=record.title, kind=str(record.kind), status=str(record.status)
+        )

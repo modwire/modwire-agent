@@ -24,7 +24,9 @@ class JsonSchemaValidator(SchemaValidator):
         if output_schema == input_schema:
             return
         if output_schema.get("type") != "object" or input_schema.get("type") != "object":
-            raise InvalidPlanDefinition("Adjacent stage contracts must use identical schemas or compatible object schemas.")
+            raise InvalidPlanDefinition(
+                "Adjacent stage contracts must use identical schemas or compatible object schemas."
+            )
         output_properties = output_schema.get("properties", {})
         input_properties = input_schema.get("properties", {})
         output_required = set(output_schema.get("required", []))
@@ -33,11 +35,19 @@ class JsonSchemaValidator(SchemaValidator):
             raise InvalidPlanDefinition("A stage result does not guarantee every required input of its successor.")
         if any(name not in output_properties for name in input_required):
             raise InvalidPlanDefinition("A stage result must declare every required successor input.")
-        if any(not self._is_subschema(output_properties[name], input_properties.get(name, {})) for name in input_required):
+        if any(
+            not self._is_subschema(output_properties[name], input_properties.get(name, {})) for name in input_required
+        ):
             raise InvalidPlanDefinition("A stage result property is incompatible with its successor input.")
-        if any(not self._is_subschema(schema, input_properties[name]) for name, schema in output_properties.items() if name in input_properties):
+        if any(
+            not self._is_subschema(schema, input_properties[name])
+            for name, schema in output_properties.items()
+            if name in input_properties
+        ):
             raise InvalidPlanDefinition("A stage result property is incompatible with its successor input.")
-        if input_schema.get("additionalProperties") is False and not self._has_compatible_properties(output_schema, input_schema):
+        if input_schema.get("additionalProperties") is False and not self._has_compatible_properties(
+            output_schema, input_schema
+        ):
             raise InvalidPlanDefinition("A stage result may contain properties forbidden by its successor.")
 
     def _is_subschema(self, output_schema: dict[str, Any], input_schema: dict[str, Any]) -> bool:

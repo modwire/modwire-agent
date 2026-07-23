@@ -9,13 +9,29 @@ class PlanApiTestCase(TestCase):
             "stages": [
                 {
                     "id": "frame",
-                    "input_schema": {"type": "object", "required": ["goal"], "properties": {"goal": {"type": "string"}}},
-                    "submission_schema": {"type": "object", "required": ["decision"], "properties": {"decision": {"type": "string"}}},
+                    "input_schema": {
+                        "type": "object",
+                        "required": ["goal"],
+                        "properties": {"goal": {"type": "string"}},
+                    },
+                    "submission_schema": {
+                        "type": "object",
+                        "required": ["decision"],
+                        "properties": {"decision": {"type": "string"}},
+                    },
                 },
                 {
                     "id": "decide",
-                    "input_schema": {"type": "object", "required": ["decision"], "properties": {"decision": {"type": "string"}}},
-                    "submission_schema": {"type": "object", "required": ["outcome"], "properties": {"outcome": {"type": "string"}}},
+                    "input_schema": {
+                        "type": "object",
+                        "required": ["decision"],
+                        "properties": {"decision": {"type": "string"}},
+                    },
+                    "submission_schema": {
+                        "type": "object",
+                        "required": ["outcome"],
+                        "properties": {"outcome": {"type": "string"}},
+                    },
                 },
             ],
             "transitions": [{"source_stage_id": "frame", "target_stage_id": "decide"}],
@@ -36,7 +52,9 @@ class PlanApiTestCase(TestCase):
         )
 
     def submit(self, run_id: str, payload: dict[str, object]):
-        return self.client.post(f"/api/plans/runs/{run_id}/submissions", data={"payload": payload}, content_type="application/json")
+        return self.client.post(
+            f"/api/plans/runs/{run_id}/submissions", data={"payload": payload}, content_type="application/json"
+        )
 
     def satisfy(self, run_id: str, gate_id: str, evidence: dict[str, object]):
         return self.client.post(

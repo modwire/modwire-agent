@@ -35,9 +35,12 @@ class ErrorBoundaryScenarios(TestCase):
         self.assertEqual(response.json(), {"detail": GENERIC_ERROR_MESSAGE})
 
     def test_masks_and_logs_unexpected_errors_without_request_data(self) -> None:
-        with self.assertLogs("modwire.core.error_handling", level="ERROR") as logs, patch(
-            "modwire.records.adapters.http.tag_api.CreateTag.execute",
-            side_effect=RuntimeError("unexpected failure"),
+        with (
+            self.assertLogs("modwire.core.error_handling", level="ERROR") as logs,
+            patch(
+                "modwire.records.adapters.http.tag_api.CreateTag.execute",
+                side_effect=RuntimeError("unexpected failure"),
+            ),
         ):
             response = self.client.post(
                 "/api/tags",

@@ -13,4 +13,11 @@ class SectionDetailsScenarios(RecordsApiTestCase):
         response = self.get_section(section["id"])
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), IsPartialDict(id=IsUUID, title="Architecture", records=[IsPartialDict(id=second["id"], title="Second"), IsPartialDict(id=first["id"], title="First")]))
+        self.assertEqual(
+            response.json(),
+            IsPartialDict(
+                id=IsUUID,
+                title="Architecture",
+                records=[IsPartialDict(id=second["id"], title="Second"), IsPartialDict(id=first["id"], title="First")],
+            ),
+        )

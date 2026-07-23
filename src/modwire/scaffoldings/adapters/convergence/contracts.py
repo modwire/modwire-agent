@@ -1,22 +1,15 @@
-from dataclasses import dataclass
-from typing import Literal, TypedDict
+from .change_set import ChangeSet
+from .convergence_plan import ConvergencePlan
+from .convergence_result import ConvergenceResult
+from .desired_scaffolding import DesiredScaffolding
+from .template_spec import TemplateSpec
+from .variable_spec import VariableSpec
 
-from pydantic import JsonValue
-
-from ..django.models.scaffolding import Scaffolding
-from ..django.models.template import Template
-from ..django.models.variable import Variable
-
-
-VariableSpec = TypedDict("VariableSpec", {"name": str, "type": str, "description": str, "default_value": JsonValue, "required": bool})
-TemplateSpec = TypedDict("TemplateSpec", {"relative_path": str, "file_content": str, "write_mode": str})
-ChangeSet = TypedDict("ChangeSet", {"create": list[str], "update": list[str], "delete": list[str]})
-ConvergencePlan = TypedDict("ConvergencePlan", {"scaffolding": Literal["create", "update", "unchanged"], "variables": ChangeSet, "templates": ChangeSet})
-ConvergenceResult = TypedDict("ConvergenceResult", {"id": str | None, "name": str, "dry_run": bool, "changed": bool, "plan": ConvergencePlan})
-
-
-@dataclass(frozen=True)
-class DesiredScaffolding:
-    scaffolding: Scaffolding
-    variables: tuple[Variable, ...]
-    templates: tuple[Template, ...]
+__all__ = [
+    "ChangeSet",
+    "ConvergencePlan",
+    "ConvergenceResult",
+    "DesiredScaffolding",
+    "TemplateSpec",
+    "VariableSpec",
+]

@@ -1,6 +1,6 @@
 from modwire_hex.django import DjangoNinja
 
-from .error_handling import configure_exception_handlers
+from .error_handling import ExceptionHandlers
 
 api = DjangoNinja.api()
-configure_exception_handlers(api)
+ExceptionHandlers.configure(api)

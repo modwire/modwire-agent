@@ -6,7 +6,9 @@ class ContentHistoryScenarios(RecordsApiTestCase):
         section = self.create_section("Architecture", ["rule"])
         record = self.create_record(section["id"], "API tests", "rule")
         first = self.replace_content(record["id"], self.valid_rule_markdown())
-        second = self.replace_content(record["id"], "## Rules\n\nUse REST.\n\n## Verification\n\nExercise the public API.")
+        second = self.replace_content(
+            record["id"], "## Rules\n\nUse REST.\n\n## Verification\n\nExercise the public API."
+        )
 
         revisions = self.list_content_revisions(record["id"])
 

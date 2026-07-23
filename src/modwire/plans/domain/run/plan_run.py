@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
@@ -16,7 +18,23 @@ class PlanRun:
     revision: int
 
     def advance(self, stage_id: str, stage_input: dict[str, Any]) -> PlanRun:
-        return PlanRun(self.identifier, self.definition_id, self.definition_version, stage_id, stage_input, PlanRunStatus.ACTIVE, self.revision + 1)
+        return PlanRun(
+            self.identifier,
+            self.definition_id,
+            self.definition_version,
+            stage_id,
+            stage_input,
+            PlanRunStatus.ACTIVE,
+            self.revision + 1,
+        )
 
     def complete(self) -> PlanRun:
-        return PlanRun(self.identifier, self.definition_id, self.definition_version, self.current_stage_id, self.current_input, PlanRunStatus.COMPLETE, self.revision + 1)
+        return PlanRun(
+            self.identifier,
+            self.definition_id,
+            self.definition_version,
+            self.current_stage_id,
+            self.current_input,
+            PlanRunStatus.COMPLETE,
+            self.revision + 1,
+        )

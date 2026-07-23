@@ -43,31 +43,72 @@ class RecordsController(ControllerBase):
         record = DjangoRequest.resolve(request, RenameRecord).execute(record_id, payload.title, actor)
         return 200, RecordOutput(id=str(record.identifier), title=record.title, kind=record.kind, status=record.status)
 
-    @route.get("/{record_id}/content-proposals", response={200: list[ContentProposalDetailsOutput]}, operation_id="list_record_content_proposals")
+    @route.get(
+        "/{record_id}/content-proposals",
+        response={200: list[ContentProposalDetailsOutput]},
+        operation_id="list_record_content_proposals",
+    )
     def list_content_proposals(self, request: Any, record_id: UUID) -> tuple[int, list[ContentProposalDetailsOutput]]:
         proposals = DjangoRequest.resolve(request, ListContentProposals).execute(record_id)
-        return 200, [ContentProposalDetailsOutput(id=str(proposal.identifier), markdown=proposal.markdown, proposed_by_id=proposal.proposed_by.identifier, proposed_by_type=proposal.proposed_by.kind, status=proposal.status) for proposal in proposals]
+        return 200, [
+            ContentProposalDetailsOutput(
+                id=str(proposal.identifier),
+                markdown=proposal.markdown,
+                proposed_by_id=proposal.proposed_by.identifier,
+                proposed_by_type=proposal.proposed_by.kind,
+                status=proposal.status,
+            )
+            for proposal in proposals
+        ]
 
     @route.get("/{record_id}", response={200: RecordDetailsOutput}, operation_id="get_record_details")
     def get_details(self, request: Any, record_id: UUID) -> tuple[int, RecordDetailsOutput]:
         record = DjangoRequest.resolve(request, GetRecordDetails).execute(record_id)
-        return 200, RecordDetailsOutput(id=str(record.identifier), title=record.title, kind=record.kind, status=record.status, tags=list(record.tag_names))
+        return 200, RecordDetailsOutput(
+            id=str(record.identifier),
+            title=record.title,
+            kind=record.kind,
+            status=record.status,
+            tags=list(record.tag_names),
+        )
 
-    @route.post("/{record_id}/content-proposals", response={201: ContentProposalOutput}, operation_id="propose_record_content")
-    def propose_content(self, request: Any, record_id: UUID, payload: ContentInput) -> tuple[int, ContentProposalOutput]:
+    @route.post(
+        "/{record_id}/content-proposals", response={201: ContentProposalOutput}, operation_id="propose_record_content"
+    )
+    def propose_content(
+        self, request: Any, record_id: UUID, payload: ContentInput
+    ) -> tuple[int, ContentProposalOutput]:
         actor = ActorHeaders.extract(request, DjangoRequest.resolve(request, ActorPolicy))
         proposal = DjangoRequest.resolve(request, ProposeContent).execute(record_id, payload.markdown, actor)
         return 201, ContentProposalOutput(id=str(proposal.identifier), status=proposal.status)
 
     @route.get("", response={200: list[RoutedRecordOutput]}, operation_id="list_published_records")
-    def list_published(self, request: Any, tag: Annotated[list[str], Query(...)]) -> tuple[int, list[RoutedRecordOutput]]:
+    def list_published(
+        self, request: Any, tag: Annotated[list[str], Query(...)]
+    ) -> tuple[int, list[RoutedRecordOutput]]:
         records = DjangoRequest.resolve(request, BuildKnowledgeRoute).execute(tag)
-        return 200, [RoutedRecordOutput(id=str(record.identifier), title=record.title, reason=f"tag: {record.matched_tag}") for record in records]
+        return 200, [
+            RoutedRecordOutput(id=str(record.identifier), title=record.title, reason=f"tag: {record.matched_tag}")
+            for record in records
+        ]
 
-    @route.get("/{record_id}/content-revisions", response={200: list[ContentRevisionOutput]}, operation_id="list_record_content_revisions")
+    @route.get(
+        "/{record_id}/content-revisions",
+        response={200: list[ContentRevisionOutput]},
+        operation_id="list_record_content_revisions",
+    )
     def list_content_revisions(self, request: Any, record_id: UUID) -> tuple[int, list[ContentRevisionOutput]]:
         revisions = DjangoRequest.resolve(request, ListContentRevisions).execute(record_id)
-        return 200, [ContentRevisionOutput(id=str(revision.identifier), actor_id=revision.actor.identifier, actor_type=revision.actor.kind, markdown=revision.markdown, schema_version=revision.schema_version) for revision in revisions]
+        return 200, [
+            ContentRevisionOutput(
+                id=str(revision.identifier),
+                actor_id=revision.actor.identifier,
+                actor_type=revision.actor.kind,
+                markdown=revision.markdown,
+                schema_version=revision.schema_version,
+            )
+            for revision in revisions
+        ]
 
     @route.put("/{record_id}/tags", response={204: None}, operation_id="assign_record_tags")
     def assign_tags(self, request: Any, record_id: UUID, payload: TagAssignmentInput) -> tuple[int, None]:

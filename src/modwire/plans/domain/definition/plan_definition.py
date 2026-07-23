@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from .invalid_plan_definition import InvalidPlanDefinition
 from ..artifact.artifact_definition import ArtifactDefinition
 from ..gate.gate_definition import GateDefinition
 from ..operation.operation_definition import OperationDefinition
+from .invalid_plan_definition import InvalidPlanDefinition
 from .stage_definition import StageDefinition
 from .transition_definition import TransitionDefinition
 
@@ -37,7 +37,9 @@ class PlanDefinition:
         raise InvalidPlanDefinition(f"Unknown stage: {stage_id!r}.")
 
     def next_stage_id(self, stage_id: str) -> str:
-        matches = [transition.target_stage_id for transition in self.transitions if transition.source_stage_id == stage_id]
+        matches = [
+            transition.target_stage_id for transition in self.transitions if transition.source_stage_id == stage_id
+        ]
         if len(matches) > 1:
             raise InvalidPlanDefinition(f"Stage {stage_id!r} has multiple transitions.")
         return matches[0] if matches else ""
@@ -85,7 +87,9 @@ class PlanDefinition:
     def _require_all_stages_reachable(self) -> None:
         reachable = {self.start_stage_id}
         while True:
-            targets = {transition.target_stage_id for transition in self.transitions if transition.source_stage_id in reachable}
+            targets = {
+                transition.target_stage_id for transition in self.transitions if transition.source_stage_id in reachable
+            }
             expanded = reachable | targets
             if expanded == reachable:
                 break

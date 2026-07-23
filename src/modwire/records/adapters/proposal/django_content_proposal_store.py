@@ -12,7 +12,10 @@ from ..django.models import ContentProposalModel
 
 class DjangoContentProposalStore(DjangoRepository[ContentProposal, ContentProposalModel, UUID], ContentProposalStore):
     def for_record(self, record_id: UUID) -> list[ContentProposal]:
-        return [self.to_domain(model) for model in ContentProposalModel.objects.filter(record_id=record_id).order_by("identifier")]
+        return [
+            self.to_domain(model)
+            for model in ContentProposalModel.objects.filter(record_id=record_id).order_by("identifier")
+        ]
 
     def key_of(self, domain: ContentProposal) -> UUID:
         return domain.identifier
@@ -24,7 +27,14 @@ class DjangoContentProposalStore(DjangoRepository[ContentProposal, ContentPropos
             return None
 
     def create_record(self, domain: ContentProposal) -> ContentProposalModel:
-        return ContentProposalModel(identifier=domain.identifier, record_id=domain.record_id, proposed_by_id=domain.proposed_by.identifier, proposed_by_kind=domain.proposed_by.kind, markdown=domain.markdown, status=domain.status)
+        return ContentProposalModel(
+            identifier=domain.identifier,
+            record_id=domain.record_id,
+            proposed_by_id=domain.proposed_by.identifier,
+            proposed_by_kind=domain.proposed_by.kind,
+            markdown=domain.markdown,
+            status=domain.status,
+        )
 
     def update_record(self, model: ContentProposalModel, domain: ContentProposal) -> None:
         model.status = domain.status
@@ -36,4 +46,10 @@ class DjangoContentProposalStore(DjangoRepository[ContentProposal, ContentPropos
         return proposal
 
     def to_domain(self, model: ContentProposalModel) -> ContentProposal:
-        return ContentProposal(identifier=model.identifier, record_id=model.record_id, proposed_by=Actor(identifier=model.proposed_by_id, kind=ActorKind(model.proposed_by_kind)), markdown=model.markdown, status=ProposalStatus(model.status))
+        return ContentProposal(
+            identifier=model.identifier,
+            record_id=model.record_id,
+            proposed_by=Actor(identifier=model.proposed_by_id, kind=ActorKind(model.proposed_by_kind)),
+            markdown=model.markdown,
+            status=ProposalStatus(model.status),
+        )
