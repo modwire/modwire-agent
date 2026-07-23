@@ -30,6 +30,7 @@ class ScaffoldingController(ControllerBase):
         request,
         data: ScaffoldingConvergenceIn,
     ):
+        """Validate and reconcile a complete scaffolding definition."""
         service = DjangoRequest.resolve(request, ConvergeScaffolding)
         return service.execute(data.model_dump())
 
@@ -45,6 +46,7 @@ class ScaffoldingController(ControllerBase):
         request,
         scaffolding_id: str,
     ):
+        """Return the variable form schema for one scaffolding."""
         activity = DjangoRequest.resolve(request, GetScaffoldingSchema)
         return activity.execute(scaffolding_id)
 
@@ -55,6 +57,7 @@ class ScaffoldingController(ControllerBase):
         summary="Get a generic scaffolding bundle for a local generator.",
     )
     def bundle(self, request, scaffolding_id: str):
+        """Return the generator bundle for one scaffolding."""
         activity = DjangoRequest.resolve(request, GetScaffoldingBundle)
         return activity.execute(scaffolding_id)
 
@@ -70,6 +73,7 @@ class ScaffoldingController(ControllerBase):
         scaffolding_id: str,
         data: ScaffoldingPreviewIn,
     ):
+        """Render a validated preview for one scaffolding."""
         activity = DjangoRequest.resolve(request, PreviewScaffolding)
         return activity.execute(
             scaffolding_id,

@@ -23,7 +23,11 @@ class LocalApp:
             services_dir = apps_root / app.label / "services"
             if services_dir.is_dir():
                 modules.append(f"{app.package}.services")
-                modules.extend(f"{app.package}.services.{path.stem}" for path in sorted(services_dir.glob("*.py")) if path.name != "__init__.py")
+                modules.extend(
+                    f"{app.package}.services.{path.stem}"
+                    for path in sorted(services_dir.glob("*.py"))
+                    if path.name != "__init__.py"
+                )
         return modules
 
 

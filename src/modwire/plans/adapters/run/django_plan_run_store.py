@@ -19,7 +19,15 @@ class DjangoPlanRunStore(DjangoRepository[PlanRun, PlanRunModel, UUID], PlanRunS
             return None
 
     def create_record(self, domain: PlanRun) -> PlanRunModel:
-        return PlanRunModel(identifier=domain.identifier, definition_id=domain.definition_id, definition_version=domain.definition_version, current_stage_id=domain.current_stage_id, current_input=domain.current_input, status=domain.status, revision=domain.revision)
+        return PlanRunModel(
+            identifier=domain.identifier,
+            definition_id=domain.definition_id,
+            definition_version=domain.definition_version,
+            current_stage_id=domain.current_stage_id,
+            current_input=domain.current_input,
+            status=domain.status,
+            revision=domain.revision,
+        )
 
     def update_record(self, model: PlanRunModel, domain: PlanRun) -> None:
         model.definition_version = domain.definition_version
@@ -29,7 +37,15 @@ class DjangoPlanRunStore(DjangoRepository[PlanRun, PlanRunModel, UUID], PlanRunS
         model.revision = domain.revision
 
     def to_domain(self, model: PlanRunModel) -> PlanRun:
-        return PlanRun(model.identifier, model.definition_id, model.definition_version, model.current_stage_id, model.current_input, PlanRunStatus(model.status), model.revision)
+        return PlanRun(
+            model.identifier,
+            model.definition_id,
+            model.definition_version,
+            model.current_stage_id,
+            model.current_input,
+            PlanRunStatus(model.status),
+            model.revision,
+        )
 
     def get(self, run_id: UUID) -> PlanRun:
         run = self.load(run_id)

@@ -19,7 +19,8 @@ class ScaffoldingPreviewApiTests(TestCase):
                         "required": True,
                     }
                 ],
-                "templates": templates or [
+                "templates": templates
+                or [
                     {
                         "relative_path": "{{ package_name }}/main.py",
                         "file_content": "print('{{ package_name }}')\n",

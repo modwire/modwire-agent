@@ -16,4 +16,13 @@ class Variable(models.Model):
     default_value = models.JSONField(default=list, blank=True)
     required = models.BooleanField(default=False)
 
-    Meta = builtins.type("Meta", (), {"ordering": ("name",), "constraints": [models.UniqueConstraint(fields=("scaffolding", "name"), name="unique_variable_name_per_scaffolding")]})
+    Meta = builtins.type(
+        "Meta",
+        (),
+        {
+            "ordering": ("name",),
+            "constraints": [
+                models.UniqueConstraint(fields=("scaffolding", "name"), name="unique_variable_name_per_scaffolding")
+            ],
+        },
+    )

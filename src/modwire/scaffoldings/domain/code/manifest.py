@@ -73,8 +73,6 @@ class CopierManifest(BaseModel):
 
         origin = get_origin(annotation)
 
-        # Copier calls both collection question types "yaml". Keep that
-        # implementation detail inside this adapter.
         if origin is list or origin is dict:
             return "yaml"
 

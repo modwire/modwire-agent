@@ -3,8 +3,8 @@ from uuid import UUID
 
 from django.db.models import Max
 
-from ...domain.definition.plan_definition import PlanDefinition
 from ...domain.artifact.artifact_definition import ArtifactDefinition
+from ...domain.definition.plan_definition import PlanDefinition
 from ...domain.definition.stage_definition import StageDefinition
 from ...domain.definition.transition_definition import TransitionDefinition
 from ...domain.gate.gate_definition import GateDefinition
@@ -33,18 +33,51 @@ class DjangoPlanDefinitionStore(PlanDefinitionStore):
         )
 
     def to_domain(self, model: PlanDefinitionModel) -> PlanDefinition:
-        stages = tuple(StageDefinition(item["identifier"], item["input_schema"], item["submission_schema"]) for item in model.stages)
-        transitions = tuple(TransitionDefinition(item["source_stage_id"], item["target_stage_id"]) for item in model.transitions)
-        gates = tuple(GateDefinition(item["identifier"], item["stage_id"], item["evidence_schema"]) for item in model.gates)
-        operations = tuple(OperationDefinition(item["identifier"], item["stage_id"], item["extension_key"], item["extension_version"], item["configuration"], item["input_schema"], item["output_schema"], item["produced_artifact_id"], tuple(item["required_artifact_ids"])) for item in model.operations)
-        artifacts = tuple(ArtifactDefinition(item["identifier"], item["producer_operation_id"], item["schema"]) for item in model.artifacts)
-        return PlanDefinition(model.identifier, model.name, model.version, model.start_stage_id, stages, transitions, gates, operations, artifacts)
+        stages = tuple(
+            StageDefinition(item["identifier"], item["input_schema"], item["submission_schema"])
+            for item in model.stages
+        )
+        transitions = tuple(
+            TransitionDefinition(item["source_stage_id"], item["target_stage_id"]) for item in model.transitions
+        )
+        gates = tuple(
+            GateDefinition(item["identifier"], item["stage_id"], item["evidence_schema"]) for item in model.gates
+        )
+        operations = tuple(
+            OperationDefinition(
+                item["identifier"],
+                item["stage_id"],
+                item["extension_key"],
+                item["extension_version"],
+                item["configuration"],
+                item["input_schema"],
+                item["output_schema"],
+                item["produced_artifact_id"],
+                tuple(item["required_artifact_ids"]),
+            )
+            for item in model.operations
+        )
+        artifacts = tuple(
+            ArtifactDefinition(item["identifier"], item["producer_operation_id"], item["schema"])
+            for item in model.artifacts
+        )
+        return PlanDefinition(
+            model.identifier,
+            model.name,
+            model.version,
+            model.start_stage_id,
+            stages,
+            transitions,
+            gates,
+            operations,
+            artifacts,
+        )
 
     def get(self, definition_id: UUID) -> PlanDefinition:
         try:
             model = PlanDefinitionModel.objects.get(identifier=definition_id)
         except PlanDefinitionModel.DoesNotExist:
-            raise LookupError(f"Plan definition {definition_id!r} was not found.")
+            raise LookupError(f"Plan definition {definition_id!r} was not found.") from None
         return self.to_domain(model)
 
     def _stages(self, domain: PlanDefinition) -> list[dict]:

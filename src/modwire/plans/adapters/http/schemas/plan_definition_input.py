@@ -1,10 +1,9 @@
-from .strict import StrictSchema
-
-from .stage_definition_input import StageDefinitionInput
-from .transition_definition_input import TransitionDefinitionInput
+from .artifact_definition_input import ArtifactDefinitionInput
 from .gate_definition_input import GateDefinitionInput
 from .operation_definition_input import OperationDefinitionInput
-from .artifact_definition_input import ArtifactDefinitionInput
+from .stage_definition_input import StageDefinitionInput
+from .strict import StrictSchema
+from .transition_definition_input import TransitionDefinitionInput
 
 
 class PlanDefinitionInput(StrictSchema):

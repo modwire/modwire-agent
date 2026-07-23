@@ -11,6 +11,7 @@ from .schemas import ApiKeyCreatedOut, ApiKeyIn
 class ApiKeyController(ControllerBase):
     @route.post("", response={201: ApiKeyCreatedOut}, operation_id="create_api_key", summary="Generate an API key.")
     def create(self, request, data: ApiKeyIn):
+        """Generate and return a new API key secret exactly once."""
         service = DjangoRequest.resolve(request, IssueApiKey)
         key, secret = service.execute(data.name)
         return Status(

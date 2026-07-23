@@ -13,5 +13,6 @@ from .schemas.plan_run_output import PlanRunOutput
 class StartPlanRunController(ControllerBase):
     @route.post("", response={201: PlanRunOutput}, operation_id="start_plan_run")
     def start(self, request: Any, payload: PlanRunInput) -> tuple[int, PlanRunOutput]:
+        """Start a run for a published plan definition."""
         run = DjangoRequest.resolve(request, StartPlanRun).execute(UUID(payload.definition_id), payload.initial_input)
         return 201, PlanRunOutput(id=str(run.identifier), current_stage_id=run.current_stage_id, status=run.status)

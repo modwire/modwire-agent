@@ -3,12 +3,14 @@ from ..api import PlanApiTestCase
 
 class GateControlScenarios(PlanApiTestCase):
     def test_all_stage_gates_must_be_satisfied_before_advancing(self) -> None:
-        definition = self.definition({
-            "gates": [
-                {"id": "reviewed", "stage_id": "frame", "evidence_schema": {"type": "object", "required": ["by"]}},
-                {"id": "approved", "stage_id": "frame", "evidence_schema": {"type": "object", "required": ["by"]}},
-            ]
-        })
+        definition = self.definition(
+            {
+                "gates": [
+                    {"id": "reviewed", "stage_id": "frame", "evidence_schema": {"type": "object", "required": ["by"]}},
+                    {"id": "approved", "stage_id": "frame", "evidence_schema": {"type": "object", "required": ["by"]}},
+                ]
+            }
+        )
         published = self.publish(definition)
         run = self.start(published.json()["id"], {"goal": "replace scaffoldings"})
 

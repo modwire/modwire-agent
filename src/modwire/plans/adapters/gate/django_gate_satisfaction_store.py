@@ -10,7 +10,9 @@ from ..django.models import GateSatisfactionModel
 
 class DjangoGateSatisfactionStore(GateSatisfactionStore):
     def find(self, run_id: UUID, gate_id: str) -> GateSatisfaction | None:
-        model = GateSatisfactionModel.objects.filter(satisfaction_key=self._satisfaction_key_for(run_id, gate_id)).first()
+        model = GateSatisfactionModel.objects.filter(
+            satisfaction_key=self._satisfaction_key_for(run_id, gate_id)
+        ).first()
         if model is None:
             return None
         return GateSatisfaction(model.identifier, model.plan_run_id, model.gate_id, model.evidence)

@@ -8,11 +8,38 @@ from ..django.models.template import Template
 from ..django.models.variable import Variable
 
 
-VariableSpec = TypedDict("VariableSpec", {"name": str, "type": str, "description": str, "default_value": JsonValue, "required": bool})
-TemplateSpec = TypedDict("TemplateSpec", {"relative_path": str, "file_content": str, "write_mode": str})
-ChangeSet = TypedDict("ChangeSet", {"create": list[str], "update": list[str], "delete": list[str]})
-ConvergencePlan = TypedDict("ConvergencePlan", {"scaffolding": Literal["create", "update", "unchanged"], "variables": ChangeSet, "templates": ChangeSet})
-ConvergenceResult = TypedDict("ConvergenceResult", {"id": str | None, "name": str, "dry_run": bool, "changed": bool, "plan": ConvergencePlan})
+class VariableSpec(TypedDict):
+    name: str
+    type: str
+    description: str
+    default_value: JsonValue
+    required: bool
+
+
+class TemplateSpec(TypedDict):
+    relative_path: str
+    file_content: str
+    write_mode: str
+
+
+class ChangeSet(TypedDict):
+    create: list[str]
+    update: list[str]
+    delete: list[str]
+
+
+class ConvergencePlan(TypedDict):
+    scaffolding: Literal["create", "update", "unchanged"]
+    variables: ChangeSet
+    templates: ChangeSet
+
+
+class ConvergenceResult(TypedDict):
+    id: str | None
+    name: str
+    dry_run: bool
+    changed: bool
+    plan: ConvergencePlan
 
 
 @dataclass(frozen=True)

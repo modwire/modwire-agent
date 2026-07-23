@@ -3,6 +3,7 @@ from uuid import UUID
 
 from ..collaboration.actor import Actor
 
+
 @dataclass(frozen=True, slots=True)
 class ContentRevision:
     identifier: UUID

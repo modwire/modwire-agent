@@ -7,7 +7,6 @@ from .invalid import InvalidRecord
 from .kind import RecordKind
 from .record import Record
 
-
 REQUIRED_HEADINGS = {
     RecordKind.RULE: ("## Rules", "## Verification"),
     RecordKind.DECISION: ("## Context", "## Decision", "## Consequences"),
@@ -27,4 +26,10 @@ class ContentSchemaPolicy:
 
     def create_revision(self, record: Record, markdown: str, schema_version: int, actor: Actor) -> ContentRevision:
         self.validate(record, markdown)
-        return ContentRevision(identifier=uuid4(), record_id=record.identifier, actor=actor, markdown=markdown, schema_version=schema_version)
+        return ContentRevision(
+            identifier=uuid4(),
+            record_id=record.identifier,
+            actor=actor,
+            markdown=markdown,
+            schema_version=schema_version,
+        )

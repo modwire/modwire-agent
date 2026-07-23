@@ -11,4 +11,3 @@ class ScaffoldingConvergenceIn(StrictSchema):
     variables: list[ScaffoldingConvergenceVariableIn]
     templates: list[ScaffoldingConvergenceTemplateIn]
     dry_run: bool = True
-

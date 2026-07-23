@@ -9,4 +9,15 @@ from .stage_definition_input import StageDefinitionInput
 from .stage_submission_input import StageSubmissionInput
 from .transition_definition_input import TransitionDefinitionInput
 
-__all__ = ["GateDefinitionInput", "GateSatisfactionInput", "OperationDefinitionInput", "PlanDefinitionInput", "PlanDefinitionOutput", "PlanRunInput", "PlanRunOutput", "StageDefinitionInput", "StageSubmissionInput", "TransitionDefinitionInput"]
+__all__ = [
+    "GateDefinitionInput",
+    "GateSatisfactionInput",
+    "OperationDefinitionInput",
+    "PlanDefinitionInput",
+    "PlanDefinitionOutput",
+    "PlanRunInput",
+    "PlanRunOutput",
+    "StageDefinitionInput",
+    "StageSubmissionInput",
+    "TransitionDefinitionInput",
+]
