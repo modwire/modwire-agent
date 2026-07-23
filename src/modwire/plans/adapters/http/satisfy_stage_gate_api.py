@@ -12,5 +12,6 @@ from .schemas.gate_satisfaction_input import GateSatisfactionInput
 class SatisfyStageGateController(ControllerBase):
     @route.post("/{run_id}/gates/{gate_id}/satisfactions", response={204: None}, operation_id="satisfy_stage_gate")
     def satisfy(self, request: Any, run_id: UUID, gate_id: str, payload: GateSatisfactionInput) -> int:
+        """Record evidence that satisfies a gate for a plan run."""
         DjangoRequest.resolve(request, SatisfyStageGate).execute(run_id, gate_id, payload.evidence)
         return 204

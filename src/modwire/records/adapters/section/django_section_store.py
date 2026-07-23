@@ -20,7 +20,9 @@ class DjangoSectionStore(DjangoRepository[Section, SectionModel, UUID], SectionS
             return None
 
     def create_record(self, domain: Section) -> SectionModel:
-        return SectionModel(identifier=domain.identifier, title=domain.title, allowed_kinds=[str(kind) for kind in domain.allowed_kinds])
+        return SectionModel(
+            identifier=domain.identifier, title=domain.title, allowed_kinds=[str(kind) for kind in domain.allowed_kinds]
+        )
 
     def update_record(self, model: SectionModel, domain: Section) -> None:
         model.title = domain.title
@@ -36,10 +38,20 @@ class DjangoSectionStore(DjangoRepository[Section, SectionModel, UUID], SectionS
         super().save(domain)
         SectionPlacementModel.objects.filter(section_id=domain.identifier).delete()
         SectionPlacementModel.objects.bulk_create(
-            SectionPlacementModel(section_id=domain.identifier, record_id=placement.record_id, position=placement.position)
+            SectionPlacementModel(
+                section_id=domain.identifier, record_id=placement.record_id, position=placement.position
+            )
             for placement in domain.placements
         )
 
     def to_domain(self, model: SectionModel) -> Section:
-        placements = tuple(SectionPlacement(record_id=placement.record_id, position=placement.position) for placement in model.placements.all())
-        return Section(identifier=model.identifier, title=model.title, allowed_kinds=tuple(RecordKind(kind) for kind in model.allowed_kinds), placements=placements)
+        placements = tuple(
+            SectionPlacement(record_id=placement.record_id, position=placement.position)
+            for placement in model.placements.all()
+        )
+        return Section(
+            identifier=model.identifier,
+            title=model.title,
+            allowed_kinds=tuple(RecordKind(kind) for kind in model.allowed_kinds),
+            placements=placements,
+        )

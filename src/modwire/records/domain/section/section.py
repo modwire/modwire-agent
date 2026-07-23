@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -17,5 +19,7 @@ class Section:
         return Section(self.identifier, self.title, self.allowed_kinds, (*self.placements, placement))
 
     def reorder(self, record_ids: list[UUID]) -> Section:
-        placements = tuple(SectionPlacement(record_id=record_id, position=position) for position, record_id in enumerate(record_ids))
+        placements = tuple(
+            SectionPlacement(record_id=record_id, position=position) for position, record_id in enumerate(record_ids)
+        )
         return Section(self.identifier, self.title, self.allowed_kinds, placements)

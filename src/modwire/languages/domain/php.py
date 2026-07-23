@@ -1,4 +1,3 @@
-
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
@@ -101,5 +100,3 @@ class PHP(Language):
         url="https://endoflife.date/api/php.json",
         result_path=(0, "latest"),
     )
-
-

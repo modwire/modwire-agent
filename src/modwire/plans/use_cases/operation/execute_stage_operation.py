@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from ...domain.artifact.artifact_policy import ArtifactPolicy
 from ...domain.operation.operation_context import OperationContext
-from ...domain.operation.operation_execution import OperationExecution
 from ...domain.operation.operation_policy import OperationPolicy
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
 from ...domain.run.plan_run_status import PlanRunStatus
@@ -41,8 +40,13 @@ class ExecuteStageOperation:
                 return
             raise InvalidStageSubmission("The operation is already running.")
         try:
-            artifacts = {artifact_id: self.artifacts.get(run.identifier, artifact_id).payload for artifact_id in operation.required_artifact_ids}
-            context = OperationContext(run.identifier, operation.identifier, run.current_input, artifacts, operation.configuration)
+            artifacts = {
+                artifact_id: self.artifacts.get(run.identifier, artifact_id).payload
+                for artifact_id in operation.required_artifact_ids
+            }
+            context = OperationContext(
+                run.identifier, operation.identifier, run.current_input, artifacts, operation.configuration
+            )
             output = self.operations.resolve(operation.extension_key, operation.extension_version).execute(context)
             self.schemas.require_valid_value(operation.output_schema, output)
             artifact = self._produce_artifact(definition, operation.produced_artifact_id, run.identifier, output)

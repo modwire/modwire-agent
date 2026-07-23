@@ -5,8 +5,6 @@ from .response import SirenResponse
 
 
 class SirenClient:
-    """Route existing REST test calls through the Siren facade."""
-
     _methods = frozenset({"delete", "get", "head", "options", "patch", "post", "put"})
 
     def __init__(self, client: Any) -> None:

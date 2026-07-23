@@ -12,7 +12,7 @@ class HttpVersionReader(VersionReader):
             headers={"Accept": "application/json", "User-Agent": "modwire-languages-cms/1.0"},
         )
         try:
-            with urlopen(request, timeout=timeout) as response:  # noqa: S310
+            with urlopen(request, timeout=timeout) as response:
                 value = self._extract(json.load(response), language)
         except (OSError, ValueError, IndexError, KeyError, TypeError) as error:
             raise RuntimeError(f"Could not obtain the current {language.name} version: {error}") from error

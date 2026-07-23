@@ -25,3 +25,5 @@ Run `make modwire` when changing module boundaries, imports, or wiring.
   workflows without an explicit rollout need.
 - Keep `AGENTS.md` concise and change it only when the task explicitly calls
   for instruction updates.
+- Use documentation comments only for public REST API documentation; do not
+  add comments or docstrings elsewhere in code.

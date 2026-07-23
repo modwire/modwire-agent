@@ -79,4 +79,6 @@ class SirenApiTests(TestCase):
         self.assertEqual(response["Content-Type"], "application/vnd.siren+json")
         self.assertEqual(response.json()["class"], ["error"])
         self.assertEqual(response.json()["properties"], {"detail": "Request failed."})
-        self.assertEqual(response.json()["links"], [{"rel": ["self"], "href": "http://testserver/siren/languages/not-a-language"}])
+        self.assertEqual(
+            response.json()["links"], [{"rel": ["self"], "href": "http://testserver/siren/languages/not-a-language"}]
+        )

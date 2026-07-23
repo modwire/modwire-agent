@@ -19,9 +19,21 @@ class RunIntegrityAttacks(PlanApiTestCase):
         self.assertEqual(duplicate_submission.status_code, 422)
 
     def test_rejects_gate_evidence_outside_its_stage_or_schema(self) -> None:
-        definition = self.definition({
-            "gates": [{"id": "reviewed", "stage_id": "frame", "evidence_schema": {"type": "object", "required": ["by"], "properties": {"by": {"type": "string"}}}}]
-        })
+        definition = self.definition(
+            {
+                "gates": [
+                    {
+                        "id": "reviewed",
+                        "stage_id": "frame",
+                        "evidence_schema": {
+                            "type": "object",
+                            "required": ["by"],
+                            "properties": {"by": {"type": "string"}},
+                        },
+                    }
+                ]
+            }
+        )
         published = self.publish(definition)
         run = self.start(published.json()["id"], {"goal": "replace scaffoldings"})
 

@@ -5,8 +5,6 @@ from django.test import SimpleTestCase
 
 
 class SirenTransportCoverageTests(SimpleTestCase):
-    """Keep REST behavior scenarios and their Siren counterparts in lockstep."""
-
     scenario_directories = (
         Path("core/functional"),
         Path("languages/functional"),
@@ -17,10 +15,10 @@ class SirenTransportCoverageTests(SimpleTestCase):
     )
     excluded_modules = frozenset(
         {
-            "tests.core.functional.test_cors",  # CORS preflight is middleware negotiation, not a Siren representation.
-            "tests.core.functional.test_health",  # Operational readiness, not part of the API transport.
-            "tests.core.functional.test_openapi",  # Contract generation rather than an API scenario.
-            "tests.core.functional.test_siren_api",  # Native Siren contract tests, not REST behavior to replay.
+            "tests.core.functional.test_cors",
+            "tests.core.functional.test_health",
+            "tests.core.functional.test_openapi",
+            "tests.core.functional.test_siren_api",
         }
     )
 
@@ -48,8 +46,7 @@ class SirenTransportCoverageTests(SimpleTestCase):
                 tree = ast.parse(path.read_text())
                 for node in tree.body:
                     if isinstance(node, ast.ClassDef) and any(
-                        isinstance(member, (ast.FunctionDef, ast.AsyncFunctionDef))
-                        and member.name.startswith("test_")
+                        isinstance(member, (ast.FunctionDef, ast.AsyncFunctionDef)) and member.name.startswith("test_")
                         for member in node.body
                     ):
                         scenarios.add((module, node.name))
@@ -64,10 +61,7 @@ class SirenTransportCoverageTests(SimpleTestCase):
             for node in tree.body:
                 if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("tests."):
                     imported_modules.update(
-                        {
-                            alias.asname or alias.name: f"{node.module}.{alias.name}"
-                            for alias in node.names
-                        }
+                        {alias.asname or alias.name: f"{node.module}.{alias.name}" for alias in node.names}
                     )
             for node in tree.body:
                 if not isinstance(node, ast.ClassDef) or not node.name.startswith("TestSiren"):

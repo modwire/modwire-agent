@@ -1,10 +1,10 @@
 from typing import Any
 from uuid import UUID, uuid4
 
-from .gate_satisfaction import GateSatisfaction
 from ..definition.invalid_plan_definition import InvalidPlanDefinition
 from ..definition.plan_definition import PlanDefinition
 from ..run.invalid_stage_submission import InvalidStageSubmission
+from .gate_satisfaction import GateSatisfaction
 
 
 class GatePolicy:

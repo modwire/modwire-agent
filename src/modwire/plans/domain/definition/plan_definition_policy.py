@@ -14,6 +14,26 @@ from .transition_definition import TransitionDefinition
 class PlanDefinitionPolicy:
     artifacts: ArtifactDefinitionPolicy
 
-    def publish(self, name: str, version: int, start_stage_id: str, stages: list[StageDefinition], transitions: list[TransitionDefinition], gates: list[GateDefinition], operations: list[OperationDefinition], artifacts: list[ArtifactDefinition]) -> PlanDefinition:
+    def publish(
+        self,
+        name: str,
+        version: int,
+        start_stage_id: str,
+        stages: list[StageDefinition],
+        transitions: list[TransitionDefinition],
+        gates: list[GateDefinition],
+        operations: list[OperationDefinition],
+        artifacts: list[ArtifactDefinition],
+    ) -> PlanDefinition:
         self.artifacts.require_valid_declarations(tuple(operations), tuple(artifacts))
-        return PlanDefinition(uuid4(), name, version, start_stage_id, tuple(stages), tuple(transitions), tuple(gates), tuple(operations), tuple(artifacts))
+        return PlanDefinition(
+            uuid4(),
+            name,
+            version,
+            start_stage_id,
+            tuple(stages),
+            tuple(transitions),
+            tuple(gates),
+            tuple(operations),
+            tuple(artifacts),
+        )

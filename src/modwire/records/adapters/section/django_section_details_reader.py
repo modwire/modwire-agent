@@ -13,5 +13,18 @@ class DjangoSectionDetailsReader(SectionDetailsReader):
         except SectionModel.DoesNotExist as error:
             raise LookupError(f"Section {section_id!r} was not found.") from error
         placements = sorted(section.placements.all(), key=lambda placement: placement.position)
-        records = tuple(SectionRecordDetails(identifier=placement.record.identifier, title=placement.record.title, kind=placement.record.kind, status=placement.record.status) for placement in placements)
-        return SectionDetails(identifier=section.identifier, title=section.title, allowed_kinds=tuple(section.allowed_kinds), records=records)
+        records = tuple(
+            SectionRecordDetails(
+                identifier=placement.record.identifier,
+                title=placement.record.title,
+                kind=placement.record.kind,
+                status=placement.record.status,
+            )
+            for placement in placements
+        )
+        return SectionDetails(
+            identifier=section.identifier,
+            title=section.title,
+            allowed_kinds=tuple(section.allowed_kinds),
+            records=records,
+        )

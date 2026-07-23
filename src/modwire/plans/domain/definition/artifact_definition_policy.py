@@ -4,7 +4,9 @@ from .invalid_plan_definition import InvalidPlanDefinition
 
 
 class ArtifactDefinitionPolicy:
-    def require_valid_declarations(self, operations: tuple[OperationDefinition, ...], artifacts: tuple[ArtifactDefinition, ...]) -> None:
+    def require_valid_declarations(
+        self, operations: tuple[OperationDefinition, ...], artifacts: tuple[ArtifactDefinition, ...]
+    ) -> None:
         artifact_ids = [artifact.identifier for artifact in artifacts]
         operation_ids = {operation.identifier for operation in operations}
         if not all(artifact_ids) or len(artifact_ids) != len(set(artifact_ids)):

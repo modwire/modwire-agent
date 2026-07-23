@@ -13,4 +13,6 @@ class RecordDetailsScenarios(RecordsApiTestCase):
         response = self.get_record(record["id"])
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), IsPartialDict(id=IsUUID, title="API tests", kind="rule", status="draft", tags=["testing"]))
+        self.assertEqual(
+            response.json(), IsPartialDict(id=IsUUID, title="API tests", kind="rule", status="draft", tags=["testing"])
+        )

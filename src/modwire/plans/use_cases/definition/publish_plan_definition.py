@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from ...domain.artifact.artifact_definition import ArtifactDefinition
 from ...domain.definition.plan_definition import PlanDefinition
 from ...domain.definition.plan_definition_policy import PlanDefinitionPolicy
@@ -18,7 +19,16 @@ class PublishPlanDefinition:
     policy: PlanDefinitionPolicy
     operations: OperationCatalog
 
-    def execute(self, name: str, start_stage_id: str, stages: list[StageDefinition], transitions: list[TransitionDefinition], gates: list[GateDefinition], operations: list[OperationDefinition], artifacts: list[ArtifactDefinition]) -> PlanDefinition:
+    def execute(
+        self,
+        name: str,
+        start_stage_id: str,
+        stages: list[StageDefinition],
+        transitions: list[TransitionDefinition],
+        gates: list[GateDefinition],
+        operations: list[OperationDefinition],
+        artifacts: list[ArtifactDefinition],
+    ) -> PlanDefinition:
         for stage in stages:
             self.schemas.require_valid_schema(stage.input_schema)
             self.schemas.require_valid_schema(stage.submission_schema)
@@ -28,7 +38,9 @@ class PublishPlanDefinition:
             self._validate_operation(operation)
         for artifact in artifacts:
             self.schemas.require_valid_schema(artifact.schema)
-        definition = self.policy.publish(name, self.definitions.next_version(name), start_stage_id, stages, transitions, gates, operations, artifacts)
+        definition = self.policy.publish(
+            name, self.definitions.next_version(name), start_stage_id, stages, transitions, gates, operations, artifacts
+        )
         self._require_compatible_stage_contracts(definition)
         self._require_compatible_artifact_contracts(definition)
         self.definitions.publish(definition)
@@ -37,7 +49,9 @@ class PublishPlanDefinition:
     def _validate_operation(self, operation: OperationDefinition) -> None:
         self.schemas.require_valid_schema(operation.input_schema)
         self.schemas.require_valid_schema(operation.output_schema)
-        self.operations.resolve(operation.extension_key, operation.extension_version).require_valid_configuration(operation.configuration)
+        self.operations.resolve(operation.extension_key, operation.extension_version).require_valid_configuration(
+            operation.configuration
+        )
 
     def _require_compatible_stage_contracts(self, definition: PlanDefinition) -> None:
         for transition in definition.transitions:
@@ -49,4 +63,6 @@ class PublishPlanDefinition:
         artifacts = {artifact.identifier: artifact for artifact in definition.artifacts}
         for operation in definition.operations:
             if operation.produced_artifact_id:
-                self.schemas.require_compatible_values(operation.output_schema, artifacts[operation.produced_artifact_id].schema)
+                self.schemas.require_compatible_values(
+                    operation.output_schema, artifacts[operation.produced_artifact_id].schema
+                )

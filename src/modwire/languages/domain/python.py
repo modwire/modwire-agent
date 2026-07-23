@@ -1,4 +1,3 @@
-
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
@@ -117,5 +116,3 @@ class Python(Language):
         url="https://endoflife.date/api/python.json",
         result_path=(0, "latest"),
     )
-
-

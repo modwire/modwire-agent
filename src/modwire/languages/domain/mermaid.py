@@ -1,4 +1,3 @@
-
 from .contracts import Language, PackageManager, Tool, VersionProvider
 
 
@@ -29,5 +28,3 @@ class Mermaid(Language):
         url="https://registry.npmjs.org/mermaid/latest",
         result_path=("version",),
     )
-
-

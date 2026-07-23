@@ -13,5 +13,6 @@ from .schemas.stage_submission_input import StageSubmissionInput
 class SubmitStageResultController(ControllerBase):
     @route.post("/{run_id}/submissions", response={200: PlanRunOutput}, operation_id="submit_stage_result")
     def submit(self, request: Any, run_id: UUID, payload: StageSubmissionInput) -> tuple[int, PlanRunOutput]:
+        """Submit the result for the active stage of a plan run."""
         run = DjangoRequest.resolve(request, SubmitStageResult).execute(run_id, payload.payload)
         return 200, PlanRunOutput(id=str(run.identifier), current_stage_id=run.current_stage_id, status=run.status)

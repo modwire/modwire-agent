@@ -2,8 +2,6 @@ from typing import Any
 
 
 class SirenResponse:
-    """Expose Siren documents through the existing REST test assertions."""
-
     def __init__(self, response: Any, collection_response: bool) -> None:
         self._response = response
         self._collection_response = collection_response

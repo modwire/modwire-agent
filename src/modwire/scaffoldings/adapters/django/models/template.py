@@ -17,7 +17,18 @@ class Template(models.Model):
         default=WriteMode.MANAGED,
     )
 
-    Meta = type("Meta", (), {"ordering": ("relative_path",), "constraints": [models.UniqueConstraint(fields=("scaffolding", "relative_path"), name="unique_template_path_per_scaffolding")]})
+    Meta = type(
+        "Meta",
+        (),
+        {
+            "ordering": ("relative_path",),
+            "constraints": [
+                models.UniqueConstraint(
+                    fields=("scaffolding", "relative_path"), name="unique_template_path_per_scaffolding"
+                )
+            ],
+        },
+    )
 
     def __str__(self):
         return self.relative_path

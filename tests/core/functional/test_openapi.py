@@ -12,6 +12,8 @@ class OpenApiScenarios(SimpleTestCase):
             if method.lower() in {"delete", "get", "patch", "post", "put"}
         ]
         operation_ids = [operation.get("operationId") for operation in operations]
+        descriptions = [operation.get("description") for operation in operations]
 
         self.assertTrue(all(isinstance(operation_id, str) and operation_id for operation_id in operation_ids))
         self.assertEqual(len(operation_ids), len(set(operation_ids)))
+        self.assertTrue(all(isinstance(description, str) and description for description in descriptions))

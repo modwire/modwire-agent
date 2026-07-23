@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from ...domain.operation.operation_execution import OperationExecution
-from ...domain.operation.operation_claim import OperationClaim
 from ...domain.artifact.plan_artifact import PlanArtifact
+from ...domain.operation.operation_claim import OperationClaim
+from ...domain.operation.operation_execution import OperationExecution
 
 
 class OperationExecutionStore(ABC):

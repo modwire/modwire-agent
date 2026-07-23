@@ -38,4 +38,10 @@ class DjangoRecordStore(DjangoRepository[Record, RecordModel, UUID], RecordStore
         return record
 
     def to_domain(self, model: RecordModel) -> Record:
-        return Record(identifier=model.identifier, title=model.title, kind=RecordKind(model.kind), status=RecordStatus(model.status), tag_ids=tuple(model.tags.values_list("identifier", flat=True)))
+        return Record(
+            identifier=model.identifier,
+            title=model.title,
+            kind=RecordKind(model.kind),
+            status=RecordStatus(model.status),
+            tag_ids=tuple(model.tags.values_list("identifier", flat=True)),
+        )

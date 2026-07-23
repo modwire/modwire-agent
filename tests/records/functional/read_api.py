@@ -18,7 +18,9 @@ class ReadApiMixin:
         return self.client.get(f"/api/records/search/semantic?q={query}")
 
     def rename_record(self, record_id: str, title: str, headers: dict[str, str]):
-        return self.client.patch(f"/api/records/{record_id}", data={"title": title}, content_type="application/json", headers=headers)
+        return self.client.patch(
+            f"/api/records/{record_id}", data={"title": title}, content_type="application/json", headers=headers
+        )
 
     def archive_record(self, record_id: str, headers: dict[str, str]):
         return self.client.delete(f"/api/records/{record_id}", headers=headers)
