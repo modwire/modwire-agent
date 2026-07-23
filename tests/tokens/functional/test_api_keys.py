@@ -35,7 +35,9 @@ class ApiKeyScenarios(TestCase):
         )
 
         self.assertEqual(blank.status_code, 422)
+        self.assertEqual(blank.json(), {"detail": "Request failed."})
         self.assertEqual(extra.status_code, 422)
+        self.assertEqual(extra.json(), {"detail": "Request failed."})
 
     def test_issues_independent_secrets_for_each_request(self) -> None:
         first = self.client.post("/api/api_keys", data={"name": "first"}, content_type="application/json")

@@ -1,6 +1,5 @@
 from modwire_hex.django import DjangoRequest
 from ninja import Status
-from ninja.errors import HttpError
 from ninja_extra import route
 from ninja_extra.controllers import ControllerBase, api_controller
 
@@ -13,10 +12,7 @@ class ApiKeyController(ControllerBase):
     @route.post("", response={201: ApiKeyCreatedOut}, operation_id="create_api_key", summary="Generate an API key.")
     def create(self, request, data: ApiKeyIn):
         service = DjangoRequest.resolve(request, IssueApiKey)
-        try:
-            key, secret = service.execute(data.name)
-        except ValueError as error:
-            raise HttpError(422, str(error)) from error
+        key, secret = service.execute(data.name)
         return Status(
             201,
             {

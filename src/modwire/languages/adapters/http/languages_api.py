@@ -1,7 +1,6 @@
 from typing import Any
 
 from modwire_hex.django import DjangoRequest
-from ninja.errors import HttpError
 from ninja_extra import ControllerBase, api_controller, route
 
 from ...use_cases.language.get_language import GetLanguage
@@ -18,8 +17,5 @@ class LanguagesController(ControllerBase):
 
     @route.get("/{language_id}", response={200: LanguageOut}, operation_id="get_language")
     def get_language(self, request: Any, language_id: str) -> tuple[int, LanguageOut]:
-        try:
-            language = DjangoRequest.resolve(request, GetLanguage).execute(language_id)
-        except LookupError as error:
-            raise HttpError(404, str(error)) from error
+        language = DjangoRequest.resolve(request, GetLanguage).execute(language_id)
         return 200, LanguageOut(**language.model_dump())
