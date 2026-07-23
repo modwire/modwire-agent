@@ -68,7 +68,7 @@ class SirenResponseFactory:
 
     @staticmethod
     def _payload(response: HttpResponse) -> Any | None:
-        if "application/json" not in response.get("Content-Type", ""):
+        if not response.content or "application/json" not in response.get("Content-Type", ""):
             return None
         return json.loads(response.content)
 
