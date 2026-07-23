@@ -1,3 +1,6 @@
+import json
+from urllib.parse import urlparse
+
 from django.test import TestCase
 
 from modwire.core.api import api
@@ -5,6 +8,51 @@ from modwire.core.siren import facade
 
 
 class SirenApiTests(TestCase):
+    def test_advertises_and_executes_a_tag_write_action(self) -> None:
+        document = self.client.get("/siren/tags").json()
+
+        action = next(action for action in document["actions"] if action["name"] == "create_tag")
+        self.assertEqual(action["href"], "http://testserver/siren/tags")
+        self.assertEqual(action["method"], "POST")
+        self.assertEqual(action["type"], "application/json")
+        self.assertEqual([(field["name"], field["required"]) for field in action["fields"]], [("name", True)])
+
+        response = self.client.post(
+            urlparse(action["href"]).path,
+            data=json.dumps({"name": "Architecture"}),
+            content_type=action["type"],
+            headers={"X-Actor-Id": "test-agent", "X-Actor-Type": "agent"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response["Content-Type"], "application/vnd.siren+json")
+        self.assertEqual(response.json()["class"], ["collection", "tag"])
+        self.assertEqual(response.json()["entities"][0]["properties"]["name"], "architecture")
+
+    def test_advertises_and_executes_a_section_write_action(self) -> None:
+        document = self.client.get("/siren/sections").json()
+
+        action = next(action for action in document["actions"] if action["name"] == "create_section")
+        self.assertEqual(action["href"], "http://testserver/siren/sections")
+        self.assertEqual(action["method"], "POST")
+        self.assertEqual(action["type"], "application/json")
+        self.assertEqual(
+            [(field["name"], field["required"]) for field in action["fields"]],
+            [("title", True), ("allowed_kinds", True)],
+        )
+
+        response = self.client.post(
+            urlparse(action["href"]).path,
+            data=json.dumps({"title": "Architecture", "allowed_kinds": ["rule"]}),
+            content_type=action["type"],
+            headers={"X-Actor-Id": "test-agent", "X-Actor-Type": "agent"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response["Content-Type"], "application/vnd.siren+json")
+        self.assertEqual(response.json()["class"], ["section"])
+        self.assertEqual(response.json()["properties"]["title"], "Architecture")
+
     def test_discovers_every_documented_rest_operation(self) -> None:
         documented = {
             operation["operationId"]
