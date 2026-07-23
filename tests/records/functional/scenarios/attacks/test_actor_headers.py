@@ -15,7 +15,8 @@ class ActorHeaderAttacks(RecordsApiTestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()["detail"], "Missing required actor headers: X-Actor-Id, X-Actor-Type.")
 
-    def test_does_not_serve_the_retired_siren_api(self) -> None:
+    def test_serves_the_siren_api_root_without_actor_headers(self) -> None:
         response = self.client.get("/siren/")
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/vnd.siren+json")
