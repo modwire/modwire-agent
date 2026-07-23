@@ -1,39 +1,27 @@
+from tests.plans.functional import test_plan_run
+from tests.plans.functional.attacks import test_definition_validation, test_run_integrity
+from tests.plans.functional.happy import test_gate_control, test_terminal_plan
+
 from ..helpers.test_case import SirenFunctionalTestCase
 
 
 class TestSirenDefinitionValidationAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.plans.functional.attacks.test_definition_validation",
-        "DefinitionValidationAttacks",
-    ),
+    SirenFunctionalTestCase, test_definition_validation.DefinitionValidationAttacks
 ):
     pass
 
 
-class TestSirenRunIntegrityAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.plans.functional.attacks.test_run_integrity", "RunIntegrityAttacks"),
-):
+class TestSirenRunIntegrityAttacks(SirenFunctionalTestCase, test_run_integrity.RunIntegrityAttacks):
     pass
 
 
-class TestSirenGateControlScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.plans.functional.happy.test_gate_control", "GateControlScenarios"),
-):
+class TestSirenGateControlScenarios(SirenFunctionalTestCase, test_gate_control.GateControlScenarios):
     pass
 
 
-class TestSirenTerminalPlanScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.plans.functional.happy.test_terminal_plan", "TerminalPlanScenarios"),
-):
+class TestSirenTerminalPlanScenarios(SirenFunctionalTestCase, test_terminal_plan.TerminalPlanScenarios):
     pass
 
 
-class TestSirenPlanRunScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.plans.functional.test_plan_run", "PlanRunScenarios"),
-):
+class TestSirenPlanRunScenarios(SirenFunctionalTestCase, test_plan_run.PlanRunScenarios):
     pass

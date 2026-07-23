@@ -53,7 +53,7 @@ class SirenFacade:
 
         response = match.func(request, *match.args, **match.kwargs)
         if response.status_code >= 400:
-            return response
+            return SirenResponseFactory(self.engine, self._resources).error(request, response)
 
         operation = self._operation(request.method, request.path)
         if operation is None:

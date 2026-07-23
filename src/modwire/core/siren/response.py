@@ -48,6 +48,17 @@ class SirenResponseFactory:
             document["properties"] = payload if isinstance(payload, Mapping) else {"result": payload}
         return self.response(document, status=response.status_code)
 
+    def error(self, request: HttpRequest, response: HttpResponse) -> JsonResponse:
+        """Preserve an API error's status and payload in a Siren error document."""
+        payload = self._payload(response)
+        properties = payload if isinstance(payload, Mapping) else {"result": payload} if payload is not None else {}
+        document: dict[str, Any] = {
+            "class": ["error"],
+            "properties": properties,
+            "links": [{"rel": ["self"], "href": request.build_absolute_uri()}],
+        }
+        return self.response(document, status=response.status_code)
+
     @staticmethod
     def _representation(
         scope: str,

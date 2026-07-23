@@ -1,8 +1,7 @@
+from tests.tokens.functional import test_api_keys
+
 from ..helpers.test_case import SirenFunctionalTestCase
 
 
-class TestSirenApiKeys(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.tokens.functional.test_api_keys", "ApiKeyScenarios"),
-):
+class TestSirenApiKeys(SirenFunctionalTestCase, test_api_keys.ApiKeyScenarios):
     pass

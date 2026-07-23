@@ -1,276 +1,175 @@
+from tests.records.functional.scenarios import (
+    test_catalogs,
+    test_content,
+    test_content_history,
+    test_content_kinds,
+    test_content_proposals,
+    test_happy,
+    test_publication,
+    test_record_archive,
+    test_record_details,
+    test_record_rename,
+    test_record_tags,
+    test_records,
+    test_search,
+    test_section_details,
+    test_section_placements,
+    test_sections,
+    test_tags,
+)
+from tests.records.functional.scenarios.attacks import (
+    test_actor_headers,
+    test_content_proposal_details,
+    test_content_schema,
+    test_request_contract,
+    test_routing,
+    test_section_kinds,
+    test_tag_assignment,
+    test_visibility,
+)
+from tests.records.functional.scenarios.attacks import (
+    test_content_proposals as content_proposal_attacks,
+)
+from tests.records.functional.scenarios.attacks import (
+    test_record_archive as record_archive_attacks,
+)
+from tests.records.functional.scenarios.attacks import (
+    test_record_details as record_details_attacks,
+)
+from tests.records.functional.scenarios.attacks import (
+    test_record_rename as record_rename_attacks,
+)
+from tests.records.functional.scenarios.attacks import (
+    test_section_details as section_details_attacks,
+)
+from tests.records.functional.scenarios.attacks import (
+    test_section_placements as section_placement_attacks,
+)
+
 from ..helpers.test_case import SirenFunctionalTestCase
 
 
-class TestSirenActorHeaderAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_actor_headers",
-        "ActorHeaderAttacks",
-    ),
-):
+class TestSirenActorHeaderAttacks(SirenFunctionalTestCase, test_actor_headers.ActorHeaderAttacks):
     pass
 
 
 class TestSirenContentProposalDetailsAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_content_proposal_details",
-        "ContentProposalDetailsAttacks",
-    ),
+    SirenFunctionalTestCase, test_content_proposal_details.ContentProposalDetailsAttacks
 ):
     pass
 
 
-class TestSirenContentProposalAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_content_proposals",
-        "ContentProposalAttacks",
-    ),
-):
+class TestSirenContentProposalAttacks(SirenFunctionalTestCase, content_proposal_attacks.ContentProposalAttacks):
     pass
 
 
-class TestSirenContentSchemaAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_content_schema",
-        "ContentSchemaAttacks",
-    ),
-):
+class TestSirenContentSchemaAttacks(SirenFunctionalTestCase, test_content_schema.ContentSchemaAttacks):
     pass
 
 
-class TestSirenRecordArchiveAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_record_archive",
-        "RecordArchiveAttacks",
-    ),
-):
+class TestSirenRecordArchiveAttacks(SirenFunctionalTestCase, record_archive_attacks.RecordArchiveAttacks):
     pass
 
 
-class TestSirenRecordDetailsAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_record_details",
-        "RecordDetailsAttacks",
-    ),
-):
+class TestSirenRecordDetailsAttacks(SirenFunctionalTestCase, record_details_attacks.RecordDetailsAttacks):
     pass
 
 
-class TestSirenRecordRenameAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_record_rename",
-        "RecordRenameAttacks",
-    ),
-):
+class TestSirenRecordRenameAttacks(SirenFunctionalTestCase, record_rename_attacks.RecordRenameAttacks):
     pass
 
 
-class TestSirenRequestContractAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_request_contract",
-        "RequestContractAttacks",
-    ),
-):
+class TestSirenRequestContractAttacks(SirenFunctionalTestCase, test_request_contract.RequestContractAttacks):
     pass
 
 
-class TestSirenRouteFilteringAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_routing",
-        "RouteFilteringAttacks",
-    ),
-):
+class TestSirenRouteFilteringAttacks(SirenFunctionalTestCase, test_routing.RouteFilteringAttacks):
     pass
 
 
-class TestSirenSectionDetailsAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_section_details",
-        "SectionDetailsAttacks",
-    ),
-):
+class TestSirenSectionDetailsAttacks(SirenFunctionalTestCase, section_details_attacks.SectionDetailsAttacks):
     pass
 
 
-class TestSirenSectionKindAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_section_kinds",
-        "SectionKindAttacks",
-    ),
-):
+class TestSirenSectionKindAttacks(SirenFunctionalTestCase, test_section_kinds.SectionKindAttacks):
     pass
 
 
-class TestSirenSectionPlacementAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_section_placements",
-        "SectionPlacementAttacks",
-    ),
-):
+class TestSirenSectionPlacementAttacks(SirenFunctionalTestCase, section_placement_attacks.SectionPlacementAttacks):
     pass
 
 
-class TestSirenTagAssignmentAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_tag_assignment",
-        "TagAssignmentAttacks",
-    ),
-):
+class TestSirenTagAssignmentAttacks(SirenFunctionalTestCase, test_tag_assignment.TagAssignmentAttacks):
     pass
 
 
-class TestSirenDraftVisibilityAttacks(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.attacks.test_visibility",
-        "DraftVisibilityAttacks",
-    ),
-):
+class TestSirenDraftVisibilityAttacks(SirenFunctionalTestCase, test_visibility.DraftVisibilityAttacks):
     pass
 
 
-class TestSirenCatalogScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_catalogs", "CatalogScenarios"),
-):
+class TestSirenCatalogScenarios(SirenFunctionalTestCase, test_catalogs.CatalogScenarios):
     pass
 
 
-class TestSirenContentScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_content", "ContentScenarios"),
-):
+class TestSirenContentScenarios(SirenFunctionalTestCase, test_content.ContentScenarios):
     pass
 
 
-class TestSirenContentHistoryScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.test_content_history",
-        "ContentHistoryScenarios",
-    ),
-):
+class TestSirenContentHistoryScenarios(SirenFunctionalTestCase, test_content_history.ContentHistoryScenarios):
     pass
 
 
-class TestSirenContentKindScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_content_kinds", "ContentKindScenarios"),
-):
+class TestSirenContentKindScenarios(SirenFunctionalTestCase, test_content_kinds.ContentKindScenarios):
     pass
 
 
-class TestSirenContentProposalScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.test_content_proposals",
-        "ContentProposalScenarios",
-    ),
-):
+class TestSirenContentProposalScenarios(SirenFunctionalTestCase, test_content_proposals.ContentProposalScenarios):
     pass
 
 
-class TestSirenHappyRecordsPath(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_happy", "HappyRecordsPath"),
-):
+class TestSirenHappyRecordsPath(SirenFunctionalTestCase, test_happy.HappyRecordsPath):
     pass
 
 
-class TestSirenPublicationScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_publication", "PublicationScenarios"),
-):
+class TestSirenPublicationScenarios(SirenFunctionalTestCase, test_publication.PublicationScenarios):
     pass
 
 
-class TestSirenRecordArchiveScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.test_record_archive", "RecordArchiveScenarios"
-    ),
-):
+class TestSirenRecordArchiveScenarios(SirenFunctionalTestCase, test_record_archive.RecordArchiveScenarios):
     pass
 
 
-class TestSirenRecordDetailsScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.test_record_details", "RecordDetailsScenarios"
-    ),
-):
+class TestSirenRecordDetailsScenarios(SirenFunctionalTestCase, test_record_details.RecordDetailsScenarios):
     pass
 
 
-class TestSirenRecordRenameScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_record_rename", "RecordRenameScenarios"),
-):
+class TestSirenRecordRenameScenarios(SirenFunctionalTestCase, test_record_rename.RecordRenameScenarios):
     pass
 
 
-class TestSirenRecordTagScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_record_tags", "RecordTagScenarios"),
-):
+class TestSirenRecordTagScenarios(SirenFunctionalTestCase, test_record_tags.RecordTagScenarios):
     pass
 
 
-class TestSirenRecordScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_records", "RecordScenarios"),
-):
+class TestSirenRecordScenarios(SirenFunctionalTestCase, test_records.RecordScenarios):
     pass
 
 
-class TestSirenSearchScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_search", "SearchScenarios"),
-):
+class TestSirenSearchScenarios(SirenFunctionalTestCase, test_search.SearchScenarios):
     pass
 
 
-class TestSirenSectionDetailsScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.test_section_details",
-        "SectionDetailsScenarios",
-    ),
-):
+class TestSirenSectionDetailsScenarios(SirenFunctionalTestCase, test_section_details.SectionDetailsScenarios):
     pass
 
 
-class TestSirenSectionPlacementScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.records.functional.scenarios.test_section_placements",
-        "SectionPlacementScenarios",
-    ),
-):
+class TestSirenSectionPlacementScenarios(SirenFunctionalTestCase, test_section_placements.SectionPlacementScenarios):
     pass
 
 
-class TestSirenSectionScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_sections", "SectionScenarios"),
-):
+class TestSirenSectionScenarios(SirenFunctionalTestCase, test_sections.SectionScenarios):
     pass
 
 
-class TestSirenTagScenarios(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.records.functional.scenarios.test_tags", "TagScenarios"),
-):
+class TestSirenTagScenarios(SirenFunctionalTestCase, test_tags.TagScenarios):
     pass

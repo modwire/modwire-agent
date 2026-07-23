@@ -1,18 +1,11 @@
+from tests.scaffoldings.functional import test_convergence, test_preview_api
+
 from ..helpers.test_case import SirenFunctionalTestCase
 
 
-class TestSirenScaffoldingConvergence(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case(
-        "tests.scaffoldings.functional.test_convergence",
-        "ScaffoldingConvergenceScenarios",
-    ),
-):
+class TestSirenScaffoldingConvergence(SirenFunctionalTestCase, test_convergence.ScaffoldingConvergenceScenarios):
     pass
 
 
-class TestSirenScaffoldingPreview(
-    SirenFunctionalTestCase,
-    SirenFunctionalTestCase.load_case("tests.scaffoldings.functional.test_preview_api", "ScaffoldingPreviewApiTests"),
-):
+class TestSirenScaffoldingPreview(SirenFunctionalTestCase, test_preview_api.ScaffoldingPreviewApiTests):
     pass
