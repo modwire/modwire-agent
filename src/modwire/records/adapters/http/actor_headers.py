@@ -1,8 +1,7 @@
 from typing import Any
 
-from ninja.errors import HttpError
-
 from ...domain.collaboration.actor import Actor
+from ...domain.collaboration.invalid import InvalidActor
 from ...domain.collaboration.policy import ActorPolicy
 
 
@@ -17,5 +16,5 @@ class ActorHeaders:
             if not value or not value.strip()
         ]
         if missing:
-            raise HttpError(422, f"Missing required actor headers: {', '.join(missing)}.")
+            raise InvalidActor(f"Missing required actor headers: {', '.join(missing)}.")
         return policy.identify(actor_id, actor_type)
