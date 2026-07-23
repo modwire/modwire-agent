@@ -32,7 +32,7 @@ from .record_document import record_document
 from .request_validation import validated_siren_actor
 
 
-@api_controller(SECTION_COLLECTION_ROUTE, tags=["records"])
+@api_controller(SECTION_COLLECTION_ROUTE, tags=["records"], auto_import=False)
 class SectionsSirenController(ControllerBase):
     @route.get("", response=dict, operation_id=LIST_SECTIONS_OPERATION)
     def list_sections(self, request: Any):

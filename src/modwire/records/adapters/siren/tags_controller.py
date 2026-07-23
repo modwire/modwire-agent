@@ -15,7 +15,7 @@ from .contract import CREATE_TAG_OPERATION, LIST_TAGS_OPERATION, TAG_COLLECTION_
 from .request_validation import validated_siren_actor
 
 
-@api_controller(TAG_COLLECTION_ROUTE, tags=["records"])
+@api_controller(TAG_COLLECTION_ROUTE, tags=["records"], auto_import=False)
 class TagsSirenController(ControllerBase):
     @route.get("", response=dict, operation_id=LIST_TAGS_OPERATION)
     def list_tags(self, request: Any):

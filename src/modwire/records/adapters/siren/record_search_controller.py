@@ -11,7 +11,7 @@ from ...use_cases.record.search_records import SearchRecords
 from .contract import COLLECTION_ROUTE, GET_OPERATION, RESOURCE_NAME, SEMANTIC_SEARCH_OPERATION, TEXT_SEARCH_OPERATION
 
 
-@api_controller(COLLECTION_ROUTE + "/search", tags=["records"])
+@api_controller(COLLECTION_ROUTE + "/search", tags=["records"], auto_import=False)
 class RecordSearchSirenController(ControllerBase):
     @route.get("/text", response=dict, operation_id=TEXT_SEARCH_OPERATION)
     def text(self, request: Any, q: Annotated[str, Query(...)]):

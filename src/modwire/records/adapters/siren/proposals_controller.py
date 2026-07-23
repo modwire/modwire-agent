@@ -22,7 +22,7 @@ from .contract import (
 from .request_validation import validated_siren_actor
 
 
-@api_controller(COLLECTION_ROUTE + "/{record_id}/content-proposals", tags=["records"])
+@api_controller(COLLECTION_ROUTE + "/{record_id}/content-proposals", tags=["records"], auto_import=False)
 class ContentProposalsSirenController(ControllerBase):
     @route.patch("/{proposal_id}", response=dict, operation_id=RESOLVE_PROPOSAL_OPERATION)
     def resolve(self, request: Any, record_id: UUID, proposal_id: UUID, payload: ProposalStatusInput):

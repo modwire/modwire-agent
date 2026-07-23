@@ -12,7 +12,7 @@ from ...use_cases.record.list_content_revisions import ListContentRevisions
 from .contract import COLLECTION_ROUTE, GET_REVISION_OPERATION, IDENTIFIER_PARAMETER, REVISION_IDENTIFIER_PARAMETER, REVISION_RESOURCE_NAME
 
 
-@api_controller(COLLECTION_ROUTE + "/{record_id}/content-revisions", tags=["records"])
+@api_controller(COLLECTION_ROUTE + "/{record_id}/content-revisions", tags=["records"], auto_import=False)
 class ContentRevisionsSirenController(ControllerBase):
     @route.get("/{revision_id}", response=dict, operation_id=GET_REVISION_OPERATION)
     def get_revision(self, request: Any, record_id: UUID, revision_id: UUID):

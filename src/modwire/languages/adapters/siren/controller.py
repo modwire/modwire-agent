@@ -19,7 +19,7 @@ from .contract import (
 )
 
 
-@api_controller(COLLECTION_ROUTE, tags=["languages"])
+@api_controller(COLLECTION_ROUTE, tags=["languages"], auto_import=False)
 class LanguagesSirenController(ControllerBase):
     @route.get("", response=dict, operation_id=LIST_OPERATION)
     def list_languages(self, request: Any):

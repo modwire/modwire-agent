@@ -48,7 +48,7 @@ from .record_document import record_document
 from .request_validation import validated_siren_actor
 
 
-@api_controller(COLLECTION_ROUTE, tags=["records"])
+@api_controller(COLLECTION_ROUTE, tags=["records"], auto_import=False)
 class RecordsSirenController(ControllerBase):
     @route.get("", response=dict, operation_id=LIST_OPERATION)
     def list_records(self, request: Any, tag: Annotated[list[str], Query(...)]) -> Any:
