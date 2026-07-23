@@ -4,7 +4,7 @@ from django.test import SimpleTestCase
 class CorsScenarios(SimpleTestCase):
     def test_allows_local_development_preflight_requests(self) -> None:
         response = self.client.options(
-            "/siren/",
+            "/api/",
             HTTP_ORIGIN="http://localhost:5173",
             HTTP_ACCESS_CONTROL_REQUEST_METHOD="PATCH",
             HTTP_ACCESS_CONTROL_REQUEST_HEADERS="content-type,x-actor-id,x-actor-type",

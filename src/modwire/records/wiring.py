@@ -10,7 +10,6 @@ from .adapters.record.django_search_projection_store import DjangoSearchProjecti
 from .adapters.section.django_section_catalog import DjangoSectionCatalog
 from .adapters.section.django_section_details_reader import DjangoSectionDetailsReader
 from .adapters.section.django_section_store import DjangoSectionStore
-from .adapters.siren.request_validation import SirenRequestValidator
 from .adapters.tag.django_tag_catalog import DjangoTagCatalog
 from .adapters.tag.django_tag_store import DjangoTagStore
 from .domain.collaboration.policy import ActorPolicy
@@ -94,7 +93,6 @@ records = Module.auto(
         Providers.singleton(RecordPolicy, None),
         Providers.singleton(SectionPolicy, None),
         Providers.singleton(SectionPlacementPolicy, None),
-        Providers.singleton(SirenRequestValidator, None),
         Providers.singleton(TagPolicy, None),
     ),
 )
