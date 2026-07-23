@@ -9,7 +9,7 @@ from modwire.core.siren import facade
 
 class SirenApiTests(TestCase):
     def test_advertises_and_executes_a_tag_write_action(self) -> None:
-        document = self.client.get("/siren/tags").json()
+        document = self.client.get("/siren/").json()
 
         action = next(action for action in document["actions"] if action["name"] == "create_tag")
         self.assertEqual(action["href"], "http://testserver/siren/tags")
@@ -70,7 +70,43 @@ class SirenApiTests(TestCase):
         self.assertEqual(response["Content-Type"], "application/vnd.siren+json")
         self.assertEqual(response.json()["class"], ["api", "entry-point"])
         self.assertEqual(response.json()["properties"]["title"], "Modwire API")
-        self.assertIn({"rel": ["record"], "href": "http://testserver/siren/records"}, response.json()["links"])
+        self.assertEqual(
+            response.json()["links"],
+            [
+                {"rel": ["self"], "href": "http://testserver/siren/"},
+                {"rel": ["tag"], "href": "http://testserver/siren/tags"},
+                {"rel": ["language"], "href": "http://testserver/siren/languages"},
+                {"rel": ["section"], "href": "http://testserver/siren/sections"},
+            ],
+        )
+        actions = {action["name"]: action for action in response.json()["actions"]}
+        self.assertEqual(
+            set(actions),
+            {
+                "create_api_key",
+                "converge_scaffolding",
+                "create_section",
+                "create_tag",
+                "list_published_records",
+                "publish_plan_definition",
+                "start_plan_run",
+            },
+        )
+        self.assertEqual(
+            actions["list_published_records"],
+            {
+                "name": "list_published_records",
+                "href": "http://testserver/siren/records",
+                "method": "GET",
+                "fields": [{"name": "tag", "type": "array", "required": True}],
+            },
+        )
+
+        for link in response.json()["links"]:
+            linked_response = self.client.get(urlparse(link["href"]).path)
+
+            self.assertEqual(linked_response.status_code, 200)
+            self.assertEqual(linked_response["Content-Type"], "application/vnd.siren+json")
 
     def test_forwards_a_rest_mutation_and_projects_its_siren_entity(self) -> None:
         response = self.client.post(

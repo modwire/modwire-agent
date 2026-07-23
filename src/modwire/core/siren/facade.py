@@ -40,7 +40,13 @@ class SirenFacade:
         return {resource.reference: resource for resource in self.engine._api.resources}
 
     def root(self, request: HttpRequest) -> JsonResponse:
-        document = self.engine.project(SirenContext(base_url=SirenResponseFactory.base_url(request), scope="root"))
+        document = self.engine.project(
+            SirenContext(
+                base_url=SirenResponseFactory.base_url(request),
+                scope="root",
+                capabilities=self.operation_ids,
+            )
+        )
         document["properties"] = self.schema["info"]
         return SirenResponseFactory.response(document)
 
@@ -56,7 +62,7 @@ class SirenFacade:
             return SirenResponseFactory(self.engine, self._resources).error(request, response)
 
         operation = self._operation(request.method, request.path)
-        if operation is None:
+        if operation is None or operation.resource is None:
             return SirenResponseFactory(self.engine, self._resources).command(request, api_path, response)
         return SirenResponseFactory(self.engine, self._resources).resource(request, match.kwargs, operation, response)
 
