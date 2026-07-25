@@ -51,7 +51,6 @@ export function BrowserShell() {
         onNavigate={navigation.navigate}
         onRetry={navigation.retry}
         resource={navigation.resource}
-        resources={navigation.resources}
       />
     </AppShell>
   );

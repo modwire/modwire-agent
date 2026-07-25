@@ -31,6 +31,7 @@ it("renders entity properties, classes, structured values, links, and embedded e
       {
         rel: ["related"],
         class: ["tag"],
+        title: "network",
         properties: { title: "network" },
         links: [{ rel: ["self"], href: "/siren/tags/network" }],
       },
@@ -47,19 +48,22 @@ it("renders entity properties, classes, structured values, links, and embedded e
   expect(onNavigate).toHaveBeenCalledWith("/siren/records/http");
 });
 
-it("renders populated collections and navigates only advertised embedded targets", () => {
+it("renders collections as a flat list without repeating collection or item metadata", () => {
   const onNavigate = renderPage({
     class: ["collection"],
     title: "Records",
     entities: [
       { rel: ["item"], href: "/siren/records/http", title: "HTTP" },
-      { rel: ["item"], class: ["record"], properties: { title: "No target" } },
+      { rel: ["item"], class: ["record"], title: "No target", properties: { title: "No target" } },
     ],
   });
 
-  expect(screen.getByRole("heading", { name: "Records" })).toBeVisible();
-  expect(screen.getByRole("heading", { name: "HTTP" })).toBeVisible();
-  expect(screen.getByRole("heading", { name: "No target" })).toBeVisible();
+  expect(screen.getByRole("list")).toBeVisible();
+  expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  expect(screen.queryByRole("heading", { name: "Records" })).not.toBeInTheDocument();
+  expect(screen.queryByText("collection")).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "HTTP" })).toBeVisible();
+  expect(screen.getByText("No target")).toBeVisible();
 
   fireEvent.click(screen.getByRole("button", { name: "HTTP" }));
   expect(onNavigate).toHaveBeenCalledWith("/siren/records/http");

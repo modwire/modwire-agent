@@ -22,7 +22,7 @@ export function ResourcePage({ isLoading, onNavigate, resource }: ResourcePagePr
   const { entity } = resource;
 
   if (entity.class?.includes("collection")) {
-    return <CollectionRepresentation entity={entity} onNavigate={onNavigate} />;
+    return <CollectionRepresentation entity={entity} onNavigate={onNavigate} resourceUrl={resource.url} />;
   }
 
   if (entity.class?.includes("error") || entity.properties || entity.links?.length || entity.entities?.length) {

@@ -1,37 +1,54 @@
-import { Card, SimpleGrid, Stack, Title } from "@mantine/core";
-import type { SirenEntity } from "siren-parser";
-import { EmbeddedResourceCard } from "./EmbeddedResourceCard";
-import { PropertyGrid } from "./PropertyGrid";
-import { RepresentationLinks } from "./RepresentationLinks";
-import { ResourceClasses } from "./ResourceClasses";
+import { Anchor, List, Text } from "@mantine/core";
+import type { SirenEntity, SirenLink, SirenSubEntity } from "siren-parser";
+import { linkLabel } from "../../navigation/functions/representationLabel";
+import { resourceLabel } from "../functions/resourceLabel";
 
 type CollectionRepresentationProps = {
   entity: SirenEntity;
   onNavigate: (url: string) => void;
+  resourceUrl: string;
 };
 
-export function CollectionRepresentation({ entity, onNavigate }: CollectionRepresentationProps) {
+function targetFor(resource: SirenSubEntity): SirenLink | undefined {
+  return "href" in resource ? resource : resource.getLinkByRel("self");
+}
+
+function pointsToCurrentResource(target: SirenLink, resourceUrl: string): boolean {
+  return new URL(target.href, window.location.origin).href === new URL(resourceUrl, window.location.origin).href;
+}
+
+function CollectionItem({ onNavigate, resource, resourceUrl }: { onNavigate: (url: string) => void; resource: SirenSubEntity; resourceUrl: string }) {
+  const target = targetFor(resource);
+  const label = resourceLabel(resource) ?? (target ? linkLabel(target) : "Resource");
+
   return (
-    <Stack gap="md">
-      <Card p="md" withBorder>
-        <Stack gap="md">
-          {entity.title ? <Title order={2}>{entity.title}</Title> : null}
-          <ResourceClasses classes={entity.class} />
-          <PropertyGrid properties={entity.properties} />
-          <RepresentationLinks links={entity.links} onNavigate={onNavigate} />
-        </Stack>
-      </Card>
-      {entity.entities?.length ? (
-        <SimpleGrid cols={{ base: 1, md: 2 }}>
-          {entity.entities.map((resource, index) => (
-            <EmbeddedResourceCard
-              key={"href" in resource ? resource.href : `${resource.rel?.join("-") ?? "resource"}-${index}`}
-              onNavigate={onNavigate}
-              resource={resource}
-            />
-          ))}
-        </SimpleGrid>
-      ) : null}
-    </Stack>
+    <List.Item>
+      {target && !pointsToCurrentResource(target, resourceUrl) ? (
+        <Anchor component="button" onClick={() => onNavigate(target.href)} type="button">
+          {label}
+        </Anchor>
+      ) : (
+        <Text span>{label}</Text>
+      )}
+    </List.Item>
+  );
+}
+
+export function CollectionRepresentation({ entity, onNavigate, resourceUrl }: CollectionRepresentationProps) {
+  if (!entity.entities?.length) {
+    return <Text c="dimmed">No items.</Text>;
+  }
+
+  return (
+    <List spacing="xs" withPadding>
+      {entity.entities.map((resource, index) => (
+        <CollectionItem
+          key={"href" in resource ? resource.href : `${resource.rel?.join("-") ?? "resource"}-${index}`}
+          onNavigate={onNavigate}
+          resource={resource}
+          resourceUrl={resourceUrl}
+        />
+      ))}
+    </List>
   );
 }

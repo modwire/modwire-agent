@@ -11,8 +11,20 @@ class SirenApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/vnd.siren+json")
         self.assertEqual(response.json()["class"], ["api", "entry-point"])
+        self.assertEqual(response.json()["title"], "Modwire API")
         self.assertEqual(response.json()["properties"]["title"], "Modwire API")
-        self.assertIn({"rel": ["collection"], "href": "http://testserver/siren/records"}, response.json()["links"])
+        self.assertIn(
+            {"rel": ["collection"], "href": "http://testserver/siren/records", "title": "Records"},
+            response.json()["links"],
+        )
+
+    def test_supplies_titles_for_collections_embedded_entities_and_errors(self) -> None:
+        tags = self.client.get("/siren/tags").json()
+        error = self.client.get("/siren/languages/not-a-language").json()
+
+        self.assertEqual(tags["title"], "Tags")
+        self.assertEqual(tags["links"][0]["title"], "Tags")
+        self.assertEqual(error["title"], "Error")
 
     def test_advertises_and_executes_a_tag_write_action(self) -> None:
         document = self.client.get("/siren/tags").json()
@@ -32,7 +44,9 @@ class SirenApiTests(TestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response["Content-Type"], "application/vnd.siren+json")
+        self.assertEqual(response.json()["title"], "Tags")
         self.assertEqual(response.json()["class"], ["collection", "tag"])
+        self.assertEqual(response.json()["entities"][0]["title"], "architecture")
         self.assertEqual(response.json()["entities"][0]["properties"]["name"], "architecture")
 
     def test_projects_api_errors_as_siren_documents(self) -> None:

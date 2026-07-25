@@ -1,18 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import type { SirenLink } from "siren-parser";
-import { representationLabel } from "../functions/representationLabel";
 import { normalizeResourceUrl, resourceLocation, resourceUrlFromLocation, rootResourceUrl } from "../functions/resourceUrl";
 import { fetchSirenResource, type SirenResource } from "../services/fetchSirenResource";
 
 type BrowserHistoryState = {
   modwireSirenPosition?: number;
   modwireSirenResourceUrl?: string;
-};
-
-type VisitedResource = {
-  label: string;
-  url: string;
 };
 
 export type SirenNavigation = {
@@ -22,7 +16,6 @@ export type SirenNavigation = {
   isLoading: boolean;
   links: SirenLink[];
   navigate: (url: string) => void;
-  resources: VisitedResource[];
   resource: SirenResource | null;
   resourceUrl: string;
   retry: () => void;
@@ -42,7 +35,6 @@ export function useSirenNavigation(): SirenNavigation {
   const [rootUrl] = useState(rootResourceUrl);
   const [resourceUrl, setResourceUrl] = useState(() => resourceUrlFromLocation(rootUrl));
   const [error, setError] = useState<Error | null>(null);
-  const [resources, setResources] = useState<VisitedResource[]>([]);
   const [position, setPosition] = useState(() => historyState().modwireSirenPosition ?? 0);
   const [highestPosition, setHighestPosition] = useState(position);
   const rootQuery = useQuery({
@@ -109,23 +101,6 @@ export function useSirenNavigation(): SirenNavigation {
   }, [rootUrl]);
 
   useEffect(() => {
-    if (!resourceQuery.data) {
-      return;
-    }
-
-    const resource = {
-      label: representationLabel(resourceQuery.data.entity, resourceQuery.data.url),
-      url: resourceQuery.data.url,
-    };
-
-    setResources((current) =>
-      current.some((item) => item.url === resource.url)
-        ? current.map((item) => (item.url === resource.url ? resource : item))
-        : [...current, resource],
-    );
-  }, [resourceQuery.data]);
-
-  useEffect(() => {
     if (resourceQuery.error) {
       setError(errorFrom(resourceQuery.error));
     }
@@ -140,7 +115,6 @@ export function useSirenNavigation(): SirenNavigation {
     isLoading: resourceQuery.isFetching,
     links: rootQuery.data?.entity.links ?? [],
     navigate,
-    resources,
     resource: resourceQuery.data ?? null,
     resourceUrl,
     retry,
