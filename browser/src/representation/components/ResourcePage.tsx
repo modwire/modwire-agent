@@ -1,4 +1,4 @@
-import type { SirenResource } from "../../navigation/services/fetchSirenResource";
+import type { SirenResource } from "../../siren/client";
 import { CollectionRepresentation } from "./CollectionRepresentation";
 import { EmptyRepresentation } from "./EmptyRepresentation";
 import { EntityRepresentation } from "./EntityRepresentation";

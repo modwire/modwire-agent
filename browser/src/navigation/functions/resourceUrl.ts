@@ -1,3 +1,5 @@
+import { canonicalSirenUrl } from "../../siren/url";
+
 const RESOURCE_PARAMETER = "resource";
 
 export function rootResourceUrl(): string {
@@ -5,14 +7,7 @@ export function rootResourceUrl(): string {
 }
 
 export function normalizeResourceUrl(value: string): string {
-  const address = value.trim();
-  const resourceUrl = address.startsWith("/") ? new URL(address, window.location.origin) : new URL(address);
-
-  if (resourceUrl.protocol !== "http:" && resourceUrl.protocol !== "https:") {
-    throw new TypeError(resourceUrl.protocol);
-  }
-
-  return resourceUrl.href;
+  return canonicalSirenUrl(value);
 }
 
 export function resourceUrlFromLocation(rootUrl: string): string {

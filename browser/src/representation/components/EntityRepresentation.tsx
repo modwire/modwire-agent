@@ -16,7 +16,7 @@ export function EntityRepresentation({ entity, onNavigate }: EntityRepresentatio
       <Stack gap="md">
         {entity.title ? <Title order={2}>{entity.title}</Title> : null}
         <ResourceClasses classes={entity.class} />
-        <PropertyGrid properties={entity.properties} />
+        {/* <PropertyGrid properties={entity.properties} /> */}
         <RepresentationLinks links={entity.links} onNavigate={onNavigate} />
         {entity.entities?.length ? (
           <SimpleGrid cols={{ base: 1, md: 2 }}>

@@ -2,13 +2,18 @@ import { MantineProvider } from "@mantine/core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Entity } from "siren-parser";
 import { afterEach, expect, it, vi } from "vitest";
-import type { SirenResource } from "../../navigation/services/fetchSirenResource";
+import type { SirenResource } from "../../siren/client";
 import { ResourcePage } from "../components/ResourcePage";
 
 afterEach(cleanup);
 
 function resource(document: object): SirenResource {
-  return { entity: Entity(document), url: "http://localhost:8000/siren/records" };
+  return {
+    document: document as SirenResource["document"],
+    entity: Entity(document),
+    status: 200,
+    url: "http://localhost:8000/siren/records",
+  };
 }
 
 function renderPage(document: object, onNavigate = vi.fn()) {
@@ -53,7 +58,13 @@ it("renders collections as a flat list without repeating collection or item meta
     class: ["collection"],
     title: "Records",
     entities: [
-      { rel: ["item"], href: "/siren/records/http", title: "HTTP" },
+      {
+        rel: ["item"],
+        class: ["record"],
+        title: "HTTP",
+        properties: { date: "2026-07-26" },
+        links: [{ rel: ["self"], href: "/siren/records/http" }],
+      },
       { rel: ["item"], class: ["record"], title: "No target", properties: { title: "No target" } },
     ],
   });
@@ -63,6 +74,7 @@ it("renders collections as a flat list without repeating collection or item meta
   expect(screen.queryByRole("heading", { name: "Records" })).not.toBeInTheDocument();
   expect(screen.queryByText("collection")).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "HTTP" })).toBeVisible();
+  expect(screen.getByText("2026-07-26")).toBeVisible();
   expect(screen.getByText("No target")).toBeVisible();
 
   fireEvent.click(screen.getByRole("button", { name: "HTTP" }));

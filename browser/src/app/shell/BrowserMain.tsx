@@ -1,6 +1,6 @@
 import { AppShell, Stack } from "@mantine/core";
 import { NavigationError } from "../../navigation/components/NavigationError";
-import type { SirenResource } from "../../navigation/services/fetchSirenResource";
+import type { SirenResource } from "../../siren/client";
 import { ResourcePage } from "../../representation/components/ResourcePage";
 
 type BrowserMainProps = {

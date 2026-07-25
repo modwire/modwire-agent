@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import type { SirenLink } from "siren-parser";
 import { normalizeResourceUrl, resourceLocation, resourceUrlFromLocation, rootResourceUrl } from "../functions/resourceUrl";
-import { fetchSirenResource, type SirenResource } from "../services/fetchSirenResource";
+import { useSirenResource } from "../../siren/hooks";
+import type { SirenResource } from "../../siren/client";
 
 type BrowserHistoryState = {
   modwireSirenPosition?: number;
@@ -37,16 +37,8 @@ export function useSirenNavigation(): SirenNavigation {
   const [error, setError] = useState<Error | null>(null);
   const [position, setPosition] = useState(() => historyState().modwireSirenPosition ?? 0);
   const [highestPosition, setHighestPosition] = useState(position);
-  const rootQuery = useQuery({
-    queryKey: ["siren-resource", rootUrl],
-    queryFn: ({ signal }) => fetchSirenResource(rootUrl, signal),
-    retry: false,
-  });
-  const resourceQuery = useQuery({
-    queryKey: ["siren-resource", resourceUrl],
-    queryFn: ({ signal }) => fetchSirenResource(resourceUrl, signal),
-    retry: false,
-  });
+  const rootQuery = useSirenResource(rootUrl);
+  const resourceQuery = useSirenResource(resourceUrl);
 
   const navigate = useCallback(
     (value: string) => {

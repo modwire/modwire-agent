@@ -1,4 +1,4 @@
-import { Anchor, List, Text } from "@mantine/core";
+import { Anchor, List, Stack, Text } from "@mantine/core";
 import type { SirenEntity, SirenLink, SirenSubEntity } from "siren-parser";
 import { linkLabel } from "../../navigation/functions/representationLabel";
 import { resourceLabel } from "../functions/resourceLabel";
@@ -17,19 +17,38 @@ function pointsToCurrentResource(target: SirenLink, resourceUrl: string): boolea
   return new URL(target.href, window.location.origin).href === new URL(resourceUrl, window.location.origin).href;
 }
 
-function CollectionItem({ onNavigate, resource, resourceUrl }: { onNavigate: (url: string) => void; resource: SirenSubEntity; resourceUrl: string }) {
+function captionFor(resource: SirenSubEntity): string | undefined {
+  if (!("properties" in resource)) {
+    return undefined;
+  }
+
+  const date = resource.properties?.date;
+  return typeof date === "string" && date ? date : undefined;
+}
+
+type CollectionItemProps = {
+  onNavigate: (url: string) => void;
+  resource: SirenSubEntity;
+  resourceUrl: string;
+};
+
+function CollectionItem({ onNavigate, resource, resourceUrl }: CollectionItemProps) {
   const target = targetFor(resource);
   const label = resourceLabel(resource) ?? (target ? linkLabel(target) : "Resource");
+  const caption = captionFor(resource);
 
   return (
     <List.Item>
-      {target && !pointsToCurrentResource(target, resourceUrl) ? (
-        <Anchor component="button" onClick={() => onNavigate(target.href)} type="button">
-          {label}
-        </Anchor>
-      ) : (
-        <Text span>{label}</Text>
-      )}
+      <Stack gap={0}>
+        {target && !pointsToCurrentResource(target, resourceUrl) ? (
+          <Anchor component="button" onClick={() => onNavigate(target.href)} type="button">
+            {label}
+          </Anchor>
+        ) : (
+          <Text>{label}</Text>
+        )}
+        {caption ? <Text c="dimmed" size="sm">{caption}</Text> : null}
+      </Stack>
     </List.Item>
   );
 }
