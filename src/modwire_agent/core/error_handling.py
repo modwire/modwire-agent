@@ -6,6 +6,8 @@ from django.http import Http404, HttpRequest, HttpResponse
 from modwire_hex import DomainError
 from ninja.errors import HttpError
 from ninja.errors import ValidationError as NinjaValidationError
+from ninja_extra.exceptions import ValidationError as NinjaExtraValidationError
+from pydantic import ValidationError as PydanticValidationError
 
 from modwire_agent.scaffoldings.domain.preview import PreviewFailed
 
@@ -19,6 +21,8 @@ class ExceptionHandlers:
         api.add_exception_handler(PreviewFailed, self.preview_failed_response)
         api.add_exception_handler(DomainError, self.domain_error_response)
         api.add_exception_handler(NinjaValidationError, self.validation_error_response)
+        api.add_exception_handler(NinjaExtraValidationError, self.validation_error_response)
+        api.add_exception_handler(PydanticValidationError, self.validation_error_response)
         api.add_exception_handler(DjangoValidationError, self.validation_error_response)
         api.add_exception_handler(ValueError, self.validation_error_response)
         api.add_exception_handler(Http404, self.not_found_response)
@@ -33,7 +37,7 @@ class ExceptionHandlers:
         return self.response(request, {"detail": str(error)}, status=422)
 
     def validation_error_response(self, request: HttpRequest, error: Exception) -> HttpResponse:
-        return self.generic_error_response(request, error, status=422)
+        return self.response(request, {"detail": GENERIC_ERROR_MESSAGE}, status=422)
 
     def not_found_response(self, request: HttpRequest, error: Exception) -> HttpResponse:
         return self.generic_error_response(request, error, status=404)

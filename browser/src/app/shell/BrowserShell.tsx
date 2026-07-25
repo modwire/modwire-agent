@@ -1,5 +1,6 @@
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useSirenNavigation } from "../../navigation/hooks/useSirenNavigation";
 import { BrowserAside } from "./BrowserAside";
 import { BrowserHeader } from "./BrowserHeader";
 import { BrowserMain } from "./BrowserMain";
@@ -7,6 +8,7 @@ import { BrowserNavbar } from "./BrowserNavbar";
 
 export function BrowserShell() {
   const [navigationOpened, { toggle: toggleNavigation }] = useDisclosure(false);
+  const navigation = useSirenNavigation();
 
   return (
     <AppShell
@@ -15,20 +17,40 @@ export function BrowserShell() {
       navbar={{
         width: 300,
         breakpoint: "sm",
-        collapsed: { mobile: !navigationOpened, desktop: true },
+        collapsed: { mobile: !navigationOpened },
       }}
       padding="md"
     >
       <AppShell.Header>
-        <BrowserHeader navigationOpened={navigationOpened} onNavigationToggle={toggleNavigation} />
+        <BrowserHeader
+          canGoBack={navigation.canGoBack}
+          canGoForward={navigation.canGoForward}
+          isLoading={navigation.isLoading}
+          navigationOpened={navigationOpened}
+          onBack={navigation.goBack}
+          onForward={navigation.goForward}
+          onNavigate={navigation.navigate}
+          onNavigationToggle={toggleNavigation}
+          resourceUrl={navigation.resourceUrl}
+        />
       </AppShell.Header>
       <AppShell.Navbar>
-        <BrowserNavbar />
+        <BrowserNavbar
+          isLoading={navigation.isLoading}
+          links={navigation.links}
+          onNavigate={navigation.navigate}
+          resourceUrl={navigation.resourceUrl}
+        />
       </AppShell.Navbar>
       <AppShell.Aside>
         <BrowserAside />
       </AppShell.Aside>
-      <BrowserMain />
+      <BrowserMain
+        error={navigation.error}
+        onNavigate={navigation.navigate}
+        onRetry={navigation.retry}
+        resources={navigation.resources}
+      />
     </AppShell>
   );
 }

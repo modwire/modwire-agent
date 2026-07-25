@@ -89,12 +89,16 @@ class RecordsController(ControllerBase):
 
     @route.get("", response={200: list[RoutedRecordOutput]}, operation_id="list_published_records")
     def list_published(
-        self, request: Any, tag: Annotated[list[str], Query(...)]
+        self, request: Any, tag: Annotated[list[str] | None, Query()] = None
     ) -> tuple[int, list[RoutedRecordOutput]]:
         """List published records that match all requested tags."""
-        records = DjangoRequest.resolve(request, BuildKnowledgeRoute).execute(tag)
+        records = DjangoRequest.resolve(request, BuildKnowledgeRoute).execute(tag or [])
         return 200, [
-            RoutedRecordOutput(id=str(record.identifier), title=record.title, reason=f"tag: {record.matched_tag}")
+            RoutedRecordOutput(
+                id=str(record.identifier),
+                title=record.title,
+                reason=f"tag: {record.matched_tag}" if record.matched_tag else None,
+            )
             for record in records
         ]
 
