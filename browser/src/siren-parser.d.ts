@@ -51,5 +51,5 @@ declare module "siren-parser" {
     getSubEntitiesByRel(rel: string | RegExp): SirenEntity[];
   }
 
-  export default function SirenParse(siren: string | object): SirenEntity;
+  export function Entity(siren: string | object): SirenEntity;
 }

@@ -7,7 +7,7 @@ from uuid import UUID
 class RoutedRecord:
     identifier: UUID
     title: str
-    matched_tag: str
+    matched_tag: str | None
 
 
 class KnowledgeRouter(ABC):
