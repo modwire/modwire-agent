@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
