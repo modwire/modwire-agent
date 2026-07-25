@@ -1,6 +1,6 @@
 # Architecture configuration
 
-`architecture.yaml` describes the source-tree boundaries and structural limits that Modwire checks. In this project it covers the Django API under `src/modwire`.
+`architecture.yaml` describes the source-tree boundaries and structural limits that Modwire checks. In this project it covers the Django API under `src/modwire_agent`.
 
 ## Tags
 

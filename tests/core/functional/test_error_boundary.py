@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from modwire.core.error_handling import GENERIC_ERROR_MESSAGE
+from modwire_agent.core.error_handling import GENERIC_ERROR_MESSAGE
 
 
 class ErrorBoundaryScenarios(TestCase):
@@ -36,9 +36,9 @@ class ErrorBoundaryScenarios(TestCase):
 
     def test_masks_and_logs_unexpected_errors_without_request_data(self) -> None:
         with (
-            self.assertLogs("modwire.core.error_handling", level="ERROR") as logs,
+            self.assertLogs("modwire_agent.core.error_handling", level="ERROR") as logs,
             patch(
-                "modwire.records.adapters.http.tag_api.CreateTag.execute",
+                "modwire_agent.records.adapters.http.tag_api.CreateTag.execute",
                 side_effect=RuntimeError("unexpected failure"),
             ),
         ):

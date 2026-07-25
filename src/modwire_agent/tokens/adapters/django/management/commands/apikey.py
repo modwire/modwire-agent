@@ -1,0 +1,23 @@
+from django.core.management.base import BaseCommand
+
+from modwire_agent.tokens.adapters.api_key.django_api_key_store import DjangoApiKeyStore
+from modwire_agent.tokens.domain.api_key_policy import ApiKeyPolicy
+from modwire_agent.tokens.use_cases.api_key.issue_api_key import IssueApiKey
+
+
+class Command(BaseCommand):
+    help = "Generate an API key."
+
+    def handle(
+        self,
+        verbosity: int,
+        settings: object,
+        pythonpath: object,
+        traceback: bool,
+        no_color: bool,
+        force_color: bool,
+        skip_checks: bool,
+    ) -> None:
+        _, key = IssueApiKey(DjangoApiKeyStore(), ApiKeyPolicy()).execute("api key")
+        self.stdout.write(f"key={key}")
+        self.stdout.write("header=X-API-Key")

@@ -16,19 +16,19 @@ boundaries:
     - { name: framework, match: modwire_hex }
     - { name: entrypoint, match: manage.py }
     - { name: tests, match: tests }
-    - { name: package_root, match: src/modwire/__init__.py }
-    - { name: core, match: src/modwire/core }
-    - { name: root_wiring, match: src/modwire/wiring.py }
-    - { name: languages_context, match: src/modwire/languages }
-    - { name: plans_context, match: src/modwire/plans }
-    - { name: records_context, match: src/modwire/records }
-    - { name: scaffoldings_context, match: src/modwire/scaffoldings }
-    - { name: tokens_context, match: src/modwire/tokens }
-    - { name: wiring, match: "src/modwire/*/wiring.py" }
-    - { name: adapters, match: "src/modwire/*/adapters" }
-    - { name: use_cases, match: "src/modwire/*/use_cases" }
-    - { name: ports, match: "src/modwire/*/ports" }
-    - { name: domain, match: "src/modwire/*/domain" }
+    - { name: package_root, match: src/modwire_agent/__init__.py }
+    - { name: core, match: src/modwire_agent/core }
+    - { name: root_wiring, match: src/modwire_agent/wiring.py }
+    - { name: languages_context, match: src/modwire_agent/languages }
+    - { name: plans_context, match: src/modwire_agent/plans }
+    - { name: records_context, match: src/modwire_agent/records }
+    - { name: scaffoldings_context, match: src/modwire_agent/scaffoldings }
+    - { name: tokens_context, match: src/modwire_agent/tokens }
+    - { name: wiring, match: "src/modwire_agent/*/wiring.py" }
+    - { name: adapters, match: "src/modwire_agent/*/adapters" }
+    - { name: use_cases, match: "src/modwire_agent/*/use_cases" }
+    - { name: ports, match: "src/modwire_agent/*/ports" }
+    - { name: domain, match: "src/modwire_agent/*/domain" }
   rules:
     - { source: languages_context, allow: [framework, core] }
     - { source: plans_context, allow: [framework, core] }
