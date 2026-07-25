@@ -5,13 +5,29 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mantine/core": "^9.4.2",
+    "@mantine/form": "^9.4.2",
+    "@mantine/hooks": "^9.4.2",
+    "@mantine/notifications": "^9.4.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "siren-parser": "9.2.5"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "jsdom": "^29.1.1",
+    "msw": "^2.15.0",
     "typescript": "5.9.2",
-    "vite": "7.1.7"
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
   }
 }
