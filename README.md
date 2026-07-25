@@ -76,4 +76,6 @@ default HTTP port remains `8000`, separate from the container runtime on
 
 ## API
 
-The authenticated API entry point is `GET /api/`.
+The auth-free API entry point is `GET /api/`. Mutating record endpoints use
+`X-Actor-Id` and `X-Actor-Type` for attribution; actor types are `user` and
+`agent`.

@@ -36,7 +36,6 @@ LOCAL_APPS = (
     LocalApp("records", "modwire_agent.records.adapters.http", "RecordsHttpConfig"),
     LocalApp("plans", "modwire_agent.plans.adapters.http", "PlansHttpConfig"),
     LocalApp("scaffoldings", "modwire_agent.scaffoldings.adapters.http", "ScaffoldingsHttpConfig"),
-    LocalApp("tokens", "modwire_agent.tokens.adapters.http", "TokensHttpConfig"),
 )
 
 SHARED_INJECTABLES: tuple[str, ...] = ()

@@ -35,8 +35,6 @@ INSTALLED_APPS = [
     "pgvector.django",
     "modwire_hex.django.apps.ModwireConfig",
     "modwire_agent.languages.adapters.http.apps.LanguagesHttpConfig",
-    "modwire_agent.tokens.adapters.django.apps.TokensDjangoConfig",
-    "modwire_agent.tokens.adapters.http.apps.TokensHttpConfig",
     "modwire_agent.scaffoldings.adapters.django.apps.ScaffoldingsDjangoConfig",
     "modwire_agent.scaffoldings.adapters.http.apps.ScaffoldingsHttpConfig",
     "modwire_agent.records.adapters.django.apps.RecordsConfig",
