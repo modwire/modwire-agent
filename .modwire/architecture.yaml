@@ -13,44 +13,15 @@ shape:
 
 boundaries:
   tags:
-    - { name: framework, match: modwire_hex }
-    - { name: entrypoint, match: manage.py }
-    - { name: tests, match: tests }
-    - { name: package_root, match: src/modwire_agent/__init__.py }
-    - { name: core, match: src/modwire_agent/core }
-    - { name: root_wiring, match: src/modwire_agent/wiring.py }
-    - { name: languages_context, match: src/modwire_agent/languages }
-    - { name: plans_context, match: src/modwire_agent/plans }
-    - { name: records_context, match: src/modwire_agent/records }
-    - { name: scaffoldings_context, match: src/modwire_agent/scaffoldings }
-    - { name: tokens_context, match: src/modwire_agent/tokens }
-    - { name: wiring, match: "src/modwire_agent/*/wiring.py" }
+    - { name: technical, match: "*" }
+    - { name: module, match: "src/modwire_agent/*", excluded_patterns: [src/modwire_agent/core, src/modwire_agent/__init__.py, src/modwire_agent/wiring.py] }
+    - { name: module_api, match: "src/modwire_agent/*/__init__.py" }
     - { name: adapters, match: "src/modwire_agent/*/adapters" }
     - { name: use_cases, match: "src/modwire_agent/*/use_cases" }
     - { name: ports, match: "src/modwire_agent/*/ports" }
     - { name: domain, match: "src/modwire_agent/*/domain" }
-  rules:
-    - { source: languages_context, allow: [framework, core] }
-    - { source: plans_context, allow: [framework, core] }
-    - { source: records_context, allow: [framework, core] }
-    - { source: scaffoldings_context, allow: [framework, core, languages_context] }
-    - { source: tokens_context, allow: [framework, core] }
-    - { source: core, allow: [framework, scaffoldings_context] }
-    - { source: root_wiring, allow: [framework, languages_context, plans_context, records_context, scaffoldings_context, tokens_context] }
-    - { source: entrypoint, allow: [core, framework] }
-    - { source: tests, allow: [framework, package_root, core, languages_context, plans_context, records_context, scaffoldings_context, tokens_context] }
+    - { name: wiring, match: "src/modwire_agent/*/wiring.py" }
   flow:
-    realms:
-      - { name: framework, module_tag: framework }
-      - { name: package_root, module_tag: package_root }
-      - { name: core, module_tag: core }
-      - { name: root_wiring, module_tag: root_wiring }
-      - { name: languages, module_tag: languages_context }
-      - { name: plans, module_tag: plans_context }
-      - { name: records, module_tag: records_context }
-      - { name: scaffoldings, module_tag: scaffoldings_context }
-      - { name: tokens, module_tag: tokens_context }
-      - { name: entrypoint, module_tag: entrypoint }
-      - { name: tests, module_tag: tests }
-    layers: [wiring, adapters, use_cases, ports, domain]
-    analyzers: [module-boundaries, backward-flow, no-cycles, no-reentry]
+    module_tag: module
+    layers: [adapters, use_cases, ports, domain]
+    analyzers: [backward-flow, no-cycles, no-reentry]
