@@ -5,6 +5,7 @@ COPY pyproject.toml uv.lock ./
 RUN pip install --no-cache-dir uv && uv sync --frozen --no-dev --no-install-project
 COPY . .
 RUN uv sync --frozen --no-dev
+RUN uv run python manage.py collectstatic --noinput --skip-checks
 
 FROM python:3.12-slim AS runtime
 ARG MODWIRE_RUNTIME_VERSION=0.0.0+dev

@@ -8,6 +8,21 @@ uv run python manage.py migrate
 uv run python manage.py runserver
 ```
 
+## Siren browser
+
+The TypeScript Siren browser is available at `GET /`. It starts from `/siren/`, validates each representation with `siren-parser`, follows advertised links, and renders forms for advertised actions.
+
+After changing its source, build the static files before starting Django or building the image:
+
+```sh
+cd browser
+npm ci
+npm run typecheck
+npm run build
+```
+
+The built files live in the Django browser adapter's static directory. The production image runs `collectstatic`, and WhiteNoise serves the manifest-versioned assets.
+
 ## Isolated scaffolding API
 
 The container runtime reuses the existing PostgreSQL state; it does not create

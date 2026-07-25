@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "ninja_extra",
     "pgvector.django",
     "modwire_hex.django.apps.ModwireConfig",
+    "modwire_agent.browser.adapters.http.apps.BrowserHttpConfig",
     "modwire_agent.languages.adapters.http.apps.LanguagesHttpConfig",
     "modwire_agent.scaffoldings.adapters.django.apps.ScaffoldingsDjangoConfig",
     "modwire_agent.scaffoldings.adapters.http.apps.ScaffoldingsHttpConfig",
@@ -46,6 +47,7 @@ MIDDLEWARE = [
     "modwire_hex.django.middleware.RequestScopeMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -89,6 +91,11 @@ USE_I18N = USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / ".dev" / "static"
 STATICFILES_DIRS = []
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
+}
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 RECORDS_EMBEDDING_DIMENSIONS = 384
 RECORDS_EMBEDDINGS_ENABLED = os.getenv("RECORDS_EMBEDDINGS_ENABLED", "1") == "1"
