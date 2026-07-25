@@ -1,7 +1,7 @@
 import type { SirenEntity, SirenLink } from "siren-parser";
 
 function resourcePath(url: string): string {
-  const parsed = new URL(url);
+  const parsed = new URL(url, window.location.origin);
   return `${parsed.pathname}${parsed.search}`;
 }
 

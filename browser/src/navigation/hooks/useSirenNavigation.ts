@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { SirenLink } from "siren-parser";
 import { representationLabel } from "../functions/representationLabel";
 import { normalizeResourceUrl, resourceLocation, resourceUrlFromLocation, rootResourceUrl } from "../functions/resourceUrl";
-import { fetchSirenResource } from "../services/fetchSirenResource";
+import { fetchSirenResource, type SirenResource } from "../services/fetchSirenResource";
 
 type BrowserHistoryState = {
   modwireSirenPosition?: number;
@@ -23,6 +23,7 @@ export type SirenNavigation = {
   links: SirenLink[];
   navigate: (url: string) => void;
   resources: VisitedResource[];
+  resource: SirenResource | null;
   resourceUrl: string;
   retry: () => void;
   goBack: () => void;
@@ -140,6 +141,7 @@ export function useSirenNavigation(): SirenNavigation {
     links: rootQuery.data?.entity.links ?? [],
     navigate,
     resources,
+    resource: resourceQuery.data ?? null,
     resourceUrl,
     retry,
   };

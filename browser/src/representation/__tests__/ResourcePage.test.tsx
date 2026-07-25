@@ -1,0 +1,99 @@
+import { MantineProvider } from "@mantine/core";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { Entity } from "siren-parser";
+import { afterEach, expect, it, vi } from "vitest";
+import type { SirenResource } from "../../navigation/services/fetchSirenResource";
+import { ResourcePage } from "../components/ResourcePage";
+
+afterEach(cleanup);
+
+function resource(document: object): SirenResource {
+  return { entity: Entity(document), url: "http://localhost:8000/siren/records" };
+}
+
+function renderPage(document: object, onNavigate = vi.fn()) {
+  render(
+    <MantineProvider>
+      <ResourcePage isLoading={false} onNavigate={onNavigate} resource={resource(document)} />
+    </MantineProvider>,
+  );
+
+  return onNavigate;
+}
+
+it("renders entity properties, classes, structured values, links, and embedded entities", () => {
+  const onNavigate = renderPage({
+    class: ["record"],
+    title: "Record",
+    properties: { title: "HTTP", metadata: { method: "GET", fields: ["path"] } },
+    links: [{ rel: ["self"], href: "/siren/records/http" }],
+    entities: [
+      {
+        rel: ["related"],
+        class: ["tag"],
+        properties: { title: "network" },
+        links: [{ rel: ["self"], href: "/siren/tags/network" }],
+      },
+    ],
+  });
+
+  expect(screen.getByRole("heading", { name: "Record" })).toBeVisible();
+  expect(screen.getByText("record")).toBeVisible();
+  expect(screen.getByText("metadata")).toBeVisible();
+  expect(screen.getByDisplayValue(/"method": "GET"/)).toBeVisible();
+  expect(screen.getByRole("heading", { name: "network" })).toBeVisible();
+
+  fireEvent.click(screen.getByRole("button", { name: /\/siren\/records\/http/ }));
+  expect(onNavigate).toHaveBeenCalledWith("/siren/records/http");
+});
+
+it("renders populated collections and navigates only advertised embedded targets", () => {
+  const onNavigate = renderPage({
+    class: ["collection"],
+    title: "Records",
+    entities: [
+      { rel: ["item"], href: "/siren/records/http", title: "HTTP" },
+      { rel: ["item"], class: ["record"], properties: { title: "No target" } },
+    ],
+  });
+
+  expect(screen.getByRole("heading", { name: "Records" })).toBeVisible();
+  expect(screen.getByRole("heading", { name: "HTTP" })).toBeVisible();
+  expect(screen.getByRole("heading", { name: "No target" })).toBeVisible();
+
+  fireEvent.click(screen.getByRole("button", { name: "HTTP" }));
+  expect(onNavigate).toHaveBeenCalledWith("/siren/records/http");
+  expect(screen.queryByRole("button", { name: /No target/ })).not.toBeInTheDocument();
+});
+
+it("renders an empty representation and an advertised error representation", () => {
+  const { rerender } = render(
+    <MantineProvider>
+      <ResourcePage isLoading={false} onNavigate={vi.fn()} resource={resource({ class: ["empty"] })} />
+    </MantineProvider>,
+  );
+
+  expect(screen.getByText("empty")).toBeVisible();
+
+  rerender(
+    <MantineProvider>
+      <ResourcePage
+        isLoading={false}
+        onNavigate={vi.fn()}
+        resource={resource({ class: ["error"], properties: { detail: "Request failed" } })}
+      />
+    </MantineProvider>,
+  );
+
+  expect(screen.getByText("Request failed")).toBeVisible();
+});
+
+it("renders an accessible loading state", () => {
+  render(
+    <MantineProvider>
+      <ResourcePage isLoading onNavigate={vi.fn()} resource={null} />
+    </MantineProvider>,
+  );
+
+  expect(screen.getByLabelText("Loading resource")).toBeVisible();
+});

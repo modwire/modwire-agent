@@ -34,7 +34,7 @@ export function BrowserShell() {
           resourceUrl={navigation.resourceUrl}
         />
       </AppShell.Header>
-      <AppShell.Navbar>
+      <AppShell.Navbar aria-label="Root navigation">
         <BrowserNavbar
           isLoading={navigation.isLoading}
           links={navigation.links}
@@ -47,8 +47,10 @@ export function BrowserShell() {
       </AppShell.Aside>
       <BrowserMain
         error={navigation.error}
+        isLoading={navigation.isLoading}
         onNavigate={navigation.navigate}
         onRetry={navigation.retry}
+        resource={navigation.resource}
         resources={navigation.resources}
       />
     </AppShell>

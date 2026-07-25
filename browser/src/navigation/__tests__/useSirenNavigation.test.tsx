@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { App } from "../../app/App";
 
@@ -32,7 +32,9 @@ it("navigates from advertised root links and records browser history", async () 
 
   render(<App />);
 
-  const navigation = await screen.findByRole("button", { name: /\/siren\/records/ });
+  const navigation = await within(await screen.findByTestId("root-navigation")).findByRole("button", {
+    name: /\/siren\/records/,
+  });
   fireEvent.click(navigation);
 
   await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(recordsUrl, expect.any(Object)));
@@ -106,7 +108,9 @@ it("surfaces Siren navigation errors with their advertised detail", async () => 
   vi.stubGlobal("fetch", fetchMock);
   render(<App />);
 
-  fireEvent.click(await screen.findByRole("button", { name: /\/siren\/records/ }));
+  fireEvent.click(
+    await within(await screen.findByTestId("root-navigation")).findByRole("button", { name: /\/siren\/records/ }),
+  );
 
   expect(await screen.findByRole("alert")).toHaveTextContent("Request failed.");
   expect(screen.getByLabelText("Retry")).toBeVisible();

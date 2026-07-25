@@ -12,7 +12,7 @@ type BrowserNavbarProps = {
 export function BrowserNavbar({ isLoading, links, onNavigate, resourceUrl }: BrowserNavbarProps) {
   return (
     <AppShell.Section grow p="md">
-      <Stack gap="xs">
+      <Stack data-testid="root-navigation" gap="xs">
         {links.map((link) => (
           <NavLink
             active={link.href === resourceUrl}
