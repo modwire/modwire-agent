@@ -1,5 +1,11 @@
 import type { ReactElement } from "react";
+import { AppProviders } from "./providers/AppProviders";
+import { BrowserShell } from "./shell/BrowserShell";
 
 export function App(): ReactElement {
-  return <div id="modwire-siren-browser" />;
+  return (
+    <AppProviders>
+      <BrowserShell />
+    </AppProviders>
+  );
 }
