@@ -30,6 +30,8 @@ declare module "siren-parser" {
     hasClass(name: string): boolean;
   }
 
+  export type SirenSubEntity = SirenEntity | SirenLink;
+
   export interface SirenEntity {
     rel?: string[];
     title?: string;
@@ -38,7 +40,7 @@ declare module "siren-parser" {
     class?: string[];
     actions?: SirenAction[];
     links?: SirenLink[];
-    entities?: SirenEntity[];
+    entities?: SirenSubEntity[];
     hasActionByName(name: string | RegExp): boolean;
     hasClass(name: string | RegExp): boolean;
     hasSubEntityByRel(rel: string | RegExp): boolean;
@@ -47,8 +49,8 @@ declare module "siren-parser" {
     getActionByName(name: string | RegExp): SirenAction | undefined;
     getLinkByRel(rel: string | RegExp): SirenLink | undefined;
     getLinksByRel(rel: string | RegExp): SirenLink[];
-    getSubEntityByRel(rel: string | RegExp): SirenEntity | undefined;
-    getSubEntitiesByRel(rel: string | RegExp): SirenEntity[];
+    getSubEntityByRel(rel: string | RegExp): SirenSubEntity | undefined;
+    getSubEntitiesByRel(rel: string | RegExp): SirenSubEntity[];
   }
 
   export function Entity(siren: string | object): SirenEntity;

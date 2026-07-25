@@ -12,7 +12,7 @@ it("mounts the browser application", () => {
   vi.stubGlobal(
     "fetch",
     vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ links: [], properties: { title: "Modwire API" } }), {
+      new Response(JSON.stringify({ title: "Modwire API", links: [], properties: { title: "Modwire API" } }), {
         headers: { "content-type": "application/vnd.siren+json" },
       }),
     ),

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { App } from "../../app/App";
 
@@ -19,10 +19,11 @@ it("navigates from advertised root links and records browser history", async () 
           input === rootUrl
             ? {
                 class: ["api", "entry-point"],
+                title: "Modwire API",
                 links: [{ href: recordsUrl, rel: ["collection"] }],
                 properties: { title: "Modwire API" },
               }
-            : { class: ["collection"], links: [], properties: { title: "Records" } },
+            : { class: ["collection"], title: "Records", links: [], properties: { title: "Records" } },
         ),
         { headers: { "content-type": "application/vnd.siren+json" } },
       ),
@@ -32,13 +33,15 @@ it("navigates from advertised root links and records browser history", async () 
 
   render(<App />);
 
-  const navigation = await screen.findByRole("button", { name: /\/siren\/records/ });
+  const navigation = await within(await screen.findByTestId("root-navigation")).findByRole("button", {
+    name: /\/siren\/records/,
+  });
   fireEvent.click(navigation);
 
   await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(recordsUrl, expect.any(Object)));
   expect(window.location.search).toContain(encodeURIComponent(recordsUrl));
   expect(screen.getByLabelText("Back")).toBeEnabled();
-  expect(await screen.findByRole("button", { name: "Records" })).toBeVisible();
+  expect(await screen.findByText("No items.")).toBeVisible();
 
   fireEvent.click(screen.getByLabelText("Back"));
 
@@ -51,7 +54,7 @@ it("keeps invalid pasted resource addresses recoverable", async () => {
   vi.stubGlobal(
     "fetch",
     vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ links: [], properties: { title: "Modwire API" } }), {
+      new Response(JSON.stringify({ title: "Modwire API", links: [], properties: { title: "Modwire API" } }), {
         headers: { "content-type": "application/vnd.siren+json" },
       }),
     ),
@@ -68,7 +71,7 @@ it("keeps invalid pasted resource addresses recoverable", async () => {
 
 it("opens a pasted Siren resource path", async () => {
   const fetchMock = vi.fn().mockResolvedValue(
-    new Response(JSON.stringify({ class: ["collection"], links: [], properties: { title: "Records" } }), {
+    new Response(JSON.stringify({ class: ["collection"], title: "Records", links: [], properties: { title: "Records" } }), {
       headers: { "content-type": "application/vnd.siren+json" },
     }),
   );
@@ -91,6 +94,7 @@ it("surfaces Siren navigation errors with their advertised detail", async () => 
           input === rootUrl
             ? {
                 class: ["api", "entry-point"],
+                title: "Modwire API",
                 links: [{ href: recordsUrl, rel: ["collection"] }],
                 properties: { title: "Modwire API" },
               }
@@ -106,7 +110,9 @@ it("surfaces Siren navigation errors with their advertised detail", async () => 
   vi.stubGlobal("fetch", fetchMock);
   render(<App />);
 
-  fireEvent.click(await screen.findByRole("button", { name: /\/siren\/records/ }));
+  fireEvent.click(
+    await within(await screen.findByTestId("root-navigation")).findByRole("button", { name: /\/siren\/records/ }),
+  );
 
   expect(await screen.findByRole("alert")).toHaveTextContent("Request failed.");
   expect(screen.getByLabelText("Retry")).toBeVisible();

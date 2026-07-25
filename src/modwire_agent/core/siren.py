@@ -3,6 +3,7 @@ import re
 from collections.abc import Mapping
 from functools import cached_property
 from typing import Any
+from urllib.parse import unquote, urlparse
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import Resolver404, resolve
@@ -152,7 +153,66 @@ class SirenFacade:
 
     @staticmethod
     def response(document: Mapping[str, Any], status: int) -> JsonResponse:
-        return JsonResponse(document, status=status, content_type=_SIREN_MEDIA_TYPE)
+        payload = dict(document)
+        SirenFacade.add_titles(payload)
+        return JsonResponse(payload, status=status, content_type=_SIREN_MEDIA_TYPE)
+
+    @classmethod
+    def add_titles(cls, document: dict[str, Any]) -> None:
+        if not isinstance(document.get("title"), str) or not document["title"].strip():
+            document["title"] = cls.document_title(document)
+
+        for entity in document.get("entities", []):
+            if isinstance(entity, dict):
+                cls.add_titles(entity)
+
+        for link in document.get("links", []):
+            if isinstance(link, dict):
+                if not isinstance(link.get("title"), str) or not link["title"].strip():
+                    link["title"] = document["title"] if "self" in link.get("rel", []) else cls.link_title(link)
+
+        for action in document.get("actions", []):
+            if isinstance(action, dict):
+                if not isinstance(action.get("title"), str) or not action["title"].strip():
+                    action["title"] = cls.humanize(str(action.get("name", "action")))
+
+    @classmethod
+    def document_title(cls, document: Mapping[str, Any]) -> str:
+        properties = document.get("properties")
+        if isinstance(properties, Mapping):
+            for key in ("title", "name", "label"):
+                value = properties.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value
+
+        classes = document.get("class")
+        if isinstance(classes, list):
+            nouns = [value for value in classes if isinstance(value, str) and value not in {"collection", "entity"}]
+            if nouns:
+                noun = cls.humanize(nouns[-1])
+                return cls.pluralize(noun) if "collection" in classes else noun
+
+        return "Resource"
+
+    @staticmethod
+    def link_title(link: Mapping[str, Any]) -> str:
+        href = link.get("href")
+        if isinstance(href, str):
+            path = unquote(urlparse(href).path).rstrip("/")
+            if path:
+                return SirenFacade.humanize(path.rsplit("/", maxsplit=1)[-1])
+        return "Resource"
+
+    @staticmethod
+    def humanize(value: str) -> str:
+        words = re.sub(r"[_-]+", " ", value).strip()
+        return words.replace("/", " ").title() if words else "Resource"
+
+    @staticmethod
+    def pluralize(value: str) -> str:
+        if value.endswith("y") and len(value) > 1 and value[-2].lower() not in "aeiou":
+            return f"{value[:-1]}ies"
+        return value if value.endswith("s") else f"{value}s"
 
 
 facade = SirenFacade()
