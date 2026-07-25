@@ -1,16 +1,3 @@
-shape:
-# agent untouchable start
-  max_classes_per_file: 4
-  max_types_per_file: 1
-  max_abstract_classes_per_file: 1
-  max_functions_per_file: 0
-  allow_optional_function_args: false
-  allow_optional_method_args: false
-  allow_optional_class_properties: false
-  allow_import_aliases: true
-  require_joined_imports: true
-# agent untouchable end
-
 boundaries:
   tags:
     - { name: technical, match: "*" }
@@ -24,3 +11,21 @@ boundaries:
     module_tag: module
     layers: [adapters, use_cases, ports, domain]
     analyzers: [backward-flow, no-cycles, no-reentry]
+
+
+shape:
+  realms:
+    - name: project
+      match: "src/modwire_agent/*"
+      shape:
+      # agent untouchable start
+        max_classes_per_file: 4
+        max_types_per_file: 1
+        max_abstract_classes_per_file: 1
+        max_functions_per_file: 0
+        allow_optional_function_args: false
+        allow_optional_method_args: false
+        allow_optional_class_properties: false
+        allow_import_aliases: true
+        require_joined_imports: true
+      # agent untouchable end
