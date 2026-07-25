@@ -3,7 +3,9 @@ from collections.abc import Callable
 from ..django.models.scaffolding import Scaffolding
 from ..django.models.template import Template
 from ..django.models.variable import Variable
-from .contracts import ChangeSet, ConvergencePlan, DesiredScaffolding
+from .change_set import ChangeSet
+from .contracts import DesiredScaffolding
+from .convergence_plan import ConvergencePlan
 
 
 class ScaffoldingConvergencePlanner:

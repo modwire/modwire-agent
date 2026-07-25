@@ -17,7 +17,7 @@ dependencies = [
     "modwire-cli>=1.1.0",
     "modwire-hex",
     "modwire-mermaid>=1.0.1,<2",
-    "modwire-siren==2.1.0",
+    "modwire-siren==3.0.0",
     "pgvector",
     "psycopg[binary]",
     "pydantic",

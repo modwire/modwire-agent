@@ -9,7 +9,7 @@ class CodePackageWriter:
         package: CodePackage,
         destination: Path,
         *,
-        overwrite: bool = True,
+        overwrite: bool,
     ) -> None:
         root = destination.resolve()
         root.mkdir(parents=True, exist_ok=True)

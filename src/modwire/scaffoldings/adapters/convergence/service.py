@@ -7,7 +7,8 @@ from modwire.languages.use_cases.language.get_language import GetLanguage
 
 from ...ports.scaffolding_convergence import ScaffoldingConvergence
 from ..django.models.scaffolding import Scaffolding
-from .contracts import ConvergencePlan, ConvergenceResult
+from .convergence_plan import ConvergencePlan
+from .convergence_result import ConvergenceResult
 from .planner import ScaffoldingConvergencePlanner
 from .validator import ScaffoldingAggregateValidator
 from .writer import ScaffoldingAggregateWriter
@@ -28,21 +29,21 @@ class DjangoScaffoldingConvergence(ScaffoldingConvergence):
         templates = request["templates"]
         dry_run = bool(request["dry_run"])
         language = self.languages.execute(language_id)
-        current = self._current(language, name)
+        current = self._current(language, name, False)
         desired = self.validator.validate(language, current, name, description, variables, templates)
         plan = self.planner.plan(current, desired)
         if dry_run:
             return self._result(None, name, True, plan)
 
         with transaction.atomic():
-            current = self._current(language, name, lock=True)
+            current = self._current(language, name, True)
             desired = self.validator.validate(language, current, name, description, variables, templates)
             plan = self.planner.plan(current, desired)
             scaffolding = self.writer.apply(language, current, desired)
         return self._result(scaffolding.id, name, False, plan)
 
     @staticmethod
-    def _current(language: Language, name: str, *, lock: bool = False) -> Scaffolding | None:
+    def _current(language: Language, name: str, lock: bool) -> Scaffolding | None:
         query = Scaffolding.objects.filter(language_id=language.id, name=name)
         return query.select_for_update().first() if lock else query.first()
 

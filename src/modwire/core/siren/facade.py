@@ -48,7 +48,7 @@ class SirenFacade:
             )
         )
         document["properties"] = self.schema["info"]
-        return SirenResponseFactory.response(document)
+        return SirenResponseFactory.response(document, 200)
 
     def dispatch(self, request: HttpRequest, path: str) -> HttpResponse:
         api_path = f"/api/{path}"

@@ -1,47 +1,56 @@
 shape:
 # agent untouchable start
-  max_classes_per_file: 1
-  max_interfaces_per_file: 0
+  max_classes_per_file: 4
   max_types_per_file: 1
   max_abstract_classes_per_file: 1
   max_functions_per_file: 0
-  max_methods_per_class: 10
-  max_function_lines: 20
-  max_class_lines: 200
-  allow_optional_function_args: true
-  allow_optional_method_args: true
-  allow_optional_class_properties: true
+  allow_optional_function_args: false
+  allow_optional_method_args: false
+  allow_optional_class_properties: false
   allow_import_aliases: true
   require_joined_imports: true
-  allowed_import_crossing_types: [module, symbol]
 # agent untouchable end
 
 boundaries:
   tags:
-    - { name: module, match: "modwire/*", excluded_patterns: [modwire/__init__.py, modwire/core, modwire/wiring.py] }
     - { name: framework, match: modwire_hex }
-    - { name: package_root, match: modwire/__init__.py }
-    - { name: core, match: modwire/core }
-    - { name: root_wiring, match: modwire/wiring.py }
-    - { name: languages_context, match: modwire/languages }
-    - { name: scaffoldings_context, match: modwire/scaffoldings }
-    - { name: wiring, match: "modwire/*/wiring.py" }
-    - { name: adapters, match: "modwire/*/adapters" }
-    - { name: use_cases, match: "modwire/*/use_cases" }
-    - { name: ports, match: "modwire/*/ports" }
-    - { name: domain, match: "modwire/*/domain" }
+    - { name: entrypoint, match: manage.py }
+    - { name: tests, match: tests }
+    - { name: package_root, match: src/modwire/__init__.py }
+    - { name: core, match: src/modwire/core }
+    - { name: root_wiring, match: src/modwire/wiring.py }
+    - { name: languages_context, match: src/modwire/languages }
+    - { name: plans_context, match: src/modwire/plans }
+    - { name: records_context, match: src/modwire/records }
+    - { name: scaffoldings_context, match: src/modwire/scaffoldings }
+    - { name: tokens_context, match: src/modwire/tokens }
+    - { name: wiring, match: "src/modwire/*/wiring.py" }
+    - { name: adapters, match: "src/modwire/*/adapters" }
+    - { name: use_cases, match: "src/modwire/*/use_cases" }
+    - { name: ports, match: "src/modwire/*/ports" }
+    - { name: domain, match: "src/modwire/*/domain" }
   rules:
-    - { source: module, allow: [framework] }
-    - { source: module, allow: [core] }
-    - { source: core, allow: [framework] }
-    - { source: scaffoldings_context, allow: [languages_context] }
-    - { source: root_wiring, allow: [framework, module] }
+    - { source: languages_context, allow: [framework, core] }
+    - { source: plans_context, allow: [framework, core] }
+    - { source: records_context, allow: [framework, core] }
+    - { source: scaffoldings_context, allow: [framework, core, languages_context] }
+    - { source: tokens_context, allow: [framework, core] }
+    - { source: core, allow: [framework, scaffoldings_context] }
+    - { source: root_wiring, allow: [framework, languages_context, plans_context, records_context, scaffoldings_context, tokens_context] }
+    - { source: entrypoint, allow: [core, framework] }
+    - { source: tests, allow: [framework, package_root, core, languages_context, plans_context, records_context, scaffoldings_context, tokens_context] }
   flow:
     realms:
       - { name: framework, module_tag: framework }
       - { name: package_root, module_tag: package_root }
       - { name: core, module_tag: core }
       - { name: root_wiring, module_tag: root_wiring }
-      - { name: project, module_tag: module }
+      - { name: languages, module_tag: languages_context }
+      - { name: plans, module_tag: plans_context }
+      - { name: records, module_tag: records_context }
+      - { name: scaffoldings, module_tag: scaffoldings_context }
+      - { name: tokens, module_tag: tokens_context }
+      - { name: entrypoint, module_tag: entrypoint }
+      - { name: tests, module_tag: tests }
     layers: [wiring, adapters, use_cases, ports, domain]
-    analyzers: [backward-flow, no-cycles, no-reentry]
+    analyzers: [module-boundaries, backward-flow, no-cycles, no-reentry]

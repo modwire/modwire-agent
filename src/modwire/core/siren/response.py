@@ -87,5 +87,5 @@ class SirenResponseFactory:
         return request.build_absolute_uri("/").rstrip("/")
 
     @staticmethod
-    def response(document: dict[str, Any], status: int = 200) -> JsonResponse:
+    def response(document: dict[str, Any], status: int) -> JsonResponse:
         return JsonResponse(document, status=status, content_type=_SIREN_MEDIA_TYPE)

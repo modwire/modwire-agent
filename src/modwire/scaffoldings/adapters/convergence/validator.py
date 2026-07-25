@@ -8,7 +8,9 @@ from modwire.languages.domain.contracts import Language
 from ..django.models.scaffolding import Scaffolding
 from ..django.models.template import Template
 from ..django.models.variable import Variable
-from .contracts import DesiredScaffolding, TemplateSpec, VariableSpec
+from .contracts import DesiredScaffolding
+from .template_spec import TemplateSpec
+from .variable_spec import VariableSpec
 
 
 class ScaffoldingAggregateValidator:

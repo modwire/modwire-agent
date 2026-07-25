@@ -3,7 +3,7 @@ from django.test import TestCase
 
 
 class ScaffoldingPreviewApiTests(TestCase):
-    def converge(self, templates: list[dict[str, str]] | None = None):
+    def converge(self, templates: list[dict[str, str]]):
         return self.client.post(
             "/api/scaffoldings/converge",
             data={
@@ -19,20 +19,24 @@ class ScaffoldingPreviewApiTests(TestCase):
                         "required": True,
                     }
                 ],
-                "templates": templates
-                or [
-                    {
-                        "relative_path": "{{ package_name }}/main.py",
-                        "file_content": "print('{{ package_name }}')\n",
-                    }
-                ],
+                "templates": templates,
                 "dry_run": False,
             },
             content_type="application/json",
         )
 
+    def converge_default(self):
+        return self.converge(
+            [
+                {
+                    "relative_path": "{{ package_name }}/main.py",
+                    "file_content": "print('{{ package_name }}')\n",
+                }
+            ]
+        )
+
     def test_convergence_returns_the_identifier_needed_by_the_remaining_public_api(self) -> None:
-        response = self.converge()
+        response = self.converge_default()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -41,7 +45,7 @@ class ScaffoldingPreviewApiTests(TestCase):
         )
 
     def preview(self, payload: dict[str, object]):
-        convergence = self.converge()
+        convergence = self.converge_default()
         self.assertEqual(convergence.status_code, 200)
         scaffolding_id = convergence.json()["id"]
         return self.client.post(
@@ -75,7 +79,7 @@ class ScaffoldingPreviewApiTests(TestCase):
         )
 
     def test_renders_only_validated_values_and_preserves_template_metadata(self) -> None:
-        convergence = self.converge()
+        convergence = self.converge_default()
         self.assertEqual(convergence.status_code, 200)
         scaffolding_id = convergence.json()["id"]
         bundle = self.client.get(f"/api/scaffoldings/{scaffolding_id}/bundle")
@@ -131,7 +135,7 @@ class ScaffoldingPreviewApiTests(TestCase):
         )
 
     def test_rejects_a_template_override_that_renders_outside_the_package(self) -> None:
-        convergence = self.converge()
+        convergence = self.converge_default()
         self.assertEqual(convergence.status_code, 200)
         scaffolding_id = convergence.json()["id"]
         bundle = self.client.get(f"/api/scaffoldings/{scaffolding_id}/bundle")

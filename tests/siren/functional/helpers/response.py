@@ -17,9 +17,9 @@ class SirenResponse:
     def __getattr__(self, name: str) -> Any:
         return getattr(self._response, name)
 
-    def json(self, **kwargs: Any) -> Any:
+    def json(self) -> Any:
         self._require_siren_media_type()
-        document = self._response.json(**kwargs)
+        document = self._response.json()
         if document.get("class") == ["command"]:
             return document["properties"]
         if document.get("class") == ["error"]:

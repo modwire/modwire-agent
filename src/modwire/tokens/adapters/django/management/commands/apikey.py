@@ -8,7 +8,16 @@ from modwire.tokens.use_cases.api_key.issue_api_key import IssueApiKey
 class Command(BaseCommand):
     help = "Generate an API key."
 
-    def handle(self, *args, **opts):
-        api_key, key = IssueApiKey(DjangoApiKeyStore(), ApiKeyPolicy()).execute("api key")
+    def handle(
+        self,
+        verbosity: int,
+        settings: object,
+        pythonpath: object,
+        traceback: bool,
+        no_color: bool,
+        force_color: bool,
+        skip_checks: bool,
+    ) -> None:
+        _, key = IssueApiKey(DjangoApiKeyStore(), ApiKeyPolicy()).execute("api key")
         self.stdout.write(f"key={key}")
         self.stdout.write("header=X-API-Key")

@@ -30,10 +30,10 @@ class DjangoScaffoldingStore(ScaffoldingCatalog):
         scaffolding.save()
         return scaffolding
 
-    def update(self, scaffolding_id: str, **data):
+    def update(self, scaffolding_id: str, data: dict[str, object]):
         instance = self.get(scaffolding_id)
         if "language_id" in data:
-            instance.language_id = self.languages.execute(data.pop("language_id")).id
+            instance.language_id = self.languages.execute(str(data.pop("language_id"))).id
         for field, value in data.items():
             setattr(instance, field, value)
         instance.full_clean()
