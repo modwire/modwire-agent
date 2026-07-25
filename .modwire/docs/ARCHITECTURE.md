@@ -6,7 +6,7 @@
 
 Each tag gives a source-tree pattern a meaningful name. `module` matches every operational module directly below `src/modwire_agent`, excluding only the root package files and technical `core` package. Adding a module therefore requires no configuration change.
 
-The configuration separates every module into `domain`, `ports`, `use_cases`, and `adapters`. `wiring.py` is tagged for technical dependency rules but is not an architectural layer or module realm.
+The configuration separates every module into `domain`, `ports`, `use_cases`, and `adapters`. Dependency registration is discovered from the application-level `autowiring.py`; it is not an architectural layer or module realm.
 
 | Source | Allowed dependencies |
 | --- | --- |
@@ -18,10 +18,10 @@ The configuration separates every module into `domain`, `ports`, `use_cases`, an
 
 The `backward-flow`, cycle, and re-entry analyzers enforce the generic module and layer map. Keep any cross-module integration narrow and explicit in code.
 
-The Django entry point and `tests/` are mapped as support realms. Their explicit allowances let them bootstrap and exercise the API without widening production context boundaries.
+The Django entry point, application autowiring, and `tests/` are mapped as support realms. Their explicit allowances let them bootstrap and exercise the API without widening production context boundaries.
 
 ## Rules and flow
 
-The project flow orders layers as `adapters`, `use_cases`, `ports`, then `domain`. Keep dependencies moving inward: domain code is framework-free, use cases depend on ports, and adapters implement those ports. Bind concrete adapters only in a module's `wiring.py`.
+The project flow orders layers as `adapters`, `use_cases`, `ports`, then `domain`. Keep dependencies moving inward: domain code is framework-free, use cases depend on ports, and adapters implement those ports. The application-level discovery rules bind concrete adapters to their ports.
 
-When adding a module, add its boundary tags and preserve the same layer layout before relying on it from root wiring. Run `make modwire` whenever imports, wiring, or module boundaries change. The `shape` section is maintained by Modwire; do not edit the marked managed block manually.
+When adding a module, preserve the same layer layout; matching services are discovered automatically. Run `make modwire` whenever imports, autowiring, or module boundaries change. The `shape` section is maintained by Modwire; do not edit the marked managed block manually.

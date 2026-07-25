@@ -14,13 +14,12 @@ shape:
 boundaries:
   tags:
     - { name: technical, match: "*" }
-    - { name: module, match: "src/modwire_agent/*", excluded_patterns: [src/modwire_agent/core, src/modwire_agent/__init__.py, src/modwire_agent/wiring.py] }
+    - { name: module, match: "src/modwire_agent/*", excluded_patterns: [src/modwire_agent/core, src/modwire_agent/__init__.py, src/modwire_agent/autowiring.py] }
     - { name: module_api, match: "src/modwire_agent/*/__init__.py" }
     - { name: adapters, match: "src/modwire_agent/*/adapters" }
     - { name: use_cases, match: "src/modwire_agent/*/use_cases" }
     - { name: ports, match: "src/modwire_agent/*/ports" }
     - { name: domain, match: "src/modwire_agent/*/domain" }
-    - { name: wiring, match: "src/modwire_agent/*/wiring.py" }
   flow:
     module_tag: module
     layers: [adapters, use_cases, ports, domain]

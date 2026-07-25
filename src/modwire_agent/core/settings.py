@@ -59,7 +59,7 @@ if LOCAL_DEVELOPMENT:
     CORS_ALLOW_HEADERS = [*default_headers, "x-actor-id", "x-actor-type"]
     CORS_ALLOW_METHODS = list(default_methods)
 MODWIRE = {
-    "APPLICATION": "modwire_agent.wiring.application",
+    "APPLICATION": "modwire_agent.autowiring.application",
     "NINJA": {"title": "Modwire API", "version": RELEASE_VERSION},
 }
 ROOT_URLCONF = "modwire_agent.core.urls"
