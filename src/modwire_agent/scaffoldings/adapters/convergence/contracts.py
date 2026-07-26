@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 
-from ..django.models.scaffolding import Scaffolding
-from ..django.models.template import Template
-from ..django.models.variable import Variable
+from ..django.models import Scaffolding, Template, Variable
 
 
 @dataclass(frozen=True)

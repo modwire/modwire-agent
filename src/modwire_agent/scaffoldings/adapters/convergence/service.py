@@ -6,7 +6,7 @@ from modwire_agent.languages.domain.contracts import Language
 from modwire_agent.languages.use_cases.language.get_language import GetLanguage
 
 from ...ports.scaffolding_convergence import ScaffoldingConvergence
-from ..django.models.scaffolding import Scaffolding
+from ..django.models import Scaffolding
 from .convergence_plan import ConvergencePlan
 from .convergence_result import ConvergenceResult
 from .planner import ScaffoldingConvergencePlanner

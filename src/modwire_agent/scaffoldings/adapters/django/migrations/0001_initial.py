@@ -3,7 +3,7 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
-import modwire_agent.scaffoldings.adapters.django.models.identifiers
+import modwire_agent.scaffoldings.adapters.django.models
 
 
 class Migration(migrations.Migration):
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Scaffolding',
             fields=[
-                ('id', models.CharField(default=modwire_agent.scaffoldings.adapters.django.models.identifiers.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
+                ('id', models.CharField(default=modwire_agent.scaffoldings.adapters.django.models.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
                 ('language_id', models.CharField(max_length=64)),
                 ('name', models.CharField(max_length=120)),
                 ('description', models.TextField()),
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Template',
             fields=[
-                ('id', models.CharField(default=modwire_agent.scaffoldings.adapters.django.models.identifiers.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
+                ('id', models.CharField(default=modwire_agent.scaffoldings.adapters.django.models.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
                 ('relative_path', models.CharField(max_length=255)),
                 ('file_content', models.TextField(blank=True)),
                 ('write_mode', models.CharField(choices=[('managed', 'Managed'), ('create_if_missing', 'Create if missing')], default='managed', max_length=20)),
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Variable',
             fields=[
-                ('id', models.CharField(default=modwire_agent.scaffoldings.adapters.django.models.identifiers.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
+                ('id', models.CharField(default=modwire_agent.scaffoldings.adapters.django.models.short_uuid, editable=False, max_length=22, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=120)),
                 ('type', models.CharField(choices=[('str', 'Str'), ('int', 'Int'), ('float', 'Float'), ('bool', 'Bool'), ('list', 'List'), ('dict', 'Dict')], max_length=8)),
                 ('description', models.CharField(max_length=100)),

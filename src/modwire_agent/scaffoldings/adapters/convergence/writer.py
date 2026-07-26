@@ -1,8 +1,6 @@
 from modwire_agent.languages.domain.contracts import Language
 
-from ..django.models.scaffolding import Scaffolding
-from ..django.models.template import Template
-from ..django.models.variable import Variable
+from ..django.models import Scaffolding, Template, Variable
 from .contracts import DesiredScaffolding
 
 
