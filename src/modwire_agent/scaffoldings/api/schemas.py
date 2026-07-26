@@ -43,5 +43,5 @@ class GenerateSourceCode(Schema):
     parameters: dict[str, JsonValue]
 
 
-class SourceCode(Schema):
+class Rendering(Schema):
     files: dict[str, str]

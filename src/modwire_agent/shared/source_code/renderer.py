@@ -1,7 +1,6 @@
 import abc
 from collections.abc import Mapping
 
-from .code_map import SourceCodeMap
 from .package import SourceCodePackage
 
 
@@ -11,5 +10,5 @@ class SourceCodeRenderer(abc.ABC):
         self,
         source: SourceCodePackage,
         data: Mapping[str, object],
-    ) -> SourceCodeMap:
+    ) -> SourceCodePackage:
         raise NotImplementedError

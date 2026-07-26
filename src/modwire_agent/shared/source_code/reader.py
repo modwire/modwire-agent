@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from wireup import injectable
+
 from .package import CodePackage
 
 
+@injectable
 @dataclass(frozen=True)
 class CodePackageReader:
-    def read_package(self, root: Path, extensions: list[str]) -> CodePackage:
+    def read_package(self, root: Path, extensions: list[str] | None = None) -> CodePackage:
         root = root.resolve()
         assert root.is_dir()
 
@@ -20,7 +23,7 @@ class CodePackageReader:
                 continue
 
             relative_path = path.relative_to(root).as_posix()
-            if not any(relative_path.endswith(extension) for extension in extensions):
+            if extensions and not any(relative_path.endswith(extension) for extension in extensions):
                 continue
             files[relative_path] = path.read_text(encoding="utf-8")
 
