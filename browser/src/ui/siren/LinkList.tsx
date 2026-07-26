@@ -1,19 +1,21 @@
-import type { Link } from "@siren-js/client";
+import type { Link, Target } from "@siren-js/client";
 
 export type LinkListProps = {
   links: Link[];
-  onFollow: (link: Link) => void;
+  onFollow: (target: Target) => void;
 };
 
 export function LinkList({ links, onFollow }: LinkListProps) {
-  if (!links.length) {
+  const displayedLinks = links.filter((link) => !link.rel.includes("self"));
+
+  if (!displayedLinks.length) {
     return null;
   }
 
   return (
     <nav aria-label="Resource links">
       <ul>
-        {links.map((link) => (
+        {displayedLinks.map((link) => (
           <li key={`${link.rel.join("-")}-${link.href}`}>
             <button onClick={() => onFollow(link)} type="button">
               {link.title}

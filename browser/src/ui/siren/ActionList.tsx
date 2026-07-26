@@ -7,13 +7,15 @@ export type ActionListProps = {
 };
 
 export function ActionList({ actions, onSubmit }: ActionListProps) {
-  if (!actions.length) {
+  const displayedActions = actions.filter((action) => action.method !== "GET" || action.fields.length > 0);
+
+  if (!displayedActions.length) {
     return null;
   }
 
   return (
     <section aria-label="Resource actions">
-      {actions.map((action) => (
+      {displayedActions.map((action) => (
         <ActionForm action={action} key={`${action.method}-${action.href}-${action.name}`} onSubmit={onSubmit} />
       ))}
     </section>

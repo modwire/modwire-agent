@@ -1,10 +1,10 @@
-import type { Action, Entity, Link } from "@siren-js/client";
+import type { Action, Entity, Target } from "@siren-js/client";
 import { ActionList } from "./ActionList";
 import { LinkList } from "./LinkList";
 
 export type EntityViewProps = {
   entity: Entity;
-  onFollow: (link: Link) => void;
+  onFollow: (target: Target) => void;
   onSubmit: (action: Action, values: Record<string, unknown>) => void;
 };
 

@@ -1,6 +1,10 @@
 import { ActionFiller, follow, parse, submit, type Action, type Entity, type Href, type Target } from "@siren-js/client";
 
 export const SIREN_ACCEPT = "application/vnd.siren+json, application/json";
+export const SIREN_ACTOR_HEADERS = {
+  "X-Actor-Id": "browser-user",
+  "X-Actor-Type": "user",
+};
 
 export type SirenClientOptions = {
   baseUrl?: Href;
@@ -29,7 +33,8 @@ export class SirenClient {
 
   constructor({ baseUrl = window.location.origin, headers }: SirenClientOptions = {}) {
     this.baseUrl = baseUrl;
-    this.headers = new Headers(headers);
+    this.headers = new Headers(SIREN_ACTOR_HEADERS);
+    new Headers(headers).forEach((value, name) => this.headers.set(name, value));
   }
 
   async get<T extends object = object>(target: Target, options: SirenRequestOptions = {}): Promise<Entity<T>> {

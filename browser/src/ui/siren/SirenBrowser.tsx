@@ -1,10 +1,10 @@
-import type { Action, Entity, Link } from "@siren-js/client";
+import type { Action, Entity, Target } from "@siren-js/client";
 import { EntityDispatcher } from "./EntityDispatcher";
 
 export type SirenBrowserProps = {
   entity: Entity | null;
   isLoading: boolean;
-  onFollow: (link: Link) => void;
+  onFollow: (target: Target) => void;
   onSubmit: (action: Action, values: Record<string, unknown>) => void;
 };
 
