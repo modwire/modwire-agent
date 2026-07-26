@@ -1,9 +1,9 @@
-import type { SirenAction } from "../../client/SirenAction";
+import type { Action } from "@siren-js/client";
 import { ActionForm } from "./ActionForm";
 
 export type ActionListProps = {
-  actions: SirenAction[];
-  onSubmit: (action: SirenAction, values: Record<string, unknown>) => void;
+  actions: Action[];
+  onSubmit: (action: Action, values: Record<string, unknown>) => void;
 };
 
 export function ActionList({ actions, onSubmit }: ActionListProps) {

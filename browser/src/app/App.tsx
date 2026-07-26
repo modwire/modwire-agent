@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactElement } from "react";
-import type { SirenAction } from "../client/SirenAction";
+import type { Action, Target } from "@siren-js/client";
 import { SirenClient } from "../client/SirenClient";
 import { SirenBrowser } from "../ui/siren/SirenBrowser";
 import { AppProviders } from "./providers/AppProviders";
@@ -11,10 +11,10 @@ export function App(): ReactElement {
   const [entity, setEntity] = useState<Awaited<ReturnType<SirenClient["get"]>> | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [target, setTarget] = useState(ROOT_RESOURCE);
+  const [target, setTarget] = useState<Target>(ROOT_RESOURCE);
 
   const load = useCallback(
-    async (nextTarget: string) => {
+    async (nextTarget: Target) => {
       setError(null);
       setIsLoading(true);
 
@@ -33,7 +33,7 @@ export function App(): ReactElement {
     void load(target);
   }, [load, target]);
 
-  const submit = async (action: SirenAction, values: Record<string, unknown>) => {
+  const submit = async (action: Action, values: Record<string, unknown>) => {
     setError(null);
     setIsLoading(true);
 
@@ -55,7 +55,7 @@ export function App(): ReactElement {
     <AppProviders>
       <main>
         {error ? <p role="alert">{error.message}</p> : null}
-        <SirenBrowser entity={entity} isLoading={isLoading} onFollow={(link) => setTarget(link.href)} onSubmit={submit} />
+        <SirenBrowser entity={entity} isLoading={isLoading} onFollow={setTarget} onSubmit={submit} />
       </main>
     </AppProviders>
   );

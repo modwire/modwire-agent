@@ -1,8 +1,8 @@
-import type { SirenLink } from "../../client/SirenLink";
+import type { Link } from "@siren-js/client";
 
 export type LinkListProps = {
-  links: SirenLink[];
-  onFollow: (link: SirenLink) => void;
+  links: Link[];
+  onFollow: (link: Link) => void;
 };
 
 export function LinkList({ links, onFollow }: LinkListProps) {
