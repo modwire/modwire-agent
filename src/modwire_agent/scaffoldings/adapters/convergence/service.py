@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from django.db import transaction
 
 from modwire_agent.languages.domain.contracts import Language
-from modwire_agent.languages.use_cases.language.get_language import GetLanguage
+from modwire_agent.languages.use_cases.get_language import GetLanguage
 
 from ...ports.outbound import ScaffoldingConvergence
 from ..django.models import Scaffolding

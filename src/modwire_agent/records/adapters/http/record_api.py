@@ -6,16 +6,16 @@ from ninja import Query
 from ninja_extra import ControllerBase, api_controller, route
 
 from ...domain.collaboration.policy import ActorPolicy
-from ...use_cases.proposal.list_content_proposals import ListContentProposals
-from ...use_cases.proposal.propose_content import ProposeContent
-from ...use_cases.record.archive_record import ArchiveRecord
-from ...use_cases.record.build_knowledge_route import BuildKnowledgeRoute
-from ...use_cases.record.get_record_details import GetRecordDetails
-from ...use_cases.record.list_content_revisions import ListContentRevisions
-from ...use_cases.record.publish_record import PublishRecord
-from ...use_cases.record.rename_record import RenameRecord
-from ...use_cases.record.replace_content import ReplaceContent
-from ...use_cases.tag.assign_tags import AssignTags
+from ...use_cases.archive_record import ArchiveRecord
+from ...use_cases.assign_tags import AssignTags
+from ...use_cases.build_knowledge_route import BuildKnowledgeRoute
+from ...use_cases.get_record_details import GetRecordDetails
+from ...use_cases.list_content_proposals import ListContentProposals
+from ...use_cases.list_content_revisions import ListContentRevisions
+from ...use_cases.propose_content import ProposeContent
+from ...use_cases.publish_record import PublishRecord
+from ...use_cases.rename_record import RenameRecord
+from ...use_cases.replace_content import ReplaceContent
 from .actor_headers import ActorHeaders
 from .schemas.content_input import ContentInput
 from .schemas.content_output import ContentOutput

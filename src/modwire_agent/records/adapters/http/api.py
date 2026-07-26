@@ -5,11 +5,11 @@ from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
 from ...domain.collaboration.policy import ActorPolicy
-from ...use_cases.record.create_record import CreateRecord
-from ...use_cases.section.create_section import CreateSection
-from ...use_cases.section.get_section_details import GetSectionDetails
-from ...use_cases.section.list_sections import ListSections
-from ...use_cases.section.reorder_section import ReorderSection
+from ...use_cases.create_record import CreateRecord
+from ...use_cases.create_section import CreateSection
+from ...use_cases.get_section_details import GetSectionDetails
+from ...use_cases.list_sections import ListSections
+from ...use_cases.reorder_section import ReorderSection
 from .actor_headers import ActorHeaders
 from .schemas.record_input import RecordInput
 from .schemas.record_output import RecordOutput

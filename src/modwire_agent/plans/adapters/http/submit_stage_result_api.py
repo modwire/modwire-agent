@@ -4,7 +4,7 @@ from uuid import UUID
 from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
-from ...use_cases.run.submit_stage_result import SubmitStageResult
+from ...use_cases.submit_stage_result import SubmitStageResult
 from .schemas.plan_run_output import PlanRunOutput
 from .schemas.stage_submission_input import StageSubmissionInput
 

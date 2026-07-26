@@ -4,7 +4,7 @@ from uuid import UUID
 from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
-from ...use_cases.run.start_plan_run import StartPlanRun
+from ...use_cases.start_plan_run import StartPlanRun
 from .schemas.plan_run_input import PlanRunInput
 from .schemas.plan_run_output import PlanRunOutput
 

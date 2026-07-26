@@ -3,8 +3,8 @@ from typing import Any
 from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
-from ...use_cases.language.get_language import GetLanguage
-from ...use_cases.language.list_languages import ListLanguages
+from ...use_cases.get_language import GetLanguage
+from ...use_cases.list_languages import ListLanguages
 from .schemas.language_output import LanguageOut
 
 

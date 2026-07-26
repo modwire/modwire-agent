@@ -5,7 +5,7 @@ from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
 from ...domain.collaboration.policy import ActorPolicy
-from ...use_cases.proposal.resolve_content_proposal import ResolveContentProposal
+from ...use_cases.resolve_content_proposal import ResolveContentProposal
 from .actor_headers import ActorHeaders
 from .schemas.content_proposal_output import ContentProposalOutput
 from .schemas.proposal_status_input import ProposalStatusInput

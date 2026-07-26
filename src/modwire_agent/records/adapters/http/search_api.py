@@ -4,7 +4,7 @@ from modwire_hex.django import DjangoRequest
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, route
 
-from ...use_cases.record.search_records import SearchRecords
+from ...use_cases.search_records import SearchRecords
 from .schemas.search_result_output import SearchResultOutput
 
 

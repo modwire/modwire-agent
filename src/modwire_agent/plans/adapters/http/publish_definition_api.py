@@ -8,7 +8,7 @@ from ...domain.definition.stage_definition import StageDefinition
 from ...domain.definition.transition_definition import TransitionDefinition
 from ...domain.gate.gate_definition import GateDefinition
 from ...domain.operation.operation_definition import OperationDefinition
-from ...use_cases.definition.publish_plan_definition import PublishPlanDefinition
+from ...use_cases.publish_plan_definition import PublishPlanDefinition
 from .schemas.plan_definition_input import PlanDefinitionInput
 from .schemas.plan_definition_output import PlanDefinitionOutput
 

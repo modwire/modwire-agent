@@ -4,7 +4,7 @@ from uuid import UUID
 from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
-from ...use_cases.operation.execute_stage_operation import ExecuteStageOperation
+from ...use_cases.execute_stage_operation import ExecuteStageOperation
 
 
 @api_controller("/plans/runs", tags=["plans"])

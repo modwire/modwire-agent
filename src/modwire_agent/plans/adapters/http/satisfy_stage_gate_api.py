@@ -4,7 +4,7 @@ from uuid import UUID
 from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
-from ...use_cases.gate.satisfy_stage_gate import SatisfyStageGate
+from ...use_cases.satisfy_stage_gate import SatisfyStageGate
 from .schemas.gate_satisfaction_input import GateSatisfactionInput
 
 

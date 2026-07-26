@@ -4,8 +4,8 @@ from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
 from ...domain.collaboration.policy import ActorPolicy
-from ...use_cases.tag.create_tag import CreateTag
-from ...use_cases.tag.list_tags import ListTags
+from ...use_cases.create_tag import CreateTag
+from ...use_cases.list_tags import ListTags
 from .actor_headers import ActorHeaders
 from .schemas.tag_input import TagInput
 from .schemas.tag_output import TagOutput
