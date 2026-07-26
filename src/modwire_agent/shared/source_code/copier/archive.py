@@ -20,12 +20,12 @@ class CopierArchive(SourceCodeRenderer):
 
     def render(
         self,
-        root: Path,
         source: SourceCodePackage,
         data: Mapping[str, object],
     ) -> SourceCodeMap:
-        with TemporaryDirectory() as template_directory:
+        with TemporaryDirectory() as template_directory, TemporaryDirectory() as output_directory:
             template = Path(template_directory)
+            root = Path(output_directory)
             self.writer.write(source.package, template, overwrite=True)
             run_copy(
                 str(template),
@@ -35,7 +35,7 @@ class CopierArchive(SourceCodeRenderer):
                 overwrite=True,
                 quiet=True,
             )
-        return SourceCodeMap(
-            source=source,
-            code_map=self.code_map_reader.read(root, source.language),
-        )
+            return SourceCodeMap(
+                source=source,
+                code_map=self.code_map_reader.read(root, source.language),
+            )
