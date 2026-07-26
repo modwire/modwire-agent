@@ -4,26 +4,7 @@ from uuid import UUID
 from modwire_hex.django import DjangoRequest
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, route
-
-from ..actor_policy import ActorPolicy
-from ...use_cases.archive_record import ArchiveRecord
-from ...use_cases.assign_tags import AssignTags
-from ...use_cases.build_knowledge_route import BuildKnowledgeRoute
-from ...use_cases.create_record import CreateRecord
-from ...use_cases.create_section import CreateSection
-from ...use_cases.create_tag import CreateTag
-from ...use_cases.get_record_details import GetRecordDetails
-from ...use_cases.get_section_details import GetSectionDetails
-from ...use_cases.list_content_proposals import ListContentProposals
-from ...use_cases.list_content_revisions import ListContentRevisions
-from ...use_cases.list_sections import ListSections
-from ...use_cases.list_tags import ListTags
-from ...use_cases.propose_content import ProposeContent
-from ...use_cases.publish_record import PublishRecord
-from ...use_cases.rename_record import RenameRecord
-from ...use_cases.reorder_section import ReorderSection
-from ...use_cases.replace_content import ReplaceContent
-from ...use_cases.resolve_content_proposal import ResolveContentProposal
+entProposal
 from ...use_cases.search_records import SearchRecords
 from .schemas import (
     ActorHeaders,
