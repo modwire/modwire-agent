@@ -1,30 +1,27 @@
 from dataclasses import dataclass
 
+from wireup import injectable
+
 from ..models import Scaffolding
 from .repository import ScaffoldingRepository
 
 
+@injectable
 @dataclass(frozen=True)
 class ScaffoldingService:
     repository: ScaffoldingRepository
 
-    def create(self, data: dict):
-        self.repository.save(**data)
+    def create(self, data: dict) -> Scaffolding:
+        return self.repository.save(**data)
 
     def get(self, id: str) -> Scaffolding:
         return self.repository.get(id)
 
-    def find_all(self) -> list[Scaffolding]:
+    def find_all(self):
         return self.repository.find_all()
 
-    def update_scaffolding(self, id: str, data: dict, variables: list[dict], templates: list[dict]):
-        pass
+    def update(self, id: str, data: dict) -> Scaffolding:
+        return self.repository.update(id, **data)
 
-    def delete_variables(self, id: str, variable_ids: list[str]):
-        pass
-
-    def delete_templates(self, id: str, template_ids: list[str]):
-        pass
-
-    def render(self, id: str, parameters: list[str]):
-        pass
+    def delete(self, id: str) -> None:
+        self.repository.delete(id)

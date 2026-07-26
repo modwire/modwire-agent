@@ -1,45 +1,30 @@
-from django.conf import settings
+from modwire_hex.django import DjangoRequest
+from ninja import Status
 from ninja_extra import ControllerBase, api_controller, route
 
 from ..services import ScaffoldingService
 from . import schemas
 
-
-@api_controller("", tags=["Root"])
-class RootController(ControllerBase):
-    @route.get("/", response=dict, operation_id="get_api_root", summary="Discover the API.")
-    def get(self):
-        """Return links to the API's public entry points."""
-        return {
-            "title": "Modwire API",
-            "version": settings.RELEASE_VERSION,
-        }
-
-
 @api_controller("/scaffoldings", tags=["Scaffoldings"])
 class ScaffoldingController(ControllerBase):
-    service: ScaffoldingService
+    @route.post("", response={201: schemas.Scaffolding}, operation_id="create_scaffolding")
+    def create(self, request, body: schemas.ScaffoldingInput):
+        scaffolding = DjangoRequest.resolve(request, ScaffoldingService).create(body.model_dump(mode="json"))
+        return Status(201, scaffolding)
 
-    @route.post("", operation_id="create_scaffolding", summary="Add new source code scaffolding.")
-    def create(self, body: schemas.NewScaffolding):
-        self.service.create(**body.model_dump())
+    @route.get("", response=list[schemas.ScaffoldingSummary], operation_id="find_scaffoldings")
+    def find_all(self, request):
+        return DjangoRequest.resolve(request, ScaffoldingService).find_all()
 
-    @route.put("/{scaffolding_id}", operation_id="update_scaffolding", summary="Add new source code scaffolding.")
-    def update(self, scaffolding_id: str, body: schemas.NewScaffolding):
-        self.service.update_scaffolding(scaffolding_id, **body.model_dump())
+    @route.get("/{scaffolding_id}", response=schemas.Scaffolding, operation_id="get_scaffolding")
+    def get(self, request, scaffolding_id: str):
+        return DjangoRequest.resolve(request, ScaffoldingService).get(scaffolding_id)
 
-    @route.get("", response=list[schemas.Scaffolding], operation_id="find_scaffoldings", summary="Find all Scaffoldings.", )
-    def find_all(self):
-        return self.service.find_all()
+    @route.put("/{scaffolding_id}", response=schemas.Scaffolding, operation_id="update_scaffolding")
+    def update(self, request, scaffolding_id: str, body: schemas.ScaffoldingInput):
+        return DjangoRequest.resolve(request, ScaffoldingService).update(scaffolding_id, body.model_dump(mode="json"))
 
-    @route.get("/{scaffolding_id}", response=schemas.Scaffolding, operation_id="get_scaffolding", summary="Get the scaffolding.")
-    def get(self, scaffolding_id: str):
-        return self.service.get(scaffolding_id)
-
-    @route.post("/{scaffolding_id}/renderings", response={201: schemas.SourceCode}, operation_id="render_scaffolding", summary="Render scaffolding.")
-    def render( self, scaffolding_id: str, body: schemas.GenerateSourceCode):
-        pass
-
-    @route.delete("/{scaffolding_id}/variables", response=list[schemas.Scaffolding], operation_id="find_scaffoldings", summary="Find all Scaffoldings.", )
-    def delete(self, scaffolding_id: str):
-        return self.service.delete_variables(scaffolding_id, )
+    @route.delete("/{scaffolding_id}", response={204: None}, operation_id="delete_scaffolding")
+    def delete(self, request, scaffolding_id: str):
+        DjangoRequest.resolve(request, ScaffoldingService).delete(scaffolding_id)
+        return Status(204, None)

@@ -34,10 +34,11 @@ INSTALLED_APPS = [
     "ninja_extra",
     "pgvector.django",
     "modwire_hex.django.apps.ModwireConfig",
+    "modwire_agent.scaffoldings.apps.ScaffoldingsDjangoConfig",
 ]
 
 MIDDLEWARE = [
-    # "modwire_hex.django.middleware.RequestScopeMiddleware",
+    "modwire_hex.django.middleware.RequestScopeMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",

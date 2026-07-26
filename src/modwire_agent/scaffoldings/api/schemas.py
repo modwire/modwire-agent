@@ -1,28 +1,8 @@
-from ninja import Schema, Field
-from pydantic import JsonValue, ConfigDict
+from ninja import Schema
+from pydantic import JsonValue
 
 
-class StrictSchema(Schema):
-    model_config = ConfigDict(extra="forbid")
-
-
-class NewScaffolding(StrictSchema):
-    language: str
-    name: str
-    description: str
-
-
-class Template(StrictSchema):
-    relative_path: str
-    file_content: str
-    write_mode: str
-
-
-class UpdateTemplate(StrictSchema):
-    id: str
-
-
-class Variable(StrictSchema):
+class Variable(Schema):
     name: str
     shape: str
     description: str
@@ -30,25 +10,38 @@ class Variable(StrictSchema):
     required: bool
 
 
-class UpdateVariable(Variable):
-    id: str
+class Template(Schema):
+    relative_path: str
+    file_content: str
+    write_mode: str
 
 
-class Scaffolding(Template):
-    id: str
-    templates: list[UpdateTemplate] = Field()
-    variables: list[UpdateVariable] = Field()
+class ScaffoldingSpec(Schema):
+    variables: list[Variable]
+    templates: list[Template]
 
 
-class Parameter(StrictSchema):
+class ScaffoldingInput(Schema):
+    language_id: str
     name: str
-    value: JsonValue
+    description: str
+    spec: ScaffoldingSpec
 
 
-class GenerateSourceCode(StrictSchema):
-    parameters: list[Parameter]
-    target_root: str = ""
+class ScaffoldingSummary(Schema):
+    id: str
+    language_id: str
+    name: str
+    description: str
 
 
-class SourceCode(StrictSchema):
+class Scaffolding(ScaffoldingSummary):
+    spec: ScaffoldingSpec
+
+
+class GenerateSourceCode(Schema):
+    parameters: dict[str, JsonValue]
+
+
+class SourceCode(Schema):
     files: dict[str, str]
