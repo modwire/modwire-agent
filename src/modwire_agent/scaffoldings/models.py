@@ -1,6 +1,7 @@
 from django.db import models
 
 from modwire_agent.shared import SourceCodePackage
+
 from ..core.models import ShortUUIDModel
 
 
@@ -12,10 +13,7 @@ class Scaffolding(ShortUUIDModel):
 
     @property
     def source(self) -> SourceCodePackage:
-        return SourceCodePackage(
-            language=self.language_id,
-            package={"files": {template["relative_path"]: template["file_content"] for template in self.spec["templates"]}},
-        )
+        return SourceCodePackage.model_validate(self.spec)
 
     class Meta:
         unique_together = ("language_id", "name")

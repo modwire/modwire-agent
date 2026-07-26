@@ -10,14 +10,8 @@ def test_scaffolding_crud() -> None:
         "name": "Package",
         "description": "Creates a Python package.",
         "spec": {
-            "variables": [],
-            "templates": [
-                {
-                    "relative_path": "src/package/__init__.py",
-                    "file_content": "",
-                    "write_mode": "create_if_missing",
-                }
-            ],
+            "language": "python",
+            "package": {"files": {"src/package/__init__.py": ""}},
         },
     }
 
@@ -35,6 +29,15 @@ def test_scaffolding_crud() -> None:
 
     assert fetched.status_code == 200
     assert fetched.json()["spec"] == payload["spec"]
+
+    rendering = client.post(
+        f"/api/scaffoldings/{scaffolding_id}/renderings",
+        data={"parameters": {}},
+        content_type="application/json",
+    )
+
+    assert rendering.status_code == 200
+    assert rendering.json() == {"files": {"src/package/__init__.py": ""}}
 
     payload["name"] = "Renamed package"
     updated = client.put(f"/api/scaffoldings/{scaffolding_id}", data=payload, content_type="application/json")

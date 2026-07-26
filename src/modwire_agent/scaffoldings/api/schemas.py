@@ -2,23 +2,13 @@ from ninja import Schema
 from pydantic import JsonValue
 
 
-class Variable(Schema):
-    name: str
-    shape: str
-    description: str
-    default_value: JsonValue
-    required: bool
-
-
-class Template(Schema):
-    relative_path: str
-    file_content: str
-    write_mode: str
+class SourceCode(Schema):
+    files: dict[str, str]
 
 
 class ScaffoldingSpec(Schema):
-    variables: list[Variable]
-    templates: list[Template]
+    language: str
+    package: SourceCode
 
 
 class ScaffoldingInput(Schema):
