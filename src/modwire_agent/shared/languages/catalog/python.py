@@ -1,6 +1,9 @@
+from wireup import injectable
+
 from ..base import Language, PackageManager, Tool, VersionProvider
 
 
+@injectable(as_type=Language)
 class Python(Language):
     id: str = "python"
     name: str = "Python"

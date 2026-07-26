@@ -1,6 +1,9 @@
+from wireup import injectable
+
 from ..base import Language, PackageManager, Tool, VersionProvider
 
-@inject()
+
+@injectable(as_type=Language)
 class Markdown(Language):
     id: str = "markdown"
     name: str = "Markdown"

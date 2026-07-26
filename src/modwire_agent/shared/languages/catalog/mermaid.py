@@ -1,6 +1,9 @@
+from wireup import injectable
+
 from ..base import Language, PackageManager, Tool, VersionProvider
 
 
+@injectable(as_type=Language)
 class Mermaid(Language):
     id: str = "mermaid"
     name: str = "Mermaid"

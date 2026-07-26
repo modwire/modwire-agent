@@ -1,6 +1,9 @@
+from wireup import injectable
+
 from ..base import Language, PackageManager, Tool, VersionProvider
 
 
+@injectable(as_type=Language)
 class Typescript(Language):
     id: str = "typescript"
     name: str = "TypeScript"
