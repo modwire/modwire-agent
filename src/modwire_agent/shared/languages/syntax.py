@@ -9,6 +9,9 @@ from ..source_code import SourceCodePackage
 
 
 class Highlighter:
+    """
+    Transforms source code to highlighted HTML
+    """
     def highlight(self, path: str, source: SourceCodePackage, *, template_id: str) -> tuple[str, str]:
         try:
             try:
