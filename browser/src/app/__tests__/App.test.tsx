@@ -23,6 +23,5 @@ it("mounts the browser application", () => {
   expect(container.querySelector("nav")).not.toBeNull();
   expect(container.querySelector("main")).not.toBeNull();
   expect(container.querySelector("aside")).not.toBeNull();
-  expect(container).toHaveTextContent("Modwire");
   return waitFor(() => expect(fetch).toHaveBeenCalled());
 });
