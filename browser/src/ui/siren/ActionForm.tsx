@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Action } from "@siren-js/client";
 
 export type ActionFormProps = {
@@ -7,15 +6,11 @@ export type ActionFormProps = {
 };
 
 export function ActionForm({ action, onSubmit }: ActionFormProps) {
-  const [values, setValues] = useState<Record<string, unknown>>(() =>
-    Object.fromEntries(action.fields.map((field) => [field.name, field.value ?? ""])),
-  );
-
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        onSubmit(action, values);
+        onSubmit(action, Object.fromEntries(new FormData(event.currentTarget)));
       }}
     >
       <fieldset>
@@ -24,10 +19,9 @@ export function ActionForm({ action, onSubmit }: ActionFormProps) {
           <label key={field.name}>
             {field.title ?? field.name}
             <input
+              defaultValue={field.value === undefined ? "" : String(field.value)}
               name={field.name}
-              onChange={(event) => setValues((current) => ({ ...current, [field.name]: event.currentTarget.value }))}
               type={field.type}
-              value={String(values[field.name] ?? "")}
             />
           </label>
         ))}
