@@ -104,24 +104,3 @@ Language = type(
         }
     },
 )
-
-
-class LanguageCatalog(LanguageModel):
-    languages: tuple[Language, ...]
-
-    @model_validator(mode="after")
-    def validate_catalog(self):
-        language_ids = [language.id for language in self.languages]
-        if len(language_ids) != len(set(language_ids)):
-            raise ValueError("language ids must be unique")
-
-        for language in self.languages:
-            manager_ids = [manager.id for manager in language.package_managers]
-            if len(manager_ids) != len(set(manager_ids)):
-                raise ValueError(f"package manager ids must be unique for {language.id}")
-
-            tool_ids = [tool.id for tool in language.tools]
-            if len(tool_ids) != len(set(tool_ids)):
-                raise ValueError(f"tool ids must be unique for {language.id}")
-
-        return self

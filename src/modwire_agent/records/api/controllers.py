@@ -4,8 +4,7 @@ from uuid import UUID
 from modwire_hex.django import DjangoRequest
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, route
-entProposal
-from ...use_cases.search_records import SearchRecords
+
 from .schemas import (
     ActorHeaders,
     ContentInput,

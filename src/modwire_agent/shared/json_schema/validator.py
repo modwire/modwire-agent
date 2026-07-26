@@ -2,9 +2,9 @@ from typing import Any
 
 from jsonschema import Draft202012Validator, SchemaError, ValidationError
 
-from ..plans.domain.definition.invalid_plan_definition import InvalidPlanDefinition
-from ..plans.domain.run.invalid_stage_submission import InvalidStageSubmission
-from ..plans.ports.outbound import SchemaValidator
+from ...plans import InvalidPlanDefinition
+from ...plans import InvalidStageSubmission
+from ...plans import SchemaValidator
 
 
 class JsonSchemaValidator(SchemaValidator):

@@ -5,14 +5,15 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import TextLexer, get_lexer_for_filename
 from pygments.util import ClassNotFound
 
-from ...domain.preview import PreviewError, PreviewFailed
+from ..source_code import SourceCodePackage
 
 
-class SyntaxHighlightingService:
-    def highlight(self, path: str, source: str, *, template_id: str) -> tuple[str, str]:
+class Highlighter:
+    def highlight(self, path: str, source: SourceCodePackage, *, template_id: str) -> tuple[str, str]:
         try:
             try:
-                lexer = get_lexer_for_filename(PurePosixPath(path).name, source)
+                lexer = get_lexer_for_filename(
+                    PurePosixPath(path).name, source)
             except ClassNotFound:
                 lexer = TextLexer()
             language = lexer.aliases[0] if lexer.aliases else "text"

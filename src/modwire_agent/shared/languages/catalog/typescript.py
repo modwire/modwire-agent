@@ -1,4 +1,4 @@
-from .contracts import Language, PackageManager, Tool, VersionProvider
+from ..base import Language, PackageManager, Tool, VersionProvider
 
 
 class Typescript(Language):
