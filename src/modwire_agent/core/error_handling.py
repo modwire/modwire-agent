@@ -9,7 +9,7 @@ from ninja.errors import ValidationError as NinjaValidationError
 from ninja_extra.exceptions import ValidationError as NinjaExtraValidationError
 from pydantic import ValidationError as PydanticValidationError
 
-from modwire_agent.scaffoldings.domain.preview import PreviewFailed
+from modwire_agent.domain.preview import PreviewFailed
 
 GENERIC_ERROR_MESSAGE = "Request failed."
 
