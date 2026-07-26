@@ -3,7 +3,7 @@ from typing import Sequence
 from .base import Language
 
 from ..source_code import CodePackage, SourceCodePackage
-from .syntax import Highlighter
+from ..source_code.syntax import Highlighter
 
 
 @dataclass(frozen=True)

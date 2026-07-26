@@ -5,7 +5,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import TextLexer, get_lexer_for_filename
 from pygments.util import ClassNotFound
 
-from ..source_code import SourceCodePackage
+from . import SourceCodePackage
 
 
 class Highlighter:
