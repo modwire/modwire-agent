@@ -29,4 +29,4 @@ class ScaffoldingService:
         self.repository.delete(id)
 
     def render(self, id: str, parameters: dict):
-        return self.renderer.render(self.get(id).source, parameters)
+        return self.renderer.render(self.get(id).source, parameters).package.files

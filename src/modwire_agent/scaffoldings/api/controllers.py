@@ -24,6 +24,10 @@ class ScaffoldingController(ControllerBase):
     def update(self, request, scaffolding_id: str, body: schemas.ScaffoldingInput):
         return DjangoRequest.resolve(request, ScaffoldingService).update(scaffolding_id, body.model_dump(mode="json"))
 
+    @route.post("/{scaffolding_id}/renderings", response=schemas.Rendering)
+    def create_rendering(self, request, scaffolding_id: str, body: schemas.GenerateSourceCode):
+        return {"files": DjangoRequest.resolve(request, ScaffoldingService).render(scaffolding_id, body.parameters)}
+
     @route.delete("/{scaffolding_id}", response={204: None}, operation_id="delete_scaffolding")
     def delete(self, request, scaffolding_id: str):
         DjangoRequest.resolve(request, ScaffoldingService).delete(scaffolding_id)

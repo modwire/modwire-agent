@@ -6,8 +6,8 @@ from tempfile import TemporaryDirectory
 from copier import run_copy
 from wireup import injectable
 
-from ..code_map import QueryableCodeMapReader, SourceCodeMap
 from ..package import SourceCodePackage
+from ..reader import CodePackageReader
 from ..renderer import SourceCodeRenderer
 from ..writer import CodePackageWriter
 
@@ -16,13 +16,13 @@ from ..writer import CodePackageWriter
 @dataclass(frozen=True)
 class CopierArchive(SourceCodeRenderer):
     writer: CodePackageWriter
-    code_map_reader: QueryableCodeMapReader
+    reader: CodePackageReader
 
     def render(
         self,
         source: SourceCodePackage,
         data: Mapping[str, object],
-    ) -> SourceCodeMap:
+    ) -> SourceCodePackage:
         with TemporaryDirectory() as template_directory, TemporaryDirectory() as output_directory:
             template = Path(template_directory)
             root = Path(output_directory)
@@ -35,7 +35,4 @@ class CopierArchive(SourceCodeRenderer):
                 overwrite=True,
                 quiet=True,
             )
-            return SourceCodeMap(
-                source=source,
-                code_map=self.code_map_reader.read(root, source.language),
-            )
+            return SourceCodePackage(language=source.language, package=self.reader.read_package(root))
