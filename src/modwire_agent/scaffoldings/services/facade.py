@@ -27,3 +27,6 @@ class ScaffoldingService:
 
     def delete(self, id: str) -> None:
         self.repository.delete(id)
+
+    def render(self, id: str, parameters: dict):
+        return self.renderer.render(self.get(id).source, parameters)
