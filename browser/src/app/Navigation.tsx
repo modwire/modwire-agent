@@ -1,5 +1,5 @@
 import type { Link, Target } from "@siren-js/client";
-import { LinkList } from "../ui/siren/LinkList";
+import { SirenNavigation } from "../ui/siren/SirenNavigation";
 
 export type NavigationProps = {
   links: Link[];
@@ -8,5 +8,7 @@ export type NavigationProps = {
 };
 
 export function Navigation({ links, onFollow, target }: NavigationProps) {
-  return <LinkList activeTarget={target} links={links} onFollow={onFollow} />;
+  return (
+    <SirenNavigation activeTarget={target} links={links} onFollow={onFollow} />
+  );
 }

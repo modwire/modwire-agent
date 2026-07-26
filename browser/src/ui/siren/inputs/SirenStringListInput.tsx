@@ -6,7 +6,10 @@ export type SirenStringListInputProps = { field: Field };
 
 export function SirenStringListInput({ field }: SirenStringListInputProps) {
   const [values, setValues] = useState(() =>
-    Array.isArray(field.value) && field.value.every((value) => typeof value === "string") ? field.value : [""],
+    Array.isArray(field.value) &&
+    field.value.every((value) => typeof value === "string")
+      ? field.value
+      : [""],
   );
 
   return (
@@ -16,15 +19,33 @@ export function SirenStringListInput({ field }: SirenStringListInputProps) {
         <Group key={`${field.name}-${index}`}>
           <TextInput
             name={field.name}
-            onChange={(event) => setValues(values.map((item, itemIndex) => (itemIndex === index ? event.target.value : item)))}
+            onChange={(event) =>
+              setValues(
+                values.map((item, itemIndex) =>
+                  itemIndex === index ? event.target.value : item,
+                ),
+              )
+            }
             value={value}
           />
-          <Button onClick={() => setValues(values.filter((_, itemIndex) => itemIndex !== index))} size="xs" type="button" variant="subtle">
+          <Button
+            onClick={() =>
+              setValues(values.filter((_, itemIndex) => itemIndex !== index))
+            }
+            size="xs"
+            type="button"
+            variant="subtle"
+          >
             Remove
           </Button>
         </Group>
       ))}
-      <Button onClick={() => setValues([...values, ""])} size="xs" type="button" variant="light">
+      <Button
+        onClick={() => setValues([...values, ""])}
+        size="xs"
+        type="button"
+        variant="light"
+      >
         Add
       </Button>
     </Stack>

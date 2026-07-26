@@ -33,8 +33,8 @@ class SirenFacade:
         return {resource.reference: resource for resource in self.engine.api.resources}
 
     @cached_property
-    def action_field_types(self) -> dict[str, dict[str, str]]:
-        action_field_types: dict[str, dict[str, str]] = {}
+    def action_form_schemas(self) -> dict[str, Mapping[str, Any]]:
+        action_form_schemas: dict[str, Mapping[str, Any]] = {}
         for path_item in self.schema["paths"].values():
             if not isinstance(path_item, Mapping):
                 continue
@@ -51,13 +51,23 @@ class SirenFacade:
                 properties = body_schema.get("properties")
                 if not isinstance(properties, Mapping):
                     continue
-                fields = {
-                    name: self.field_type(property_schema)
-                    for name, property_schema in properties.items()
-                    if isinstance(name, str) and self.field_type(property_schema) is not None
-                }
-                if fields:
-                    action_field_types[operation["operationId"]] = fields
+                action_form_schemas[operation["operationId"]] = body_schema
+        return action_form_schemas
+
+    @cached_property
+    def action_field_types(self) -> dict[str, dict[str, str]]:
+        action_field_types: dict[str, dict[str, str]] = {}
+        for action_name, body_schema in self.action_form_schemas.items():
+            properties = body_schema["properties"]
+            if not isinstance(properties, Mapping):
+                continue
+            fields = {
+                name: self.field_type(property_schema)
+                for name, property_schema in properties.items()
+                if isinstance(name, str) and self.field_type(property_schema) is not None
+            }
+            if fields:
+                action_field_types[action_name] = fields
         return action_field_types
 
     def root(self, request: HttpRequest) -> JsonResponse:
@@ -193,6 +203,9 @@ class SirenFacade:
         for action in document.get("actions", []):
             if not isinstance(action, dict) or not isinstance(action.get("name"), str):
                 continue
+            form_schema = self.action_form_schemas.get(action["name"])
+            if form_schema:
+                action["x-form"] = {"schema": form_schema}
             field_types = self.action_field_types.get(action["name"])
             if not field_types:
                 continue

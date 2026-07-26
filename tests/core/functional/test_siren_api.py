@@ -58,6 +58,7 @@ class SirenApiTests(TestCase):
             {"name": "title", "type": "text", "title": "Title"},
             {"name": "allowed_kinds", "type": "list", "title": "Allowed Kinds"},
         ])
+        self.assertEqual(action["x-form"]["schema"]["required"], ["title", "allowed_kinds"])
 
     def test_projects_api_errors_as_siren_documents(self) -> None:
         response = self.client.get("/siren/languages/not-a-language")

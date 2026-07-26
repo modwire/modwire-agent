@@ -1,4 +1,13 @@
-import { ActionFiller, follow, parse, submit, type Action, type Entity, type Href, type Target } from "@siren-js/client";
+import {
+  ActionFiller,
+  follow,
+  parse,
+  submit,
+  type Action,
+  type Entity,
+  type Href,
+  type Target,
+} from "@siren-js/client";
 
 export const SIREN_ACCEPT = "application/vnd.siren+json, application/json";
 export const SIREN_ACTOR_HEADERS = {
@@ -31,14 +40,25 @@ export class SirenClient {
   private readonly baseUrl: Href;
   private readonly headers: Headers;
 
-  constructor({ baseUrl = window.location.origin, headers }: SirenClientOptions = {}) {
+  constructor({
+    baseUrl = window.location.origin,
+    headers,
+  }: SirenClientOptions = {}) {
     this.baseUrl = baseUrl;
     this.headers = new Headers(SIREN_ACTOR_HEADERS);
-    new Headers(headers).forEach((value, name) => this.headers.set(name, value));
+    new Headers(headers).forEach((value, name) =>
+      this.headers.set(name, value),
+    );
   }
 
-  async get<T extends object = object>(target: Target, options: SirenRequestOptions = {}): Promise<Entity<T>> {
-    const response = await follow(target, { baseUrl: this.baseUrl, requestInit: this.requestInit(options) });
+  async get<T extends object = object>(
+    target: Target,
+    options: SirenRequestOptions = {},
+  ): Promise<Entity<T>> {
+    const response = await follow(target, {
+      baseUrl: this.baseUrl,
+      requestInit: this.requestInit(options),
+    });
     return this.entity<T>(response);
   }
 
@@ -48,7 +68,10 @@ export class SirenClient {
     options: SirenRequestOptions = {},
   ): Promise<Entity<T> | null> {
     await action.accept(new ActionFiller(values));
-    const response = await submit(action, { baseUrl: this.baseUrl, requestInit: this.requestInit(options) });
+    const response = await submit(action, {
+      baseUrl: this.baseUrl,
+      requestInit: this.requestInit(options),
+    });
 
     if (response.status === 204) {
       return null;
@@ -57,9 +80,15 @@ export class SirenClient {
     return this.entity<T>(response);
   }
 
-  private async entity<T extends object>(response: Response): Promise<Entity<T>> {
+  private async entity<T extends object>(
+    response: Response,
+  ): Promise<Entity<T>> {
     if (!response.ok) {
-      throw new SirenResponseError(response.status, response.url, response.statusText || `Request failed with ${response.status}.`);
+      throw new SirenResponseError(
+        response.status,
+        response.url,
+        response.statusText || `Request failed with ${response.status}.`,
+      );
     }
 
     return parse<T>(response);
@@ -67,9 +96,10 @@ export class SirenClient {
 
   private requestInit({ headers, signal }: SirenRequestOptions): RequestInit {
     const requestHeaders = new Headers(this.headers);
-    new Headers(headers).forEach((value, name) => requestHeaders.set(name, value));
+    new Headers(headers).forEach((value, name) =>
+      requestHeaders.set(name, value),
+    );
     requestHeaders.set("Accept", requestHeaders.get("Accept") ?? SIREN_ACCEPT);
     return { headers: requestHeaders, signal };
   }
-
 }

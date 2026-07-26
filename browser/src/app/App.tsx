@@ -2,7 +2,7 @@ import { AppShell } from "@mantine/core";
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import type { Action, Target } from "@siren-js/client";
 import { SirenClient } from "../client/SirenClient";
-import { SirenBrowser } from "../ui/siren/SirenBrowser";
+import { SirenPage } from "../ui/siren/SirenPage";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader";
 import { AppProviders } from "./providers/AppProviders";
@@ -11,11 +11,17 @@ const ROOT_RESOURCE = "/siren/";
 
 export function App(): ReactElement {
   const [client] = useState(() => new SirenClient());
-  const [entity, setEntity] = useState<Awaited<ReturnType<SirenClient["get"]>> | null>(null);
-  const [firstEntity, setFirstEntity] = useState<Awaited<ReturnType<SirenClient["get"]>> | null>(null);
+  const [entity, setEntity] = useState<Awaited<
+    ReturnType<SirenClient["get"]>
+  > | null>(null);
+  const [firstEntity, setFirstEntity] = useState<Awaited<
+    ReturnType<SirenClient["get"]>
+  > | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [target, setTarget] = useState<Target>(() => window.location.hash.slice(1) || ROOT_RESOURCE);
+  const [target, setTarget] = useState<Target>(
+    () => window.location.hash.slice(1) || ROOT_RESOURCE,
+  );
 
   const load = useCallback(
     async (nextTarget: Target) => {
@@ -26,7 +32,11 @@ export function App(): ReactElement {
         const nextEntity = await client.get(nextTarget);
         setEntity(nextEntity);
       } catch (reason) {
-        setError(reason instanceof Error ? reason : new Error("Unable to load the Siren resource."));
+        setError(
+          reason instanceof Error
+            ? reason
+            : new Error("Unable to load the Siren resource."),
+        );
       } finally {
         setIsLoading(false);
       }
@@ -39,7 +49,8 @@ export function App(): ReactElement {
   }, [load, target]);
 
   useEffect(() => {
-    const onHashChange = () => setTarget(window.location.hash.slice(1) || ROOT_RESOURCE);
+    const onHashChange = () =>
+      setTarget(window.location.hash.slice(1) || ROOT_RESOURCE);
 
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
@@ -50,7 +61,9 @@ export function App(): ReactElement {
   }, [client]);
 
   const follow = (nextTarget: Target) => {
-    const href = (typeof nextTarget === "string" ? nextTarget : nextTarget.href).toString();
+    const href = (
+      typeof nextTarget === "string" ? nextTarget : nextTarget.href
+    ).toString();
     window.location.hash = href;
     setTarget(href);
   };
@@ -67,7 +80,11 @@ export function App(): ReactElement {
         await load(target);
       }
     } catch (reason) {
-      setError(reason instanceof Error ? reason : new Error("Unable to submit the Siren action."));
+      setError(
+        reason instanceof Error
+          ? reason
+          : new Error("Unable to submit the Siren action."),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -76,10 +93,19 @@ export function App(): ReactElement {
   return (
     <AppProviders>
       <AppShell footer={{ height: 48 }} header={{ height: 60 }} padding="md">
-        <AppHeader links={firstEntity?.links ?? []} onFollow={follow} target={target} />
+        <AppHeader
+          links={firstEntity?.links ?? []}
+          onFollow={follow}
+          target={target}
+        />
         <AppShell.Main>
           {error ? <p role="alert">{error.message}</p> : null}
-          <SirenBrowser entity={entity} isLoading={isLoading} onFollow={follow} onSubmit={submit} />
+          <SirenPage
+            entity={entity}
+            isLoading={isLoading}
+            onFollow={follow}
+            onSubmit={submit}
+          />
         </AppShell.Main>
         <AppFooter />
       </AppShell>

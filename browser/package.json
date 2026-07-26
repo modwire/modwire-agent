@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
@@ -28,6 +30,7 @@
     "@vitejs/plugin-react": "^6.0.4",
     "jsdom": "^29.1.1",
     "msw": "^2.15.0",
+    "prettier": "^3.9.6",
     "typescript": "5.9.2",
     "vite": "^8.1.5",
     "vitest": "^4.1.10"
