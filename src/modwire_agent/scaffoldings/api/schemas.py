@@ -1,4 +1,4 @@
-from ninja import Schema
+from ninja import Schema, Field
 from pydantic import JsonValue, ConfigDict
 
 
@@ -12,40 +12,42 @@ class NewScaffolding(StrictSchema):
     description: str
 
 
-class Scaffolding(StrictSchema):
-    id: str
-
-
-class NewTemplate(StrictSchema):
+class Template(StrictSchema):
     relative_path: str
     file_content: str
     write_mode: str
 
 
-class Template(StrictSchema):
+class UpdateTemplate(StrictSchema):
     id: str
 
 
-class NewVariable(StrictSchema):
+class Variable(StrictSchema):
     name: str
     shape: str
-    descrription: str
+    description: str
     default_value: JsonValue
     required: bool
 
 
-class Variable(NewVariable):
+class UpdateVariable(Variable):
     id: str
 
 
-class Parameter(NewVariable):
+class Scaffolding(Template):
+    id: str
+    templates: list[UpdateTemplate] = Field()
+    variables: list[UpdateVariable] = Field()
+
+
+class Parameter(StrictSchema):
     name: str
     value: JsonValue
 
 
 class GenerateSourceCode(StrictSchema):
-    scaffold_id: str
     parameters: list[Parameter]
+    target_root: str = ""
 
 
 class SourceCode(StrictSchema):

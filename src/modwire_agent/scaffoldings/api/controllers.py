@@ -1,5 +1,4 @@
 from django.conf import settings
-from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
 from ..services import ScaffoldingService
@@ -21,53 +20,26 @@ class RootController(ControllerBase):
 class ScaffoldingController(ControllerBase):
     service: ScaffoldingService
 
-    @route.post("", response=schemas.Scaffolding, operation_id="create_scaffolding", summary="Add new source code scaffolding.")
-    def create( self, request, body: schemas.NewScaffolding):
-        return self.service
+    @route.post("", operation_id="create_scaffolding", summary="Add new source code scaffolding.")
+    def create(self, body: schemas.NewScaffolding):
+        self.service.create(**body.model_dump())
 
-    @route.get(
-        "/{scaffolding_id}/schema",
-        response=ScaffoldingFormSchemaOut,
-        by_alias=True,
-        operation_id="get_scaffolding_schema",
-        summary="Get the scaffolding variable form schema.",
-    )
-    def schema(
-        self,
-        request,
-        scaffolding_id: str,
-    ):
-        """Return the variable form schema for one scaffolding."""
-        activity = DjangoRequest.resolve(request, GetScaffoldingSchema)
-        return activity.execute(scaffolding_id)
+    @route.put("/{scaffolding_id}", operation_id="update_scaffolding", summary="Add new source code scaffolding.")
+    def update(self, scaffolding_id: str, body: schemas.NewScaffolding):
+        self.service.update_scaffolding(scaffolding_id, **body.model_dump())
 
-    @route.get(
-        "/{scaffolding_id}/bundle",
-        response=ScaffoldingBundleOut,
-        operation_id="get_scaffolding_bundle",
-        summary="Get a generic scaffolding bundle for a local generator.",
-    )
-    def bundle(self, request, scaffolding_id: str):
-        """Return the generator bundle for one scaffolding."""
-        activity = DjangoRequest.resolve(request, GetScaffoldingBundle)
-        return activity.execute(scaffolding_id)
+    @route.get("", response=list[schemas.Scaffolding], operation_id="find_scaffoldings", summary="Find all Scaffoldings.", )
+    def find_all(self):
+        return self.service.find_all()
 
-    @route.post(
-        "/{scaffolding_id}/preview",
-        response={200: ScaffoldingPreviewOut, 422: ScaffoldingPreviewErrorOut},
-        operation_id="preview_scaffolding",
-        summary="Preview a rendered scaffolding.",
-    )
-    def preview(
-        self,
-        request,
-        scaffolding_id: str,
-        data: ScaffoldingPreviewIn,
-    ):
-        """Render a validated preview for one scaffolding."""
-        activity = DjangoRequest.resolve(request, PreviewScaffolding)
-        return activity.execute(
-            scaffolding_id,
-            data.values,
-            [override.model_dump(exclude_none=True) for override in data.template_overrides],
-        )
+    @route.get("/{scaffolding_id}", response=schemas.Scaffolding, operation_id="get_scaffolding", summary="Get the scaffolding.")
+    def get(self, scaffolding_id: str):
+        return self.service.get(scaffolding_id)
+
+    @route.post("/{scaffolding_id}/renderings", response={201: schemas.SourceCode}, operation_id="render_scaffolding", summary="Render scaffolding.")
+    def render( self, scaffolding_id: str, body: schemas.GenerateSourceCode):
+        pass
+
+    @route.delete("/{scaffolding_id}/variables", response=list[schemas.Scaffolding], operation_id="find_scaffoldings", summary="Find all Scaffoldings.", )
+    def delete(self, scaffolding_id: str):
+        return self.service.delete_variables(scaffolding_id, )
