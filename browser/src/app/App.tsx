@@ -80,11 +80,12 @@ export function App(): ReactElement {
         await load(target);
       }
     } catch (reason) {
-      setError(
+      const submissionError =
         reason instanceof Error
           ? reason
-          : new Error("Unable to submit the Siren action."),
-      );
+          : new Error("Unable to submit the Siren action.");
+      setError(submissionError);
+      throw submissionError;
     } finally {
       setIsLoading(false);
     }

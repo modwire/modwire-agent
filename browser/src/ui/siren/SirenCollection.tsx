@@ -2,7 +2,6 @@ import { Paper, Stack, Title } from "@mantine/core";
 import type { Action, Entity, Target } from "@siren-js/client";
 import { SirenCollectionItem } from "./SirenCollectionItem";
 import { SirenActions } from "./SirenActions";
-import { SirenNavigation } from "./SirenNavigation";
 
 export type SirenCollectionProps = {
   entity: Entity;
@@ -26,7 +25,6 @@ export function SirenCollection({
             </li>
           ))}
         </ul>
-        <SirenNavigation links={entity.links} onFollow={onFollow} />
         <SirenActions actions={entity.actions} onSubmit={onSubmit} />
       </Stack>
     </Paper>

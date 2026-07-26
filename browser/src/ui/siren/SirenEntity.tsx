@@ -3,7 +3,6 @@ import type { Action, Entity, Target } from "@siren-js/client";
 import { sirenRegistry } from "./SirenRegistry";
 import { SirenActions } from "./SirenActions";
 import { SirenCollection } from "./SirenCollection";
-import { SirenNavigation } from "./SirenNavigation";
 import { SirenProperties } from "./SirenProperties";
 
 export type SirenEntityProps = {
@@ -42,7 +41,6 @@ export function SirenEntity({ entity, onFollow, onSubmit }: SirenEntityProps) {
       <Stack>
         <Title order={1}>{entity.title}</Title>
         <SirenProperties entity={entity} />
-        <SirenNavigation links={entity.links} onFollow={onFollow} />
         <SirenActions actions={entity.actions} onSubmit={onSubmit} />
       </Stack>
     </Paper>
