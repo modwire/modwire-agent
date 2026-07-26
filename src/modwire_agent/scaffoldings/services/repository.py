@@ -1,11 +1,9 @@
 from typing import Any
 
-from modwire_hex.django import DjangoRepository
-
-from ..models import Record
+from ..models import Scaffolding
 
 
-class RecordRepository[Record](DjangoRepository):
+class ScaffoldingRepository[Scaffolding](DjangoRepository):
     def key_of(self, domain: Any) -> Any:
         raise NotImplementedError
 

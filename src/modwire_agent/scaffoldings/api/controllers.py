@@ -2,19 +2,8 @@ from django.conf import settings
 from modwire_hex.django import DjangoRequest
 from ninja_extra import ControllerBase, api_controller, route
 
-from ..use_cases.converge_scaffolding import ConvergeScaffolding
-from ..use_cases.get_scaffolding_bundle import GetScaffoldingBundle
-from ..use_cases.get_scaffolding_schema import GetScaffoldingSchema
-from ..use_cases.preview_scaffolding import PreviewScaffolding
-from .schemas import (
-    ScaffoldingBundleOut,
-    ScaffoldingConvergenceIn,
-    ScaffoldingConvergenceOut,
-    ScaffoldingFormSchemaOut,
-    ScaffoldingPreviewErrorOut,
-    ScaffoldingPreviewIn,
-    ScaffoldingPreviewOut,
-)
+from ..services import ScaffoldingService
+from . import schemas
 
 
 @api_controller("", tags=["Root"])
@@ -30,20 +19,11 @@ class RootController(ControllerBase):
 
 @api_controller("/scaffoldings", tags=["Scaffoldings"])
 class ScaffoldingController(ControllerBase):
-    @route.post(
-        "/converge",
-        response=ScaffoldingConvergenceOut,
-        operation_id="converge_scaffolding",
-        summary="Validate or transactionally reconcile a complete scaffolding aggregate.",
-    )
-    def converge(
-        self,
-        request,
-        data: ScaffoldingConvergenceIn,
-    ):
-        """Validate and reconcile a complete scaffolding definition."""
-        service = DjangoRequest.resolve(request, ConvergeScaffolding)
-        return service.execute(data.model_dump())
+    service: ScaffoldingService
+
+    @route.post("", response=schemas.Scaffolding, operation_id="create_scaffolding", summary="Add new source code scaffolding.")
+    def create( self, request, body: schemas.NewScaffolding):
+        return self.service
 
     @route.get(
         "/{scaffolding_id}/schema",

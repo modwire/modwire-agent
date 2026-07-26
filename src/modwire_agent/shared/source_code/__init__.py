@@ -1,8 +1,8 @@
-from .package import CodePackage, SourceCodePackage
-from .writer import CodePackageWriter
+from .package import SourceCodePackage
+from .facade import SourceCodeService
+
 
 __all__ = [
     "SourceCodePackage",
-    "CodePackage",
-    "CodePackageWriter",
+    "SourceCodeService",
 ]

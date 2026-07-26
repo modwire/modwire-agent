@@ -4,7 +4,7 @@ from .base import Language
 
 
 @dataclass(frozen=True)
-class LanguageService:
+class LanguagesService:
     languages: Sequence[Language]
 
     def get_extensions(self, language: str) -> list[str]:
