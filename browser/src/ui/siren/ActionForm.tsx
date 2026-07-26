@@ -1,8 +1,8 @@
-import type { Action } from "@siren-js/client";
+import type { SirenAction } from "../../client/SirenAction";
 
 export type ActionFormProps = {
-  action: Action;
-  onSubmit: (action: Action, values: Record<string, unknown>) => void;
+  action: SirenAction;
+  onSubmit: (action: SirenAction, values: Record<string, unknown>) => void;
 };
 
 export function ActionForm({ action, onSubmit }: ActionFormProps) {
@@ -14,18 +14,18 @@ export function ActionForm({ action, onSubmit }: ActionFormProps) {
       }}
     >
       <fieldset>
-        <legend>{action.title ?? action.name}</legend>
+        <legend>{action.title}</legend>
         {action.fields.map((field) => (
           <label key={field.name}>
-            {field.title ?? field.name}
+            {field.title}
             <input
-              defaultValue={field.value === undefined ? "" : String(field.value)}
+              defaultValue={String(field.value)}
               name={field.name}
               type={field.type}
             />
           </label>
         ))}
-        <button type="submit">{action.title ?? action.name}</button>
+        <button type="submit">{action.title}</button>
       </fieldset>
     </form>
   );

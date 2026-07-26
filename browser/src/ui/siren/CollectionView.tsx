@@ -1,20 +1,22 @@
-import type { Action, Entity, Link } from "@siren-js/client";
+import type { SirenAction } from "../../client/SirenAction";
+import type { SirenEntity } from "../../client/SirenEntity";
+import type { SirenLink } from "../../client/SirenLink";
 import { ActionList } from "./ActionList";
 import { LinkList } from "./LinkList";
 
 export type CollectionViewProps = {
-  entity: Entity;
-  onFollow: (link: Link) => void;
-  onSubmit: (action: Action, values: Record<string, unknown>) => void;
+  entity: SirenEntity;
+  onFollow: (link: SirenLink) => void;
+  onSubmit: (action: SirenAction, values: Record<string, unknown>) => void;
 };
 
 export function CollectionView({ entity, onFollow, onSubmit }: CollectionViewProps) {
   return (
-    <section aria-label={entity.title ?? "Collection"}>
-      <h1>{entity.title ?? "Collection"}</h1>
+    <section aria-label={entity.title}>
+      <h1>{entity.title}</h1>
       <ul>
         {entity.entities.map((item, index) => (
-          <li key={`${item.rel.join("-")}-${index}`}>{item.title ?? item.class.join(" ")}</li>
+          <li key={`${item.rel.join("-")}-${index}`}>{item.title}</li>
         ))}
       </ul>
       <LinkList links={entity.links.filter((link) => !link.rel.includes("self"))} onFollow={onFollow} />

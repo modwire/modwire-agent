@@ -1,11 +1,13 @@
-import type { Action, Entity, Link } from "@siren-js/client";
+import type { SirenAction } from "../../client/SirenAction";
+import type { SirenEntity } from "../../client/SirenEntity";
+import type { SirenLink } from "../../client/SirenLink";
 import { CollectionView } from "./CollectionView";
 import { EntityView } from "./EntityView";
 
 export type EntityDispatcherProps = {
-  entity: Entity;
-  onFollow: (link: Link) => void;
-  onSubmit: (action: Action, values: Record<string, unknown>) => void;
+  entity: SirenEntity;
+  onFollow: (link: SirenLink) => void;
+  onSubmit: (action: SirenAction, values: Record<string, unknown>) => void;
 };
 
 export function EntityDispatcher({ entity, onFollow, onSubmit }: EntityDispatcherProps) {

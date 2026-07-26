@@ -1,8 +1,8 @@
-import type { Link } from "@siren-js/client";
+import type { SirenLink } from "../../client/SirenLink";
 
 export type LinkListProps = {
-  links: Link[];
-  onFollow: (link: Link) => void;
+  links: SirenLink[];
+  onFollow: (link: SirenLink) => void;
 };
 
 export function LinkList({ links, onFollow }: LinkListProps) {
@@ -16,7 +16,7 @@ export function LinkList({ links, onFollow }: LinkListProps) {
         {links.map((link) => (
           <li key={`${link.rel.join("-")}-${link.href}`}>
             <button onClick={() => onFollow(link)} type="button">
-              {link.title ?? link.href}
+              {link.title}
             </button>
           </li>
         ))}
