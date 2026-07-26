@@ -32,6 +32,34 @@ class SirenFacade:
     def resources(self) -> dict[str, Any]:
         return {resource.reference: resource for resource in self.engine.api.resources}
 
+    @cached_property
+    def action_field_types(self) -> dict[str, dict[str, str]]:
+        action_field_types: dict[str, dict[str, str]] = {}
+        for path_item in self.schema["paths"].values():
+            if not isinstance(path_item, Mapping):
+                continue
+            for operation in path_item.values():
+                if not isinstance(operation, Mapping) or not isinstance(operation.get("operationId"), str):
+                    continue
+                request_body = operation.get("requestBody")
+                if not isinstance(request_body, Mapping):
+                    continue
+                content = request_body.get("content")
+                if not isinstance(content, Mapping) or not isinstance(content.get("application/json"), Mapping):
+                    continue
+                body_schema = self.resolve_schema(content["application/json"].get("schema"))
+                properties = body_schema.get("properties")
+                if not isinstance(properties, Mapping):
+                    continue
+                fields = {
+                    name: self.field_type(property_schema)
+                    for name, property_schema in properties.items()
+                    if isinstance(name, str) and self.field_type(property_schema) is not None
+                }
+                if fields:
+                    action_field_types[operation["operationId"]] = fields
+        return action_field_types
+
     def root(self, request: HttpRequest) -> JsonResponse:
         capabilities = frozenset(
             operation.name
@@ -151,11 +179,60 @@ class SirenFacade:
     def base_url(request: HttpRequest) -> str:
         return request.build_absolute_uri("/").rstrip("/")
 
-    @staticmethod
-    def response(document: Mapping[str, Any], status: int) -> JsonResponse:
+    def response(self, document: Mapping[str, Any], status: int) -> JsonResponse:
         payload = dict(document)
+        self.add_field_types(payload)
         SirenFacade.add_titles(payload)
         return JsonResponse(payload, status=status, content_type=_SIREN_MEDIA_TYPE)
+
+    def add_field_types(self, document: dict[str, Any]) -> None:
+        for entity in document.get("entities", []):
+            if isinstance(entity, dict):
+                self.add_field_types(entity)
+
+        for action in document.get("actions", []):
+            if not isinstance(action, dict) or not isinstance(action.get("name"), str):
+                continue
+            field_types = self.action_field_types.get(action["name"])
+            if not field_types:
+                continue
+            fields = action.setdefault("fields", [])
+            if not isinstance(fields, list):
+                continue
+            present = {
+                field.get("name"): field
+                for field in fields
+                if isinstance(field, dict) and isinstance(field.get("name"), str)
+            }
+            for name, field_type in field_types.items():
+                if name not in present:
+                    fields.append({"name": name, "type": field_type, "title": self.humanize(name)})
+                    continue
+                field = present[name]
+                if isinstance(field, dict) and field.get("name") in field_types:
+                    field["type"] = field_type
+
+    def resolve_schema(self, schema: Any) -> Mapping[str, Any]:
+        while isinstance(schema, Mapping) and isinstance(schema.get("$ref"), str):
+            reference = schema["$ref"]
+            if not reference.startswith("#/components/"):
+                return {}
+            target: Any = self.schema
+            for part in reference.removeprefix("#/").split("/"):
+                if not isinstance(target, Mapping):
+                    return {}
+                target = target.get(part)
+            schema = target
+        return schema if isinstance(schema, Mapping) else {}
+
+    def field_type(self, schema: Any) -> str | None:
+        field_schema = self.resolve_schema(schema)
+        if field_schema.get("type") == "object":
+            return "object"
+        if field_schema.get("type") != "array":
+            return None
+        item_schema = self.resolve_schema(field_schema.get("items"))
+        return "list" if item_schema.get("type") in {"boolean", "integer", "number", "string"} else "object"
 
     @classmethod
     def add_titles(cls, document: dict[str, Any]) -> None:

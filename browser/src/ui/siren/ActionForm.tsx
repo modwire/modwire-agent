@@ -1,4 +1,5 @@
 import type { Action } from "@siren-js/client";
+import { SirenInput } from "./inputs/SirenInput";
 
 export type ActionFormProps = {
   action: Action;
@@ -10,19 +11,29 @@ export function ActionForm({ action, onSubmit }: ActionFormProps) {
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        onSubmit(action, Object.fromEntries(new FormData(event.currentTarget)));
+        const formData = new FormData(event.currentTarget);
+        onSubmit(
+          action,
+          Object.fromEntries(
+            [...new Set(formData.keys())].map((name) => {
+              const values = formData.getAll(name);
+              const controls = event.currentTarget.elements.namedItem(name);
+              const control = controls instanceof RadioNodeList ? controls.item(0) : controls;
+              if (control instanceof HTMLElement && control.dataset.sirenType === "object") {
+                return [name, JSON.parse(String(values[0]))];
+              }
+              return [name, values.length > 1 ? values.filter((value) => value !== "") : values[0]];
+            }),
+          ),
+        );
       }}
     >
       <fieldset>
         <legend>{action.title}</legend>
         {action.fields.map((field) => (
           <label key={field.name}>
-            {field.title}
-            <input
-              defaultValue={String(field.value)}
-              name={field.name}
-              type={field.type}
-            />
+            {field.title ?? field.name}
+            <SirenInput field={field} />
           </label>
         ))}
         <button type="submit">{action.title}</button>

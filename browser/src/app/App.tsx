@@ -1,3 +1,4 @@
+import { AppShell } from "@mantine/core";
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import type { Action, Target } from "@siren-js/client";
 import { SirenClient } from "../client/SirenClient";
@@ -53,10 +54,12 @@ export function App(): ReactElement {
 
   return (
     <AppProviders>
-      <main>
-        {error ? <p role="alert">{error.message}</p> : null}
-        <SirenBrowser entity={entity} isLoading={isLoading} onFollow={setTarget} onSubmit={submit} />
-      </main>
+      <AppShell padding="md">
+        <AppShell.Main>
+          {error ? <p role="alert">{error.message}</p> : null}
+          <SirenBrowser entity={entity} isLoading={isLoading} onFollow={setTarget} onSubmit={submit} />
+        </AppShell.Main>
+      </AppShell>
     </AppProviders>
   );
 }

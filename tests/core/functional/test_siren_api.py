@@ -49,6 +49,16 @@ class SirenApiTests(TestCase):
         self.assertEqual(response.json()["entities"][0]["title"], "architecture")
         self.assertEqual(response.json()["entities"][0]["properties"]["name"], "architecture")
 
+    def test_preserves_list_field_shape_in_siren_actions(self) -> None:
+        document = self.client.get("/siren/sections").json()
+
+        action = next(action for action in document["actions"] if action["name"] == "create_section")
+
+        self.assertEqual(action["fields"], [
+            {"name": "title", "type": "text", "title": "Title"},
+            {"name": "allowed_kinds", "type": "list", "title": "Allowed Kinds"},
+        ])
+
     def test_projects_api_errors_as_siren_documents(self) -> None:
         response = self.client.get("/siren/languages/not-a-language")
 
