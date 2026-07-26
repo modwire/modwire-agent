@@ -38,7 +38,7 @@ class ErrorBoundaryScenarios(TestCase):
         with (
             self.assertLogs("modwire_agent.core.error_handling", level="ERROR") as logs,
             patch(
-                "modwire_agent.records.adapters.http.tag_api.CreateTag.execute",
+                "modwire_agent.records.adapters.http.controllers.CreateTag.execute",
                 side_effect=RuntimeError("unexpected failure"),
             ),
         ):

@@ -5,7 +5,7 @@ from ninja_extra import ControllerBase, api_controller, route
 
 from ...use_cases.get_language import GetLanguage
 from ...use_cases.list_languages import ListLanguages
-from .schemas.language_output import LanguageOut
+from .schemas import LanguageOut
 
 
 @api_controller("/languages", tags=["languages"])

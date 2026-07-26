@@ -1,11 +1,11 @@
+from django.conf import settings
 from modwire_hex.django import DjangoRequest
-from ninja_extra import route
-from ninja_extra.controllers import ControllerBase, api_controller
+from ninja_extra import ControllerBase, api_controller, route
 
-from ....use_cases.converge_scaffolding import ConvergeScaffolding
-from ....use_cases.get_scaffolding_bundle import GetScaffoldingBundle
-from ....use_cases.get_scaffolding_schema import GetScaffoldingSchema
-from ....use_cases.preview_scaffolding import PreviewScaffolding
+from ...use_cases.converge_scaffolding import ConvergeScaffolding
+from ...use_cases.get_scaffolding_bundle import GetScaffoldingBundle
+from ...use_cases.get_scaffolding_schema import GetScaffoldingSchema
+from ...use_cases.preview_scaffolding import PreviewScaffolding
 from .schemas import (
     ScaffoldingBundleOut,
     ScaffoldingConvergenceIn,
@@ -15,6 +15,17 @@ from .schemas import (
     ScaffoldingPreviewIn,
     ScaffoldingPreviewOut,
 )
+
+
+@api_controller("", tags=["Root"])
+class RootController(ControllerBase):
+    @route.get("/", response=dict, operation_id="get_api_root", summary="Discover the API.")
+    def get(self):
+        """Return links to the API's public entry points."""
+        return {
+            "title": "Modwire API",
+            "version": settings.RELEASE_VERSION,
+        }
 
 
 @api_controller("/scaffoldings", tags=["Scaffoldings"])

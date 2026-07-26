@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from health_check.views import HealthCheckView
 
-from modwire_agent.browser.adapters.http.views import BrowserIndexView
+from modwire_agent.browser.adapters.http.controllers import BrowserIndexView
 
 from .api import api
 from .siren import facade
