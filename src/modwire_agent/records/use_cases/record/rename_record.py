@@ -5,7 +5,7 @@ from ...domain.collaboration.actor import Actor
 from ...domain.collaboration.policy import ActorPolicy
 from ...domain.record.policy import RecordPolicy
 from ...domain.record.record import Record
-from ...ports.record.record_store import RecordStore
+from ...ports.outbound import RecordStore
 
 
 @dataclass(frozen=True, slots=True)

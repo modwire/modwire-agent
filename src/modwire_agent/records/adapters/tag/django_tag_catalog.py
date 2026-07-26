@@ -1,4 +1,4 @@
-from ...ports.tag.tag_catalog import TagCatalog, TagSummary
+from ...ports.outbound import TagCatalog, TagSummary
 from ..django.models import TagModel
 
 

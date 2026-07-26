@@ -4,7 +4,7 @@ from uuid import UUID
 from ...domain.collaboration.actor import Actor
 from ...domain.collaboration.policy import ActorPolicy
 from ...domain.record.policy import RecordPolicy
-from ...ports.record.record_store import RecordStore
+from ...ports.outbound import RecordStore
 
 
 @dataclass(frozen=True, slots=True)

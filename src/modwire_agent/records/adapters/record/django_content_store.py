@@ -5,7 +5,7 @@ from modwire_hex.django import DjangoRepository
 from ...domain.collaboration.actor import Actor
 from ...domain.collaboration.actor_kind import ActorKind
 from ...domain.record.content_revision import ContentRevision
-from ...ports.record.content_store import ContentStore
+from ...ports.outbound import ContentStore
 from ..django.models import ContentRevisionModel
 
 

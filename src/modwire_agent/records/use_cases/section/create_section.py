@@ -4,7 +4,7 @@ from ...domain.collaboration.actor import Actor
 from ...domain.collaboration.policy import ActorPolicy
 from ...domain.section.policy import SectionPolicy
 from ...domain.section.section import Section
-from ...ports.section.section_store import SectionStore
+from ...ports.outbound import SectionStore
 
 
 @dataclass(frozen=True, slots=True)

@@ -6,9 +6,7 @@ from ...domain.collaboration.policy import ActorPolicy
 from ...domain.proposal.content_proposal import ContentProposal
 from ...domain.proposal.policy import ContentProposalPolicy
 from ...domain.record.content_schema_policy import ContentSchemaPolicy
-from ...ports.proposal.content_proposal_store import ContentProposalStore
-from ...ports.record.content_store import ContentStore
-from ...ports.record.record_store import RecordStore
+from ...ports.outbound import ContentProposalStore, ContentStore, RecordStore
 
 
 @dataclass(frozen=True, slots=True)

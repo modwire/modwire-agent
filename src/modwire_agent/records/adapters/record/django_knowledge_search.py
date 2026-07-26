@@ -1,7 +1,7 @@
 from django.db import connection
 
 from ...domain.record.status import RecordStatus
-from ...ports.record.knowledge_search import KnowledgeSearch, SearchResult
+from ...ports.outbound import KnowledgeSearch, SearchResult
 from ..django.models import ContentRevisionModel, ContentSearchProjectionModel, RecordModel
 from .django_embeddings import DeterministicEmbeddings
 

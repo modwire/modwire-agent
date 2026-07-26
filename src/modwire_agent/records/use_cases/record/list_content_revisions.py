@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from ...domain.record.content_revision import ContentRevision
-from ...ports.record.content_store import ContentStore
+from ...ports.outbound import ContentStore
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from ...ports.section.section_details import SectionDetails
-from ...ports.section.section_details_reader import SectionDetailsReader
+from ...ports.outbound import SectionDetails, SectionDetailsReader
 
 
 @dataclass(frozen=True, slots=True)

@@ -6,12 +6,14 @@ from ...domain.operation.operation_context import OperationContext
 from ...domain.operation.operation_policy import OperationPolicy
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
 from ...domain.run.plan_run_status import PlanRunStatus
-from ...ports.artifact.plan_artifact_store import PlanArtifactStore
-from ...ports.contracts.schema_validator import SchemaValidator
-from ...ports.definition.plan_definition_store import PlanDefinitionStore
-from ...ports.operation.operation_catalog import OperationCatalog
-from ...ports.operation.operation_execution_store import OperationExecutionStore
-from ...ports.run.plan_run_store import PlanRunStore
+from ...ports.outbound import (
+    OperationCatalog,
+    OperationExecutionStore,
+    PlanArtifactStore,
+    PlanDefinitionStore,
+    PlanRunStore,
+    SchemaValidator,
+)
 
 
 @dataclass(frozen=True, slots=True)

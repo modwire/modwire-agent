@@ -3,7 +3,7 @@ from uuid import UUID
 from modwire_hex.django import DjangoRepository
 
 from ...domain.tag.tag import Tag
-from ...ports.tag.tag_store import TagStore
+from ...ports.outbound import TagStore
 from ..django.models import TagModel
 
 

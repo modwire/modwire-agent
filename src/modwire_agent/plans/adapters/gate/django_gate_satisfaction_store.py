@@ -4,7 +4,7 @@ from django.db import IntegrityError, transaction
 
 from ...domain.gate.gate_satisfaction import GateSatisfaction
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
-from ...ports.gate.gate_satisfaction_store import GateSatisfactionStore
+from ...ports.outbound import GateSatisfactionStore
 from ..django.models import GateSatisfactionModel
 
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ...ports.record.knowledge_search import KnowledgeSearch, SearchResult
+from ...ports.outbound import KnowledgeSearch, SearchResult
 
 
 @dataclass(frozen=True, slots=True)

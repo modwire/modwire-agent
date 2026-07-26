@@ -5,7 +5,7 @@ from modwire_hex.django import DjangoRepository
 from ...domain.record.kind import RecordKind
 from ...domain.record.record import Record
 from ...domain.record.status import RecordStatus
-from ...ports.record.record_store import RecordStore
+from ...ports.outbound import RecordStore
 from ..django.models import RecordModel
 
 

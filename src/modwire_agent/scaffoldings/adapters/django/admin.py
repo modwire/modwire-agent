@@ -4,8 +4,7 @@ from .models import Scaffolding, Template, Variable
 
 
 @admin.register(Scaffolding)
-class ScaffoldingAdmin(admin.ModelAdmin):
-    ...
+class ScaffoldingAdmin(admin.ModelAdmin): ...
 
 
 @admin.register(Template)

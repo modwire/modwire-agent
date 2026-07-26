@@ -1,4 +1,4 @@
-from ...ports.section.section_catalog import SectionCatalog, SectionSummary
+from ...ports.outbound import SectionCatalog, SectionSummary
 from ..django.models import SectionModel
 
 

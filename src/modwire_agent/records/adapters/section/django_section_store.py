@@ -5,7 +5,7 @@ from modwire_hex.django import DjangoRepository
 from ...domain.record.kind import RecordKind
 from ...domain.section.placement import SectionPlacement
 from ...domain.section.section import Section
-from ...ports.section.section_store import SectionStore
+from ...ports.outbound import SectionStore
 from ..django.models import SectionModel, SectionPlacementModel
 
 

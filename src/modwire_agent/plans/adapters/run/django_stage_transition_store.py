@@ -2,7 +2,7 @@ from django.db import transaction
 
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
 from ...domain.run.stage_transition import StageTransition
-from ...ports.run.stage_transition_store import StageTransitionStore
+from ...ports.outbound import StageTransitionStore
 from ..django.models import PlanRunModel, StageSubmissionModel
 
 

@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from ...domain.proposal.content_proposal import ContentProposal
-from ...ports.proposal.content_proposal_store import ContentProposalStore
-from ...ports.record.record_store import RecordStore
+from ...ports.outbound import ContentProposalStore, RecordStore
 
 
 @dataclass(frozen=True, slots=True)

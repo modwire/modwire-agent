@@ -5,9 +5,7 @@ from ...domain.collaboration.actor import Actor
 from ...domain.collaboration.policy import ActorPolicy
 from ...domain.record.content_revision import ContentRevision
 from ...domain.record.content_schema_policy import ContentSchemaPolicy
-from ...ports.record.content_store import ContentStore
-from ...ports.record.record_store import RecordStore
-from ...ports.record.search_projection_store import SearchProjectionStore
+from ...ports.outbound import ContentStore, RecordStore, SearchProjectionStore
 
 
 @dataclass(frozen=True, slots=True)

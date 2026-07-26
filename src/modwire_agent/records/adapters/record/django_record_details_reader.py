@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from ...ports.record.record_details_reader import RecordDetails, RecordDetailsReader
+from ...ports.outbound import RecordDetails, RecordDetailsReader
 from ..django.models import RecordModel
 
 

@@ -4,7 +4,7 @@ from uuid import UUID
 from ...domain.collaboration.actor import Actor
 from ...domain.section.placement_policy import SectionPlacementPolicy
 from ...domain.section.section import Section
-from ...ports.section.section_store import SectionStore
+from ...ports.outbound import SectionStore
 
 
 @dataclass(frozen=True, slots=True)

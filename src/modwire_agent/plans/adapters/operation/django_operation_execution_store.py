@@ -6,7 +6,7 @@ from ...domain.artifact.plan_artifact import PlanArtifact
 from ...domain.operation.operation_claim import OperationClaim
 from ...domain.operation.operation_execution import OperationExecution
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
-from ...ports.operation.operation_execution_store import OperationExecutionStore
+from ...ports.outbound import OperationExecutionStore
 from ..django.models import OperationExecutionModel, PlanArtifactModel
 
 

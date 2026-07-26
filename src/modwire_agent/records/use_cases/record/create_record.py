@@ -6,8 +6,7 @@ from ...domain.collaboration.policy import ActorPolicy
 from ...domain.record.policy import RecordPolicy
 from ...domain.record.record import Record
 from ...domain.section.placement_policy import SectionPlacementPolicy
-from ...ports.record.record_store import RecordStore
-from ...ports.section.section_store import SectionStore
+from ...ports.outbound import RecordStore, SectionStore
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ...domain.contracts import Language
+from ..domain.contracts import Language
 
 
 class VersionReader(ABC):

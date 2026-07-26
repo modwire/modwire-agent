@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ...ports.record.knowledge_router import KnowledgeRouter, RoutedRecord
+from ...ports.outbound import KnowledgeRouter, RoutedRecord
 
 
 @dataclass(frozen=True, slots=True)

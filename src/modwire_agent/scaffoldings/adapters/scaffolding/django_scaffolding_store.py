@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 
 from modwire_agent.languages.use_cases.language.get_language import GetLanguage
 
-from ...ports.scaffolding_catalog import ScaffoldingCatalog
+from ...ports.outbound import ScaffoldingCatalog
 from ..django.models import Scaffolding
 
 

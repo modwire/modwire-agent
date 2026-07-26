@@ -4,7 +4,7 @@ from modwire_hex.django import DjangoRepository
 
 from ...domain.run.plan_run import PlanRun
 from ...domain.run.plan_run_status import PlanRunStatus
-from ...ports.run.plan_run_store import PlanRunStore
+from ...ports.outbound import PlanRunStore
 from ..django.models import PlanRunModel
 
 

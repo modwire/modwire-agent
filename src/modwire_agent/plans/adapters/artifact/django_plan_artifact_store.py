@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from ...domain.artifact.plan_artifact import PlanArtifact
-from ...ports.artifact.plan_artifact_store import PlanArtifactStore
+from ...ports.outbound import PlanArtifactStore
 from ..django.models import PlanArtifactModel
 
 

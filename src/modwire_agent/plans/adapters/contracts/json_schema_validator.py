@@ -4,7 +4,7 @@ from jsonschema import Draft202012Validator, SchemaError, ValidationError
 
 from ...domain.definition.invalid_plan_definition import InvalidPlanDefinition
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
-from ...ports.contracts.schema_validator import SchemaValidator
+from ...ports.outbound import SchemaValidator
 
 
 class JsonSchemaValidator(SchemaValidator):

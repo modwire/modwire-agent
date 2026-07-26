@@ -1,5 +1,4 @@
-from ...ports.operation.operation_catalog import OperationCatalog
-from ...ports.operation.operation_handler import OperationHandler
+from ...ports.outbound import OperationCatalog, OperationHandler
 
 
 class RegisteredOperationCatalog(OperationCatalog):

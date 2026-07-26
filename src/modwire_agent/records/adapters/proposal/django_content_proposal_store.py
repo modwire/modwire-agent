@@ -6,7 +6,7 @@ from ...domain.collaboration.actor import Actor
 from ...domain.collaboration.actor_kind import ActorKind
 from ...domain.proposal.content_proposal import ContentProposal
 from ...domain.proposal.status import ProposalStatus
-from ...ports.proposal.content_proposal_store import ContentProposalStore
+from ...ports.outbound import ContentProposalStore
 from ..django.models import ContentProposalModel
 
 

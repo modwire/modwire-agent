@@ -4,7 +4,7 @@ from ...domain.collaboration.actor import Actor
 from ...domain.collaboration.policy import ActorPolicy
 from ...domain.tag.policy import TagPolicy
 from ...domain.tag.tag import Tag
-from ...ports.tag.tag_store import TagStore
+from ...ports.outbound import TagStore
 
 
 @dataclass(frozen=True, slots=True)

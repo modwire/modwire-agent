@@ -5,10 +5,7 @@ from uuid import UUID
 from ...domain.gate.gate_policy import GatePolicy
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
 from ...domain.run.plan_run_status import PlanRunStatus
-from ...ports.contracts.schema_validator import SchemaValidator
-from ...ports.definition.plan_definition_store import PlanDefinitionStore
-from ...ports.gate.gate_satisfaction_store import GateSatisfactionStore
-from ...ports.run.plan_run_store import PlanRunStore
+from ...ports.outbound import GateSatisfactionStore, PlanDefinitionStore, PlanRunStore, SchemaValidator
 
 
 @dataclass(frozen=True, slots=True)

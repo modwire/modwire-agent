@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from ..ports.scaffolding_catalog import ScaffoldingCatalog
+from ..ports.outbound import ScaffoldingCatalog
 
 
 @dataclass(frozen=True, slots=True)

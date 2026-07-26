@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ...ports.tag.tag_catalog import TagCatalog, TagSummary
+from ...ports.outbound import TagCatalog, TagSummary
 
 
 @dataclass(frozen=True, slots=True)

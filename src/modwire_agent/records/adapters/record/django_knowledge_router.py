@@ -1,5 +1,5 @@
 from ...domain.record.status import RecordStatus
-from ...ports.record.knowledge_router import KnowledgeRouter, RoutedRecord
+from ...ports.outbound import KnowledgeRouter, RoutedRecord
 from ..django.models import RecordModel
 
 

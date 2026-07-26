@@ -7,9 +7,7 @@ from ...domain.definition.stage_definition import StageDefinition
 from ...domain.definition.transition_definition import TransitionDefinition
 from ...domain.gate.gate_definition import GateDefinition
 from ...domain.operation.operation_definition import OperationDefinition
-from ...ports.contracts.schema_validator import SchemaValidator
-from ...ports.definition.plan_definition_store import PlanDefinitionStore
-from ...ports.operation.operation_catalog import OperationCatalog
+from ...ports.outbound import OperationCatalog, PlanDefinitionStore, SchemaValidator
 
 
 @dataclass(frozen=True, slots=True)

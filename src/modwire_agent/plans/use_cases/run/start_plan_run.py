@@ -4,9 +4,7 @@ from uuid import UUID
 
 from ...domain.run.plan_run import PlanRun
 from ...domain.run.plan_run_policy import PlanRunPolicy
-from ...ports.contracts.schema_validator import SchemaValidator
-from ...ports.definition.plan_definition_store import PlanDefinitionStore
-from ...ports.run.plan_run_store import PlanRunStore
+from ...ports.outbound import PlanDefinitionStore, PlanRunStore, SchemaValidator
 
 
 @dataclass(frozen=True, slots=True)

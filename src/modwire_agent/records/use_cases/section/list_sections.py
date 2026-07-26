@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ...ports.section.section_catalog import SectionCatalog, SectionSummary
+from ...ports.outbound import SectionCatalog, SectionSummary
 
 
 @dataclass(frozen=True, slots=True)

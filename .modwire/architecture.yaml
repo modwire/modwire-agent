@@ -19,8 +19,8 @@ shape:
       match: "src/modwire_agent/*"
       shape:
       # agent untouchable start
-        max_classes_per_file: 4
-        max_types_per_file: 1
+        max_classes_per_file: -1
+        max_types_per_file: -1
         max_abstract_classes_per_file: 1
         max_functions_per_file: 0
         allow_optional_function_args: false

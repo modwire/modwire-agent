@@ -7,12 +7,14 @@ from ...domain.operation.operation_policy import OperationPolicy
 from ...domain.run.invalid_stage_submission import InvalidStageSubmission
 from ...domain.run.plan_run_policy import PlanRunPolicy
 from ...domain.run.plan_run_status import PlanRunStatus
-from ...ports.contracts.schema_validator import SchemaValidator
-from ...ports.definition.plan_definition_store import PlanDefinitionStore
-from ...ports.gate.gate_satisfaction_store import GateSatisfactionStore
-from ...ports.operation.operation_execution_store import OperationExecutionStore
-from ...ports.run.plan_run_store import PlanRunStore
-from ...ports.run.stage_transition_store import StageTransitionStore
+from ...ports.outbound import (
+    GateSatisfactionStore,
+    OperationExecutionStore,
+    PlanDefinitionStore,
+    PlanRunStore,
+    SchemaValidator,
+    StageTransitionStore,
+)
 
 
 @dataclass(frozen=True, slots=True)

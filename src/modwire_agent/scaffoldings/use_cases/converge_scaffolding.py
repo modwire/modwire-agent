@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from ..ports.scaffolding_convergence import ScaffoldingConvergence
+from ..ports.outbound import ScaffoldingConvergence
 
 
 @dataclass(frozen=True, slots=True)

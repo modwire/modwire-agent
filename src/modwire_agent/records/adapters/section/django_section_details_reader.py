@@ -1,8 +1,6 @@
 from uuid import UUID
 
-from ...ports.section.section_details import SectionDetails
-from ...ports.section.section_details_reader import SectionDetailsReader
-from ...ports.section.section_record_details import SectionRecordDetails
+from ...ports.outbound import SectionDetails, SectionDetailsReader, SectionRecordDetails
 from ..django.models import SectionModel
 
 

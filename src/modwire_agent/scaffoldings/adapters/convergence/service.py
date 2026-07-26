@@ -5,7 +5,7 @@ from django.db import transaction
 from modwire_agent.languages.domain.contracts import Language
 from modwire_agent.languages.use_cases.language.get_language import GetLanguage
 
-from ...ports.scaffolding_convergence import ScaffoldingConvergence
+from ...ports.outbound import ScaffoldingConvergence
 from ..django.models import Scaffolding
 from .convergence_plan import ConvergencePlan
 from .convergence_result import ConvergenceResult

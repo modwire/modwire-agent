@@ -1,5 +1,5 @@
 from ...domain.record.record import Record
-from ...ports.record.search_projection_store import SearchProjectionStore
+from ...ports.outbound import SearchProjectionStore
 from ..django.models import ContentRevisionModel, ContentSearchProjectionModel, RecordModel
 from .django_embeddings import DeterministicEmbeddings
 

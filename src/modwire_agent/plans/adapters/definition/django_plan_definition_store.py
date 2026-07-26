@@ -9,7 +9,7 @@ from ...domain.definition.stage_definition import StageDefinition
 from ...domain.definition.transition_definition import TransitionDefinition
 from ...domain.gate.gate_definition import GateDefinition
 from ...domain.operation.operation_definition import OperationDefinition
-from ...ports.definition.plan_definition_store import PlanDefinitionStore
+from ...ports.outbound import PlanDefinitionStore
 from ..django.models import PlanDefinitionModel
 
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from ...ports.record.record_details_reader import RecordDetails, RecordDetailsReader
+from ...ports.outbound import RecordDetails, RecordDetailsReader
 
 
 @dataclass(frozen=True, slots=True)
