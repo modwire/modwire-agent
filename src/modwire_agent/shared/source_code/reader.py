@@ -20,6 +20,8 @@ class CodePackageReader:
                 continue
 
             relative_path = path.relative_to(root).as_posix()
+            if not any(relative_path.endswith(extension) for extension in extensions):
+                continue
             files[relative_path] = path.read_text(encoding="utf-8")
 
         return CodePackage(files=files)
