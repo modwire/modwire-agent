@@ -3,7 +3,7 @@ from wireup import injectable
 from ..base import Language, PackageManager, Tool, VersionProvider
 
 
-@injectable(as_type=Language)
+@injectable(as_type=Language, qualifier="python")
 class Python(Language):
     id: str = "python"
     name: str = "Python"
