@@ -1,4 +1,5 @@
 import { EmbeddedLink, type SubEntity, type Target } from "@siren-js/client";
+import { Anchor } from "@mantine/core";
 
 export type CollectionItemProps = {
   item: SubEntity;
@@ -14,14 +15,14 @@ export function CollectionItem({ item, onFollow }: CollectionItemProps) {
   }
 
   return (
-    <a
-      href={target.href}
+    <Anchor
+      href={`#${target.href}`}
       onClick={(event) => {
         event.preventDefault();
         onFollow(target);
       }}
     >
       {label}
-    </a>
+    </Anchor>
   );
 }

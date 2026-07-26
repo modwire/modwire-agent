@@ -1,4 +1,5 @@
 import type { Action, Entity, Target } from "@siren-js/client";
+import { Center, Loader, Text } from "@mantine/core";
 import { EntityDispatcher } from "./EntityDispatcher";
 
 export type SirenBrowserProps = {
@@ -10,11 +11,11 @@ export type SirenBrowserProps = {
 
 export function SirenBrowser({ entity, isLoading, onFollow, onSubmit }: SirenBrowserProps) {
   if (isLoading) {
-    return <p role="status">Loading resource…</p>;
+    return <Center><Loader aria-label="Loading resource" /></Center>;
   }
 
   if (!entity) {
-    return <p>No resource selected.</p>;
+    return <Text>No resource selected.</Text>;
   }
 
   return <EntityDispatcher entity={entity} onFollow={onFollow} onSubmit={onSubmit} />;

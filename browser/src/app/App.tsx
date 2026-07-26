@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState, type ReactElement } from "react";
 import type { Action, Target } from "@siren-js/client";
 import { SirenClient } from "../client/SirenClient";
 import { SirenBrowser } from "../ui/siren/SirenBrowser";
+import { AppFooter } from "./AppFooter";
+import { AppHeader } from "./AppHeader";
 import { AppProviders } from "./providers/AppProviders";
 
 const ROOT_RESOURCE = "/siren/";
@@ -10,9 +12,10 @@ const ROOT_RESOURCE = "/siren/";
 export function App(): ReactElement {
   const [client] = useState(() => new SirenClient());
   const [entity, setEntity] = useState<Awaited<ReturnType<SirenClient["get"]>> | null>(null);
+  const [firstEntity, setFirstEntity] = useState<Awaited<ReturnType<SirenClient["get"]>> | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [target, setTarget] = useState<Target>(ROOT_RESOURCE);
+  const [target, setTarget] = useState<Target>(() => window.location.hash.slice(1) || ROOT_RESOURCE);
 
   const load = useCallback(
     async (nextTarget: Target) => {
@@ -20,7 +23,8 @@ export function App(): ReactElement {
       setIsLoading(true);
 
       try {
-        setEntity(await client.get(nextTarget));
+        const nextEntity = await client.get(nextTarget);
+        setEntity(nextEntity);
       } catch (reason) {
         setError(reason instanceof Error ? reason : new Error("Unable to load the Siren resource."));
       } finally {
@@ -33,6 +37,23 @@ export function App(): ReactElement {
   useEffect(() => {
     void load(target);
   }, [load, target]);
+
+  useEffect(() => {
+    const onHashChange = () => setTarget(window.location.hash.slice(1) || ROOT_RESOURCE);
+
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  useEffect(() => {
+    void client.get(ROOT_RESOURCE).then(setFirstEntity);
+  }, [client]);
+
+  const follow = (nextTarget: Target) => {
+    const href = (typeof nextTarget === "string" ? nextTarget : nextTarget.href).toString();
+    window.location.hash = href;
+    setTarget(href);
+  };
 
   const submit = async (action: Action, values: Record<string, unknown>) => {
     setError(null);
@@ -54,11 +75,13 @@ export function App(): ReactElement {
 
   return (
     <AppProviders>
-      <AppShell padding="md">
+      <AppShell footer={{ height: 48 }} header={{ height: 60 }} padding="md">
+        <AppHeader links={firstEntity?.links ?? []} onFollow={follow} target={target} />
         <AppShell.Main>
           {error ? <p role="alert">{error.message}</p> : null}
-          <SirenBrowser entity={entity} isLoading={isLoading} onFollow={setTarget} onSubmit={submit} />
+          <SirenBrowser entity={entity} isLoading={isLoading} onFollow={follow} onSubmit={submit} />
         </AppShell.Main>
+        <AppFooter />
       </AppShell>
     </AppProviders>
   );

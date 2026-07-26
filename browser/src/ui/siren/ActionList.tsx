@@ -1,4 +1,5 @@
 import type { Action } from "@siren-js/client";
+import { Stack } from "@mantine/core";
 import { ActionForm } from "./ActionForm";
 
 export type ActionListProps = {
@@ -15,9 +16,11 @@ export function ActionList({ actions, onSubmit }: ActionListProps) {
 
   return (
     <section aria-label="Resource actions">
-      {displayedActions.map((action) => (
-        <ActionForm action={action} key={`${action.method}-${action.href}-${action.name}`} onSubmit={onSubmit} />
-      ))}
+      <Stack>
+        {displayedActions.map((action) => (
+          <ActionForm action={action} key={`${action.method}-${action.href}-${action.name}`} onSubmit={onSubmit} />
+        ))}
+      </Stack>
     </section>
   );
 }

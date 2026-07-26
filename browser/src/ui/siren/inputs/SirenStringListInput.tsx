@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Field } from "@siren-js/client";
+import { Button, Group, Stack, TextInput } from "@mantine/core";
 
 export type SirenStringListInputProps = { field: Field };
 
@@ -9,24 +10,23 @@ export function SirenStringListInput({ field }: SirenStringListInputProps) {
   );
 
   return (
-    <div>
+    <Stack gap="xs">
       <input name={field.name} type="hidden" value="" />
       {values.map((value, index) => (
-        <div key={`${field.name}-${index}`}>
-          <input
+        <Group key={`${field.name}-${index}`}>
+          <TextInput
             name={field.name}
             onChange={(event) => setValues(values.map((item, itemIndex) => (itemIndex === index ? event.target.value : item)))}
-            type="text"
             value={value}
           />
-          <button onClick={() => setValues(values.filter((_, itemIndex) => itemIndex !== index))} type="button">
+          <Button onClick={() => setValues(values.filter((_, itemIndex) => itemIndex !== index))} size="xs" type="button" variant="subtle">
             Remove
-          </button>
-        </div>
+          </Button>
+        </Group>
       ))}
-      <button onClick={() => setValues([...values, ""])} type="button">
+      <Button onClick={() => setValues([...values, ""])} size="xs" type="button" variant="light">
         Add
-      </button>
-    </div>
+      </Button>
+    </Stack>
   );
 }

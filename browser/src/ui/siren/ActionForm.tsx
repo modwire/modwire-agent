@@ -1,4 +1,5 @@
 import type { Action } from "@siren-js/client";
+import { Button, Fieldset, Stack, Text } from "@mantine/core";
 import { SirenInput } from "./inputs/SirenInput";
 
 export type ActionFormProps = {
@@ -28,16 +29,17 @@ export function ActionForm({ action, onSubmit }: ActionFormProps) {
         );
       }}
     >
-      <fieldset>
-        <legend>{action.title}</legend>
+      <Fieldset legend={action.title}>
+        <Stack gap="sm">
         {action.fields.map((field) => (
           <label key={field.name}>
-            {field.title ?? field.name}
+            <Text component="span">{field.title ?? field.name}</Text>
             <SirenInput field={field} />
           </label>
         ))}
-        <button type="submit">{action.title}</button>
-      </fieldset>
+        <Button type="submit">{action.title}</Button>
+        </Stack>
+      </Fieldset>
     </form>
   );
 }

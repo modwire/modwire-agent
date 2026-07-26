@@ -1,4 +1,5 @@
 import type { Action, Entity, Target } from "@siren-js/client";
+import { Paper, Stack, Title } from "@mantine/core";
 import { ActionList } from "./ActionList";
 import { CollectionItem } from "./CollectionItem";
 import { LinkList } from "./LinkList";
@@ -11,8 +12,9 @@ export type CollectionViewProps = {
 
 export function CollectionView({ entity, onFollow, onSubmit }: CollectionViewProps) {
   return (
-    <section aria-label={entity.title}>
-      <h1>{entity.title}</h1>
+    <Paper component="section" aria-label={entity.title} p="md" shadow="xs">
+      <Stack>
+      <Title order={1}>{entity.title}</Title>
       <ul>
         {entity.entities.map((item, index) => (
           <li key={`${item.rel.join("-")}-${index}`}>
@@ -22,6 +24,7 @@ export function CollectionView({ entity, onFollow, onSubmit }: CollectionViewPro
       </ul>
       <LinkList links={entity.links} onFollow={onFollow} />
       <ActionList actions={entity.actions} onSubmit={onSubmit} />
-    </section>
+      </Stack>
+    </Paper>
   );
 }
