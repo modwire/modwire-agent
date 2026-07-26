@@ -17,8 +17,11 @@ export function CollectionView({ entity, onFollow, onSubmit }: CollectionViewPro
           <li key={`${item.rel.join("-")}-${index}`}>{item.title ?? item.class.join(" ")}</li>
         ))}
       </ul>
-      <LinkList links={entity.links} onFollow={onFollow} />
-      <ActionList actions={entity.actions} onSubmit={onSubmit} />
+      <LinkList links={entity.links.filter((link) => !link.rel.includes("self"))} onFollow={onFollow} />
+      <ActionList
+        actions={entity.actions.filter((action) => action.method !== "GET" || action.fields.length > 0)}
+        onSubmit={onSubmit}
+      />
     </section>
   );
 }
