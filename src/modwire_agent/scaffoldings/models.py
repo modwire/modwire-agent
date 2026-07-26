@@ -7,6 +7,8 @@ class VariableType(models.TextChoices):
     INT = "int"
     FLOAT = "float"
     BOOL = "bool"
+    LIST = "list"
+    DICT = "dict"
 
 
 class WriteMode(models.TextChoices):

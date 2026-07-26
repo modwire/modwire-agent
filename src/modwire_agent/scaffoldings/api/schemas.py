@@ -3,10 +3,6 @@ from typing import Literal
 from ninja import Field, Schema
 from pydantic import JsonValue
 
-from modwire_agent.core.schema import StrictSchema
-
-__all__ = ["StrictSchema"]
-
 
 class VariableFormPropertyOut(Schema):
     type: Literal["string", "integer", "number", "boolean", "array", "object"]

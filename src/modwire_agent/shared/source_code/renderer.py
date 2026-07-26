@@ -1,10 +1,17 @@
 import abc
+from collections.abc import Mapping
 from pathlib import Path
 
-from .package import CodePackage
+from .code_map import SourceCodeMap
+from .package import SourceCodePackage
 
 
-class CodePackageRenderer(abc.ABC):
+class SourceCodeRenderer(abc.ABC):
     @abc.abstractmethod
-    def render(self, root: Path, code_package: CodePackage):
+    def render(
+        self,
+        root: Path,
+        source: SourceCodePackage,
+        data: Mapping[str, object],
+    ) -> SourceCodeMap:
         raise NotImplementedError
