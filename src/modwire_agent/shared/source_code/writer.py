@@ -1,8 +1,11 @@
 from pathlib import Path
 
+from wireup import injectable
+
 from .package import CodePackage
 
 
+@injectable
 class CodePackageWriter:
     def write(
         self,

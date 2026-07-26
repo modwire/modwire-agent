@@ -4,6 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from copier import run_copy
+from wireup import injectable
 
 from ..code_map import QueryableCodeMapReader, SourceCodeMap
 from ..package import SourceCodePackage
@@ -11,6 +12,7 @@ from ..renderer import SourceCodeRenderer
 from ..writer import CodePackageWriter
 
 
+@injectable(as_type=SourceCodeRenderer)
 @dataclass(frozen=True)
 class CopierArchive(SourceCodeRenderer):
     writer: CodePackageWriter

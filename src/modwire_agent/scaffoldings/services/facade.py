@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from wireup import injectable
 
+from modwire_agent.shared import SourceCodeRenderer
 from ..models import Scaffolding
 from .repository import ScaffoldingRepository
 
@@ -10,6 +11,7 @@ from .repository import ScaffoldingRepository
 @dataclass(frozen=True)
 class ScaffoldingService:
     repository: ScaffoldingRepository
+    renderer: SourceCodeRenderer
 
     def create(self, data: dict) -> Scaffolding:
         return self.repository.save(**data)
