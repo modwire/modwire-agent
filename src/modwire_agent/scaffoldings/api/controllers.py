@@ -27,7 +27,12 @@ class ScaffoldingController(ControllerBase):
 
     @route.post("/{scaffolding_id}/renderings", response=schemas.Rendering, operation_id="render_scaffolding")
     def create_rendering(self, request, scaffolding_id: str, body: schemas.GenerateSourceCode):
-        return {"files": DjangoRequest.resolve(request, ScaffoldingService).render(scaffolding_id, body.parameters)}
+        return {
+            "files": DjangoRequest.resolve(
+                request,
+                ScaffoldingService,
+            ).render(scaffolding_id, body.parameters).package.files,
+        }
 
     @route.delete("/{scaffolding_id}", response={204: None}, operation_id="delete_scaffolding")
     def delete(self, request, scaffolding_id: str):
