@@ -10,6 +10,7 @@ from django.urls import Resolver404, resolve
 from modwire_siren import SirenContext, siren
 
 from .api import api
+from .error_handling import GENERIC_ERROR_MESSAGE
 
 _PATH_PARAMETER = re.compile(r"\{[^}]+\}")
 _SIREN_MEDIA_TYPE = "application/vnd.siren+json"
@@ -88,7 +89,7 @@ class SirenFacade:
         try:
             match = resolve(api_path)
         except Resolver404:
-            return HttpResponse(status=404)
+            return self.error(request, JsonResponse({"detail": GENERIC_ERROR_MESSAGE}, status=404))
 
         response = match.func(request, *match.args, **match.kwargs)
         if response.status_code >= 400:

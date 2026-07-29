@@ -25,7 +25,7 @@ class ScaffoldingController(ControllerBase):
     def update(self, request, scaffolding_id: str, body: schemas.ScaffoldingInput):
         return DjangoRequest.resolve(request, ScaffoldingService).update(scaffolding_id, body.model_dump(mode="json"))
 
-    @route.post("/{scaffolding_id}/renderings", response=schemas.Rendering)
+    @route.post("/{scaffolding_id}/renderings", response=schemas.Rendering, operation_id="render_scaffolding")
     def create_rendering(self, request, scaffolding_id: str, body: schemas.GenerateSourceCode):
         return {"files": DjangoRequest.resolve(request, ScaffoldingService).render(scaffolding_id, body.parameters)}
 
