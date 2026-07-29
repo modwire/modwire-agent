@@ -22,12 +22,4 @@ class Highlighter:
             language = lexer.aliases[0] if lexer.aliases else "text"
             return highlight(source, lexer, HtmlFormatter(nowrap=True)), language
         except Exception as error:
-            raise PreviewFailed(
-                [
-                    PreviewError(
-                        "highlighting_failed",
-                        str(error),
-                        {"template_id": template_id, "template_path": path},
-                    )
-                ]
-            ) from error
+            raise RuntimeError(f"Unable to highlight {template_id}:{path}: {error}") from error

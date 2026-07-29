@@ -5,6 +5,7 @@ from ninja_extra import ControllerBase, api_controller, route
 from ..services import ScaffoldingService
 from . import schemas
 
+
 @api_controller("/scaffoldings", tags=["Scaffoldings"])
 class ScaffoldingController(ControllerBase):
     @route.post("", response={201: schemas.Scaffolding}, operation_id="create_scaffolding")

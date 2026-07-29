@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from wireup import injectable
 
 from modwire_agent.shared import SourceCodeRenderer
+
 from ..models import Scaffolding
 from .repository import ScaffoldingRepository
 

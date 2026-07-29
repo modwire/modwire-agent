@@ -54,6 +54,7 @@ testpaths = ["src", "tests"]
 
 [tool.ruff]
 cache-dir = ".dev/ruff-cache"
+extend-exclude = ["src/modwire_agent/plans", "src/modwire_agent/records"]
 line-length = 120
 target-version = "py312"
 
