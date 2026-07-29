@@ -19,6 +19,7 @@ class ScaffoldingService:
     spec_service: ScaffoldingSpecService
 
     def create(self, data: dict) -> Scaffolding:
+        self.spec_service.validate(data["spec"])
         return self.repository.save(**data)
 
     def get(self, id: str) -> Scaffolding:
@@ -28,6 +29,7 @@ class ScaffoldingService:
         return self.repository.find_all()
 
     def update(self, id: str, data: dict) -> Scaffolding:
+        self.spec_service.validate(data["spec"])
         return self.repository.update(id, **data)
 
     def delete(self, id: str) -> None:

@@ -13,12 +13,17 @@ from .model import PreparedScaffolding, ScaffoldingSpec
 @injectable
 @dataclass(frozen=True)
 class ScaffoldingSpecService:
+    def validate(self, value: Mapping[str, object] | ScaffoldingSpec) -> ScaffoldingSpec:
+        spec = self._parse(value)
+        self._validate_template_content_paths(spec)
+        return spec
+
     def prepare(
         self,
         value: Mapping[str, object] | ScaffoldingSpec,
         parameters: Mapping[str, JsonValue],
     ) -> PreparedScaffolding:
-        spec = self._parse(value)
+        spec = self.validate(value)
         return PreparedScaffolding(
             spec=spec,
             source=self._source(spec),
@@ -38,6 +43,14 @@ class ScaffoldingSpecService:
             language=spec.language,
             package={"files": {template.path: template.content for template in spec.templates}},
         )
+
+    @staticmethod
+    def _validate_template_content_paths(spec: ScaffoldingSpec) -> None:
+        for template in spec.templates:
+            if not template.path.endswith(".jinja") and any(
+                token in template.content for token in ("{{", "{%", "{#")
+            ):
+                raise ScaffoldingError("Template content uses Jinja syntax; its path must end with '.jinja'.")
 
     def _validate_parameters(
         self,
