@@ -9,8 +9,6 @@ from ninja.errors import ValidationError as NinjaValidationError
 from ninja_extra.exceptions import ValidationError as NinjaExtraValidationError
 from pydantic import ValidationError as PydanticValidationError
 
-from modwire_agent.scaffoldings.domain.preview import PreviewFailed
-
 GENERIC_ERROR_MESSAGE = "Request failed."
 
 logger = structlog.get_logger(__name__)
@@ -18,7 +16,6 @@ logger = structlog.get_logger(__name__)
 
 class ExceptionHandlers:
     def configure(self, api: Any) -> None:
-        api.add_exception_handler(PreviewFailed, self.preview_failed_response)
         api.add_exception_handler(DomainError, self.domain_error_response)
         api.add_exception_handler(NinjaValidationError, self.validation_error_response)
         api.add_exception_handler(NinjaExtraValidationError, self.validation_error_response)
@@ -29,9 +26,6 @@ class ExceptionHandlers:
         api.add_exception_handler(LookupError, self.not_found_response)
         api.add_exception_handler(HttpError, self.http_error_response)
         api.add_exception_handler(Exception, self.unexpected_error_response)
-
-    def preview_failed_response(self, request: HttpRequest, error: PreviewFailed) -> HttpResponse:
-        return self.response(request, {"errors": [item.as_dict() for item in error.errors]}, status=422)
 
     def domain_error_response(self, request: HttpRequest, error: DomainError) -> HttpResponse:
         return self.response(request, {"detail": str(error)}, status=422)

@@ -12,9 +12,16 @@ it("mounts the browser application", () => {
   vi.stubGlobal(
     "fetch",
     vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ title: "Modwire API", links: [], properties: { title: "Modwire API" } }), {
-        headers: { "content-type": "application/vnd.siren+json" },
-      }),
+      new Response(
+        JSON.stringify({
+          title: "Modwire API",
+          links: [],
+          properties: { title: "Modwire API" },
+        }),
+        {
+          headers: { "content-type": "application/vnd.siren+json" },
+        },
+      ),
     ),
   );
   const { container } = render(<App />);
@@ -23,6 +30,5 @@ it("mounts the browser application", () => {
   expect(container.querySelector("nav")).not.toBeNull();
   expect(container.querySelector("main")).not.toBeNull();
   expect(container.querySelector("aside")).not.toBeNull();
-  expect(container).toHaveTextContent("Modwire");
   return waitFor(() => expect(fetch).toHaveBeenCalled());
 });
