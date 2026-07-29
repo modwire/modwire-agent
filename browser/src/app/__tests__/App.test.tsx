@@ -1,34 +1,42 @@
-import { cleanup, render, waitFor } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { App } from "../App";
 
+const sirenClient = vi.hoisted(() => ({
+  execute: vi.fn(),
+  get: vi.fn(),
+}));
+
+vi.mock("../../client/SirenClient", () => ({
+  SirenClient: class {
+    execute = sirenClient.execute;
+    get = sirenClient.get;
+  },
+}));
+
 afterEach(() => {
   cleanup();
-  vi.unstubAllGlobals();
+  vi.clearAllMocks();
   window.history.replaceState(null, "", "/");
 });
 
-it("mounts the browser application", () => {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          title: "Modwire API",
-          links: [],
-          properties: { title: "Modwire API" },
-        }),
-        {
-          headers: { "content-type": "application/vnd.siren+json" },
-        },
-      ),
-    ),
-  );
+it("loads and renders the Siren entry point", async () => {
+  sirenClient.get.mockResolvedValue({
+    actions: [],
+    class: ["api", "entry-point"],
+    entities: [],
+    links: [],
+    properties: { title: "Modwire API" },
+    title: "Modwire API",
+  });
+
   const { container } = render(<App />);
 
   expect(container.querySelector("header")).not.toBeNull();
-  expect(container.querySelector("nav")).not.toBeNull();
   expect(container.querySelector("main")).not.toBeNull();
-  expect(container.querySelector("aside")).not.toBeNull();
-  return waitFor(() => expect(fetch).toHaveBeenCalled());
+  expect(container.querySelector("footer")).not.toBeNull();
+  expect(
+    await screen.findByRole("heading", { name: "Modwire API" }),
+  ).toBeInTheDocument();
+  expect(sirenClient.get).toHaveBeenCalledWith("/siren/");
 });
