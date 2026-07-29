@@ -21,7 +21,10 @@ export default defineConfig({
   plugins: [react(), trimOutputWhitespace()],
   base: "/static/browser/",
   build: {
-    outDir: resolve(import.meta.dirname, "../src/modwire_agent/browser/adapters/http/static/browser"),
+    outDir: resolve(
+      import.meta.dirname,
+      "../src/modwire_agent/browser/adapters/http/static/browser",
+    ),
     emptyOutDir: true,
     rollupOptions: {
       output: {

@@ -34,15 +34,9 @@ INSTALLED_APPS = [
     "ninja_extra",
     "pgvector.django",
     "modwire_hex.django.apps.ModwireConfig",
-    "modwire_agent.browser.adapters.http.apps.BrowserHttpConfig",
-    "modwire_agent.languages.adapters.http.apps.LanguagesHttpConfig",
-    "modwire_agent.scaffoldings.adapters.django.apps.ScaffoldingsDjangoConfig",
-    "modwire_agent.scaffoldings.adapters.http.apps.ScaffoldingsHttpConfig",
-    "modwire_agent.records.adapters.django.apps.RecordsConfig",
-    "modwire_agent.records.adapters.http.apps.RecordsHttpConfig",
-    "modwire_agent.plans.adapters.django.apps.PlansConfig",
-    "modwire_agent.plans.adapters.http.apps.PlansHttpConfig",
+    "modwire_agent.scaffoldings.apps.ScaffoldingsDjangoConfig",
 ]
+
 MIDDLEWARE = [
     "modwire_hex.django.middleware.RequestScopeMiddleware",
     "corsheaders.middleware.CorsMiddleware",
