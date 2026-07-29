@@ -1,14 +1,7 @@
 from ninja import Schema
 from pydantic import JsonValue
 
-
-class SourceCode(Schema):
-    files: dict[str, str]
-
-
-class ScaffoldingSpec(Schema):
-    language: str
-    package: SourceCode
+from ..services.spec.model import ScaffoldingSpec
 
 
 class ScaffoldingInput(Schema):

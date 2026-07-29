@@ -20,7 +20,14 @@ def scaffolding_payload() -> dict[str, object]:
         "description": "Creates a Python package.",
         "spec": {
             "language": "python",
-            "package": {"files": {"src/package/__init__.py": ""}},
+            "variables": [],
+            "templates": [
+                {
+                    "path": "src/package/__init__.py",
+                    "content": "",
+                    "write_mode": "overwrite",
+                },
+            ],
         },
     }
 
