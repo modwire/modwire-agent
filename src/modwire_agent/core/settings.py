@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "ninja_extra",
     "pgvector.django",
     "modwire_hex.django.apps.ModwireConfig",
+    "modwire_agent.browser.adapters.http.apps.BrowserHttpConfig",
     "modwire_agent.scaffoldings.apps.ScaffoldingsDjangoConfig",
 ]
 
