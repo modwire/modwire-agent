@@ -55,3 +55,59 @@ def test_scaffolding_crud() -> None:
     deleted = client.delete(f"/api/scaffoldings/{scaffolding_id}")
 
     assert deleted.status_code == 204
+
+
+@pytest.mark.django_db
+def test_create_rejects_jinja_content_without_jinja_suffix() -> None:
+    response = Client().post(
+        "/api/scaffoldings",
+        data={
+            "language_id": "python",
+            "name": "Invalid template",
+            "description": "A template with an invalid content suffix.",
+            "spec": {
+                "language": "python",
+                "variables": [],
+                "templates": [
+                    {
+                        "path": "src/package/__init__.py",
+                        "content": "Generated for {{ package_name }}.",
+                        "write_mode": "overwrite",
+                    },
+                ],
+            },
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {"detail": "Template content uses Jinja syntax; its path must end with '.jinja'."}
+
+
+@pytest.mark.django_db
+def test_render_rejects_invalid_parameter_types_with_scaffolding_error() -> None:
+    created = Client().post(
+        "/api/scaffoldings",
+        data={
+            "language_id": "python",
+            "name": "Typed template",
+            "description": "A template with an integer parameter.",
+            "spec": {
+                "language": "python",
+                "variables": [{"name": "count", "type": "integer"}],
+                "templates": [{"path": "count.txt", "content": "", "write_mode": "overwrite"}],
+            },
+        },
+        content_type="application/json",
+    )
+
+    assert created.status_code == 201
+
+    response = Client().post(
+        f"/api/scaffoldings/{created.json()['id']}/renderings",
+        data={"parameters": {"count": "one"}},
+        content_type="application/json",
+    )
+
+    assert response.status_code == 422
+    assert "Input should be a valid integer" in response.json()["detail"]

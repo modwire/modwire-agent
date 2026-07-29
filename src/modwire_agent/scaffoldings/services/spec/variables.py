@@ -3,6 +3,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, TypeAdapter, field_validator
 
+from ...error import ScaffoldingError
+
 
 class VariableType(StrEnum):
     STRING = "string"
@@ -22,7 +24,7 @@ class BaseVariable(BaseModel):
     @classmethod
     def validate_name(cls, name: str) -> str:
         if not name.isidentifier():
-            raise ValueError("Variable names must be valid Python-style identifiers.")
+            raise ScaffoldingError("Variable names must be valid Python-style identifiers.")
         return name
 
 

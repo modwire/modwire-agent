@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, JsonValue, model_validator
 
 from modwire_agent.shared import SourceCodePackage
 
+from ...error import ScaffoldingError
 from .template import Template
 from .variables import Variable
 
@@ -33,7 +34,7 @@ class ScaffoldingSpec(BaseModel):
 
         if duplicates:
             rendered_duplicates = ", ".join(sorted(duplicates))
-            raise ValueError(f"Scaffolding {member} names must be unique: {rendered_duplicates}")
+            raise ScaffoldingError(f"Scaffolding {member} names must be unique: {rendered_duplicates}")
 
 
 class PreparedScaffolding(BaseModel):

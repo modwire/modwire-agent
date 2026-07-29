@@ -1,8 +1,10 @@
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, ValidationError, field_validator, model_validator
 
 from modwire_agent.shared import SourceCodePackage
+
+from ...error import ScaffoldingError
 
 
 class WriteMode(StrEnum):
@@ -20,7 +22,16 @@ class Template(BaseModel):
     @field_validator("path")
     @classmethod
     def validate_path(cls, path: str) -> str:
-        SourceCodePackage.model_validate(
-            {"language": "", "package": {"files": {path: ""}}},
-        )
+        try:
+            SourceCodePackage.model_validate(
+                {"language": "", "package": {"files": {path: ""}}},
+            )
+        except ValidationError as error:
+            raise ScaffoldingError(error.errors()[0]["msg"]) from error
         return path
+
+    @model_validator(mode="after")
+    def validate_jinja_content_path(self) -> "Template":
+        if not self.path.endswith(".jinja") and any(token in self.content for token in ("{{", "{%", "{#")):
+            raise ScaffoldingError("Template content uses Jinja syntax; its path must end with '.jinja'.")
+        return self

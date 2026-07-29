@@ -1,11 +1,12 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from pydantic import JsonValue
+from pydantic import JsonValue, ValidationError
 from wireup import injectable
 
 from modwire_agent.shared import SourceCodePackage
 
+from ...error import ScaffoldingError
 from .model import PreparedScaffolding, ScaffoldingSpec
 
 
@@ -27,7 +28,10 @@ class ScaffoldingSpecService:
     def _parse(self, value: Mapping[str, object] | ScaffoldingSpec) -> ScaffoldingSpec:
         if isinstance(value, ScaffoldingSpec):
             return value
-        return ScaffoldingSpec.model_validate(value)
+        try:
+            return ScaffoldingSpec.model_validate(value)
+        except ValidationError as error:
+            raise ScaffoldingError(str(error)) from error
 
     def _source(self, spec: ScaffoldingSpec) -> SourceCodePackage:
         return SourceCodePackage(
@@ -51,9 +55,12 @@ class ScaffoldingSpecService:
                 details.append(f"missing: {', '.join(sorted(missing))}")
             if unexpected:
                 details.append(f"unexpected: {', '.join(sorted(unexpected))}")
-            raise ValueError(f"Invalid rendering parameters ({'; '.join(details)}).")
+            raise ScaffoldingError(f"Invalid rendering parameters ({'; '.join(details)}).")
 
-        return {
-            name: variable.validate_value(parameters[name])
-            for name, variable in variables.items()
-        }
+        try:
+            return {
+                name: variable.validate_value(parameters[name])
+                for name, variable in variables.items()
+            }
+        except ValidationError as error:
+            raise ScaffoldingError(str(error)) from error
