@@ -42,7 +42,7 @@ def test_siren_operation_catalog_matches_openapi() -> None:
     }
 
     assert {operation.name for operation in facade.engine.api.operations} == openapi_operation_ids
-    rendering = schema["paths"]["/api/scaffoldings/{scaffolding_id}/renderings"]["post"]
+    rendering = schema["paths"]["/api/scaffoldings/{scaffolding_id}/render"]["post"]
     assert rendering["operationId"] == "render_scaffolding"
 
 
@@ -88,19 +88,23 @@ def test_siren_discovers_and_creates_scaffoldings(
     assert {action["name"] for action in details.json()["actions"]} == {
         "delete_scaffolding",
         "get_scaffolding",
+        "render_scaffolding",
         "update_scaffolding",
     }
 
+    action = next(action for action in details.json()["actions"] if action["name"] == "render_scaffolding")
+    assert action["href"] == f"http://testserver/siren/scaffoldings/{created.json()['properties']['id']}/render"
+    assert action["method"] == "POST"
     rendering = client.post(
-        f"/siren/scaffoldings/{created.json()['properties']['id']}/renderings",
+        action["href"].removeprefix("http://testserver"),
         data={"parameters": {}},
         content_type="application/json",
     )
 
     assert rendering.status_code == 200
     assert rendering["Content-Type"] == SIREN_MEDIA_TYPE
-    assert rendering.json()["class"] == ["collection", "rendering"]
-    assert rendering.json()["entities"][0]["properties"] == {"files": {"src/package/__init__.py": ""}}
+    assert rendering.json()["class"] == ["command"]
+    assert rendering.json()["properties"] == {"files": {"src/package/__init__.py": ""}}
 
 
 def test_siren_projects_commands(client: Client) -> None:
@@ -118,7 +122,7 @@ def test_siren_projects_missing_resources_as_errors(client: Client) -> None:
     assert response.status_code == 404
     assert response["Content-Type"] == SIREN_MEDIA_TYPE
     assert response.json()["class"] == ["error"]
-    assert response.json()["properties"] == {"detail": "Request failed."}
+    assert response.json()["properties"] == {"detail": "Resource not found."}
     assert response.json()["links"][0]["href"] == "http://testserver/siren/not-found"
 
 
@@ -129,4 +133,11 @@ def test_siren_projects_validation_errors(client: Client) -> None:
     assert response.status_code == 422
     assert response["Content-Type"] == SIREN_MEDIA_TYPE
     assert response.json()["class"] == ["error"]
-    assert response.json()["properties"] == {"detail": "Request failed."}
+    assert response.json()["properties"] == {
+        "detail": [
+            {"type": "missing", "loc": ["body", "body", "language_id"], "msg": "Field required"},
+            {"type": "missing", "loc": ["body", "body", "name"], "msg": "Field required"},
+            {"type": "missing", "loc": ["body", "body", "description"], "msg": "Field required"},
+            {"type": "missing", "loc": ["body", "body", "spec"], "msg": "Field required"},
+        ]
+    }

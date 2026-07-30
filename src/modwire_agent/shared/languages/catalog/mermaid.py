@@ -8,8 +8,13 @@ class Mermaid(Language):
     id: str = "mermaid"
     name: str = "Mermaid"
     executable: str = "mmdc"
+    requires_extraction: bool = False
     source_extensions: tuple[str, ...] = (".mermaid", ".mmd")
     aliases: tuple[str, ...] = ()
+
+    def validate(self, path: str, content: str) -> None:
+        super().validate(path, content)
+
     package_managers: tuple[PackageManager, ...] = ()
     tools: tuple[Tool, ...] = (
         Tool(

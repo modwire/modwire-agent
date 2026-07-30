@@ -558,6 +558,7 @@ dependencies = [
     { name = "gunicorn" },
     { name = "modwire-architecture" },
     { name = "modwire-cli" },
+    { name = "modwire-extraction" },
     { name = "modwire-hex" },
     { name = "modwire-mermaid" },
     { name = "modwire-siren" },
@@ -596,6 +597,7 @@ requires-dist = [
     { name = "gunicorn" },
     { name = "modwire-architecture", specifier = ">=7.0.0,<8" },
     { name = "modwire-cli", specifier = ">=2.0.0" },
+    { name = "modwire-extraction", specifier = "==2.1.1" },
     { name = "modwire-hex" },
     { name = "modwire-mermaid", specifier = ">=1.0.1,<2" },
     { name = "modwire-siren", specifier = "==3.1.0" },
@@ -652,14 +654,14 @@ wheels = [
 
 [[package]]
 name = "modwire-extraction"
-version = "2.0.1"
+version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/58/6d/cd1301997c7d167e6c67aa3b6a9918d277e7ecd38201382ee1f0be23d4dd/modwire_extraction-2.0.1.tar.gz", hash = "sha256:a572fc7e770930800b949d18e4eb5b085c67cc5c4770980d1e5b50060dc1f15c", size = 2363341, upload-time = "2026-07-11T23:12:20.284Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/5d/62ccc4963ffb63bd2d62497a99a9317006d4b107bdd13a97d2ddc3b77345/modwire_extraction-2.1.1.tar.gz", hash = "sha256:c937eb7afbdb9c709abfb75f0502c77168664dbb5bfc5857937eca031ba9294b", size = 2362865, upload-time = "2026-07-30T12:11:36.901Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9f/7f/4f8c4b83a1b6d877b57dc6e42db8191d01d7f1f7242cf531cd57913e90ef/modwire_extraction-2.0.1-py3-none-any.whl", hash = "sha256:970bcfbe7928a0c7e035f04a30731d4037e47a2aef9006709c9158d7b2963e45", size = 2335507, upload-time = "2026-07-11T23:12:18.612Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/bf/bf5109eab25d8a4a068596b83a924b1b086f8a4a62f2c433dc3903b03e69/modwire_extraction-2.1.1-py3-none-any.whl", hash = "sha256:57caa01c8dabd3a3dead75b7b18ed8f6a08401d6208180dd6461572cc5d94fbf", size = 2333724, upload-time = "2026-07-30T12:11:35.282Z" },
 ]
 
 [[package]]

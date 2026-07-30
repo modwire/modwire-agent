@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "modwire_hex.django.apps.ModwireConfig",
     "modwire_agent.browser.adapters.http.apps.BrowserHttpConfig",
     "modwire_agent.scaffoldings.apps.ScaffoldingsDjangoConfig",
+    "modwire_agent.records.apps.RecordsConfig",
 ]
 
 MIDDLEWARE = [

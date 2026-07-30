@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, TypeAdapter, field_validator
 
-from ...error import ScaffoldingError
+from ...errors import ScaffoldingError
 
 
 class VariableType(StrEnum):

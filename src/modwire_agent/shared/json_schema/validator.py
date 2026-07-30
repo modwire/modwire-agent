@@ -3,10 +3,12 @@ from typing import Any
 
 from jsonschema import Draft202012Validator, SchemaError
 from jsonschema.exceptions import ValidationError
+from wireup import injectable
 
 from .errors import InvalidSchema, InvalidValue, JsonSchemaIssue
 
 
+@injectable
 class JsonSchemaValidator:
     def require_valid_schema(self, document: Mapping[str, Any]) -> None:
         schema_uri = document.get("$schema", "https://json-schema.org/draft/2020-12/schema")

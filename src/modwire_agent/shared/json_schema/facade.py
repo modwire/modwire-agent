@@ -1,15 +1,18 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
+
+from wireup import injectable
 
 from .compiler import ShapeCompiler
 from .schema import Schema
 from .validator import JsonSchemaValidator
 
 
+@injectable
 @dataclass(frozen=True)
 class JsonSchemaService:
-    compiler: ShapeCompiler = field(default_factory=ShapeCompiler)
-    validator: JsonSchemaValidator = field(default_factory=JsonSchemaValidator)
+    compiler: ShapeCompiler
+    validator: JsonSchemaValidator
 
     def define(self, shape: dict[str, Any]) -> Schema:
         document = self.compiler.compile(shape)

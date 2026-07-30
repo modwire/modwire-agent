@@ -3,9 +3,12 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from wireup import injectable
+
 from .errors import InvalidShape, JsonSchemaIssue
 
 
+@injectable
 class ShapeCompiler:
     def compile(self, shape: dict[str, Any]) -> dict[str, Any]:
         return {"$schema": "https://json-schema.org/draft/2020-12/schema", **self._object(shape, ())}

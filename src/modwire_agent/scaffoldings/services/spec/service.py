@@ -6,7 +6,7 @@ from wireup import injectable
 
 from modwire_agent.shared import SourceCodePackage
 
-from ...error import ScaffoldingError
+from ...errors import ScaffoldingError
 from .model import PreparedScaffolding, ScaffoldingSpec
 
 

@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 
 from modwire_agent.shared import SourceCodePackage
 
-from ...error import ScaffoldingError
+from ...errors import ScaffoldingError
 
 
 class WriteMode(StrEnum):
