@@ -1,6 +1,9 @@
+from pathlib import PurePosixPath
+
 from wireup import injectable
 
 from ..base import Language, PackageManager, Tool, VersionProvider
+from ..errors import LanguagesError
 
 
 @injectable(as_type=Language, qualifier="php")
@@ -8,8 +11,15 @@ class PHP(Language):
     id: str = "php"
     name: str = "PHP"
     executable: str = "php"
+    requires_extraction: bool = True
     source_extensions: tuple[str, ...] = (".php",)
     aliases: tuple[str, ...] = ()
+
+    def validate(self, path: str, content: str) -> None:
+        super().validate(path, content)
+        if not path or "\\" in path or PurePosixPath(path).is_absolute():
+            raise LanguagesError(f"Invalid PHP namespace path: {path!r}")
+
     package_managers: tuple[PackageManager, ...] = (
         PackageManager(
             id="composer",
@@ -46,7 +56,8 @@ class PHP(Language):
             homepage_url="https://cs.symfony.com/",
             config_paths=(".php-cs-fixer.php",),
             default_enabled=True,
-            commands={"check": "php-cs-fixer fix --dry-run --diff", "fix": "php-cs-fixer fix"},
+            commands={"check": "php-cs-fixer fix --dry-run --diff",
+                      "fix": "php-cs-fixer fix"},
         ),
         Tool(
             id="phpstan",

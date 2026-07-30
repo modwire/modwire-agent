@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, JsonValue, model_validator
 
 from modwire_agent.shared import SourceCodePackage
 
-from ...error import ScaffoldingError
+from ...errors import ScaffoldingError
 from .template import Template
 from .variables import Variable
 

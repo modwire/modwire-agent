@@ -8,8 +8,13 @@ class Python(Language):
     id: str = "python"
     name: str = "Python"
     executable: str = "python"
+    requires_extraction: bool = True
     source_extensions: tuple[str, ...] = (".py",)
     aliases: tuple[str, ...] = ("py",)
+
+    def validate(self, path: str, content: str) -> None:
+        super().validate(path, content)
+
     package_managers: tuple[PackageManager, ...] = (
         PackageManager(
             id="uv",

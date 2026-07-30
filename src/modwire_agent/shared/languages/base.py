@@ -1,6 +1,7 @@
-from typing import Literal
+from dataclasses import dataclass
+from typing import Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict
+from .errors import LanguagesError
 
 PackageManagerCommand = Literal[
     "init",
@@ -44,63 +45,54 @@ VersionProviderKind = Literal["endoflife", "npm"]
 VersionPathItem = str | int
 
 
-LanguageModel = type("LanguageModel", (BaseModel,), {"model_config": ConfigDict(frozen=True)})
-VersionProvider = type(
-    "VersionProvider",
-    (LanguageModel,),
-    {"__annotations__": {"kind": VersionProviderKind, "url": str, "result_path": tuple[VersionPathItem, ...]}},
-)
-PackageManager = type(
-    "PackageManager",
-    (LanguageModel,),
-    {
-        "__annotations__": {
-            "id": str,
-            "name": str,
-            "executable": str,
-            "manifest_paths": tuple[str, ...],
-            "lockfile_paths": tuple[str, ...],
-            "registry_url": str,
-            "package_url_type": str,
-            "version_constraint": str,
-            "supports_workspaces": bool,
-            "commit_lockfiles": bool,
-            "commands": dict[PackageManagerCommand, str],
-        }
-    },
-)
-Tool = type(
-    "Tool",
-    (LanguageModel,),
-    {
-        "__annotations__": {
-            "id": str,
-            "name": str,
-            "roles": tuple[ToolRole, ...],
-            "executable": str,
-            "package_name": str,
-            "stable_version": str,
-            "homepage_url": str,
-            "config_paths": tuple[str, ...],
-            "default_enabled": bool,
-            "commands": dict[ToolCommand, str],
-        }
-    },
-)
-Language = type(
-    "Language",
-    (LanguageModel,),
-    {
-        "__annotations__": {
-            "id": str,
-            "name": str,
-            "executable": str,
-            "source_extensions": tuple[str, ...],
-            "aliases": tuple[str, ...],
-            "package_managers": tuple[PackageManager, ...],
-            "tools": tuple[Tool, ...],
-            "stable_version": str,
-            "version_provider": VersionProvider,
-        }
-    },
-)
+@dataclass(frozen=True)
+class VersionProvider:
+    kind: VersionProviderKind
+    url: str
+    result_path: tuple[VersionPathItem, ...]
+
+
+@dataclass(frozen=True)
+class PackageManager:
+    id: str
+    name: str
+    executable: str
+    manifest_paths: tuple[str, ...]
+    lockfile_paths: tuple[str, ...]
+    registry_url: str
+    package_url_type: str
+    version_constraint: str
+    supports_workspaces: bool
+    commit_lockfiles: bool
+    commands: dict[PackageManagerCommand, str]
+
+
+@dataclass(frozen=True)
+class Tool:
+    id: str
+    name: str
+    roles: tuple[ToolRole, ...]
+    executable: str
+    package_name: str
+    stable_version: str
+    homepage_url: str
+    config_paths: tuple[str, ...]
+    default_enabled: bool
+    commands: dict[ToolCommand, str]
+
+
+class Language(Protocol):
+    id: str
+    name: str
+    executable: str
+    requires_extraction: bool
+    source_extensions: tuple[str, ...]
+    aliases: tuple[str, ...]
+    package_managers: tuple[PackageManager, ...]
+    tools: tuple[Tool, ...]
+    stable_version: str
+    version_provider: VersionProvider
+
+    def validate(self, path: str, content: str) -> None:
+        if any(part in {".", ".."} for part in path.split("/")):
+            raise LanguagesError(f"Invalid source path: {path!r}")

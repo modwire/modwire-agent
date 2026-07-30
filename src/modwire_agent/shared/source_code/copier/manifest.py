@@ -4,6 +4,8 @@ import yaml
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
 
+from ..errors import SourceCodeError
+
 
 class CopierManifest(BaseModel):
     min_copier_version: ClassVar[str] = "9.0.0"
@@ -88,4 +90,4 @@ class CopierManifest(BaseModel):
         try:
             return type_mapping[annotation]
         except KeyError as error:
-            raise TypeError(f"Unsupported Copier question type: {annotation!r}") from error
+            raise SourceCodeError(f"Unsupported Copier question type: {annotation!r}") from error

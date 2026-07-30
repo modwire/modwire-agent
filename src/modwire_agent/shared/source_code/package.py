@@ -1,5 +1,7 @@
 from pydantic import BaseModel, field_validator
 
+from .errors import SourceCodeError
+
 
 class CodePackage(BaseModel):
     """ Keeps map of relative paths to file content. File tree is rendered.
@@ -22,21 +24,21 @@ class CodePackage(BaseModel):
     @staticmethod
     def _validate_file_path(path: str) -> None:
         if not path:
-            raise ValueError("Code package file path cannot be empty.")
+            raise SourceCodeError("Code package file path cannot be empty.")
 
         if "\\" in path:
-            raise ValueError(f"Code package path must use POSIX separators: {path!r}")
+            raise SourceCodeError(f"Code package path must use POSIX separators: {path!r}")
 
         if path.startswith("/"):
-            raise ValueError(f"Code package path must be relative: {path!r}")
+            raise SourceCodeError(f"Code package path must be relative: {path!r}")
 
         if path.endswith("/"):
-            raise ValueError(f"Code package path must point to a file: {path!r}")
+            raise SourceCodeError(f"Code package path must point to a file: {path!r}")
 
         parts = path.split("/")
 
         if any(part in {"", ".", ".."} for part in parts):
-            raise ValueError(f"Code package path contains an invalid segment: {path!r}")
+            raise SourceCodeError(f"Code package path contains an invalid segment: {path!r}")
 
 
 class SourceCodePackage(BaseModel):

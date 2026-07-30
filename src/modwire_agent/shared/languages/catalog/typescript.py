@@ -8,8 +8,13 @@ class Typescript(Language):
     id: str = "typescript"
     name: str = "TypeScript"
     executable: str = "tsc"
+    requires_extraction: bool = True
     source_extensions: tuple[str, ...] = (".tsx", ".ts", ".jsx", ".js")
     aliases: tuple[str, ...] = ("ts",)
+
+    def validate(self, path: str, content: str) -> None:
+        super().validate(path, content)
+
     package_managers: tuple[PackageManager, ...] = (
         PackageManager(
             id="npm",

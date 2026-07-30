@@ -3,6 +3,7 @@ from pathlib import Path
 
 from wireup import injectable
 
+from .errors import SourceCodeError
 from .package import CodePackage
 
 
@@ -17,7 +18,7 @@ class CodePackageReader:
 
         for path in sorted(root.rglob("*")):
             if path.is_symlink():
-                raise ValueError(f"Symbolic links are not supported: {path}")
+                raise SourceCodeError(f"Symbolic links are not supported: {path}")
 
             if not path.is_file():
                 continue
