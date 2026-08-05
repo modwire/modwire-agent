@@ -13,11 +13,19 @@ function response(
   });
 }
 
+function jsonResponse(body: unknown, status: number): Response {
+  return Response.json(body, {
+    headers: { "Content-Type": "application/vnd.siren+json" },
+    status,
+    statusText: status === 404 ? "Not Found" : "Unprocessable Content",
+  });
+}
+
 describe("sirenResponseError", () => {
   it("projects structured violations onto matching action fields", async () => {
     const error = await sirenResponseError(
-      response(
-        JSON.stringify({
+      jsonResponse(
+        {
           class: ["error"],
           properties: {
             detail: [
@@ -32,7 +40,7 @@ describe("sirenResponseError", () => {
             ],
           },
           title: "Validation failed",
-        }),
+        },
         422,
       ),
       ["language_id", "spec"],
@@ -59,12 +67,12 @@ describe("sirenResponseError", () => {
 
   it("projects a missing resource detail into the error message", async () => {
     const error = await sirenResponseError(
-      response(
-        JSON.stringify({
+      jsonResponse(
+        {
           class: ["error"],
           properties: { detail: "Resource not found." },
           title: "Scaffolding",
-        }),
+        },
         404,
       ),
     );

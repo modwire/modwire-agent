@@ -3,10 +3,20 @@ import { Field, type Action } from "@siren-js/client";
 import { Form } from "../form/Form";
 import { FormField } from "../form/FormField";
 import type { FormSchema, FormSchemaProperty } from "../form/FormSchema";
+import type { FormControl } from "../form/FormValues";
 import { SirenField } from "./SirenField";
+import { SirenJsonInput } from "./inputs/SirenJsonInput";
+import { SirenStructuredInput } from "./inputs/SirenStructuredInput";
+
+export const STRUCTURED_FORM_EXTENSION =
+  "https://modwire.dev/siren/structured-form/v1";
+export const JSON_CONTROL = "https://modwire.dev/siren/controls/json/v1";
+export const OBJECT_CONTROL = "https://modwire.dev/siren/controls/object/v1";
+export const ARRAY_CONTROL = "https://modwire.dev/siren/controls/array/v1";
 
 export type SirenActionFormProps = {
   action: Action;
+  values?: object;
   onSubmit: (
     action: Action,
     values: Record<string, unknown>,
@@ -26,8 +36,27 @@ function structuredFieldType(
   return undefined;
 }
 
-function actionFields(action: Action, schema?: FormSchema): Field[] {
-  const fields = [...action.fields];
+function formControl(field: Field): FormControl {
+  if (field.type === "checkbox")
+    return { name: field.name, valueType: "boolean" };
+  if (field.type === "number" || field.type === "range")
+    return { name: field.name, valueType: "number" };
+  return { name: field.name };
+}
+
+function actionFields(
+  action: Action,
+  schema?: FormSchema,
+  values: object = {},
+): Field[] {
+  const initialValues = record(values) ?? {};
+  const fields = action.fields.map((field) =>
+    field.value === undefined && Object.hasOwn(initialValues, field.name)
+      ? Object.assign(new Field(), field, {
+          value: initialValues[field.name],
+        })
+      : field,
+  );
   const present = new Set(fields.map((field) => field.name));
 
   for (const [name, property] of Object.entries(schema?.properties ?? {})) {
@@ -38,6 +67,9 @@ function actionFields(action: Action, schema?: FormSchema): Field[] {
         name,
         title: property.title ?? name,
         type,
+        value: Object.hasOwn(initialValues, name)
+          ? initialValues[name]
+          : undefined,
       }),
     );
   }
@@ -45,16 +77,100 @@ function actionFields(action: Action, schema?: FormSchema): Field[] {
   return fields;
 }
 
-export function SirenActionForm({ action, onSubmit }: SirenActionFormProps) {
-  const form = action["x-form"];
-  const schema =
-    typeof form === "object" && form !== null
-      ? ((form as Record<string, unknown>)["schema"] as FormSchema)
-      : undefined;
-  const fields = actionFields(action, schema);
+function record(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
+
+type StructuredControl = {
+  control: string;
+  name: string;
+  required: boolean;
+  schema: FormSchemaProperty;
+};
+
+function actionFieldInput(field: Field, control?: StructuredControl) {
+  if (!control) return <SirenField field={field} />;
+
+  switch (control.control) {
+    case JSON_CONTROL:
+      return <SirenJsonInput field={field} schema={control.schema} />;
+    case OBJECT_CONTROL:
+    case ARRAY_CONTROL:
+      return <SirenStructuredInput field={field} schema={control.schema} />;
+    default:
+      throw new Error(`Unsupported Siren control: ${control.control}`);
+  }
+}
+
+function structuredControls(action: Action): StructuredControl[] {
+  const value = action[STRUCTURED_FORM_EXTENSION];
+  if (value === undefined) return [];
+
+  const extension = record(value);
+  if (
+    !extension ||
+    extension.version !== "1" ||
+    !Array.isArray(extension.controls)
+  )
+    throw new Error("Malformed Siren structured-form extension");
+
+  return extension.controls.map((value) => {
+    const control = record(value);
+    if (!control) throw new Error("Malformed Siren structured-form control");
+    const schema = record(control.schema);
+    if (
+      typeof control.control !== "string" ||
+      typeof control.name !== "string" ||
+      control.location !== "body" ||
+      typeof control.required !== "boolean" ||
+      control.mediaType !== "application/json" ||
+      !schema
+    )
+      throw new Error("Malformed Siren structured-form control");
+
+    return {
+      control: control.control,
+      name: control.name,
+      required: control.required,
+      schema: schema as FormSchemaProperty,
+    };
+  });
+}
+
+function structuredFormSchema(
+  controls: StructuredControl[],
+): FormSchema | undefined {
+  if (controls.length) {
+    return {
+      properties: Object.fromEntries(
+        controls.map((control) => [control.name, control.schema]),
+      ),
+      required: controls
+        .filter((control) => control.required === true)
+        .map((control) => control.name),
+      type: "object",
+    };
+  }
+  return undefined;
+}
+
+export function SirenActionForm({
+  action,
+  onSubmit,
+  values,
+}: SirenActionFormProps) {
+  const controls = structuredControls(action);
+  const schema = structuredFormSchema(controls);
+  const fields = actionFields(action, schema, values);
+  const controlsByName = new Map(
+    controls.map((control) => [control.name, control]),
+  );
 
   return (
     <Form
+      controls={fields.map(formControl)}
       onSubmit={(values) => {
         action.fields = fields;
         return onSubmit(action, values);
@@ -64,18 +180,18 @@ export function SirenActionForm({ action, onSubmit }: SirenActionFormProps) {
       {(errors) => (
         <Fieldset legend={action.title}>
           <Stack gap="sm">
-            {fields.map((field) => (
-              <FormField
-                error={errors[field.name]}
-                key={field.name}
-                label={field.title ?? field.name}
-              >
-                <SirenField
-                  field={field}
-                  schema={schema?.properties?.[field.name]}
-                />
-              </FormField>
-            ))}
+            {fields.map((field) => {
+              const control = controlsByName.get(field.name);
+              return (
+                <FormField
+                  error={errors[field.name]}
+                  key={field.name}
+                  label={field.title ?? field.name}
+                >
+                  {actionFieldInput(field, control)}
+                </FormField>
+              );
+            })}
             <Button type="submit">{action.title}</Button>
           </Stack>
         </Fieldset>

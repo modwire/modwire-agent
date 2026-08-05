@@ -36,7 +36,7 @@ function collection(title?: string): Entity {
     actions: [],
     class: ["collection", "record-category"],
     entities: [],
-    links: [link("/siren/record-categories")],
+    links: [link("/api/record-categories")],
     properties: {},
     title,
   });
@@ -51,6 +51,12 @@ describe("Siren labels", () => {
 
   it("replaces framework collection titles with a domain class label", () => {
     expect(collectionLabel(collection("Response"))).toBe("Record Categories");
+    expect(collectionLabel(collection("RecordCategorySummary"))).toBe(
+      "Record Categories",
+    );
+    expect(collectionLabel(collection("RecordCategory"))).toBe(
+      "Record Categories",
+    );
   });
 
   it("distinguishes repeated item titles with identifying properties", () => {
@@ -78,7 +84,7 @@ describe("Siren labels", () => {
       collectionItemLabel(
         Object.assign(new EmbeddedLink(), {
           class: [],
-          href: "/siren/records/42",
+          href: "/api/records/42",
           rel: ["item"],
           title: "Response",
         }),
@@ -100,12 +106,30 @@ describe("Siren labels", () => {
     });
     const exampleLink = Object.assign(new Link(), {
       class: [],
-      href: "/siren/example-resources",
+      href: "/api/example-resources",
       rel: ["collection"],
       title: "Response",
     });
 
     expect(entityLabel(exampleEntity)).toBe("Example record");
     expect(linkLabel(exampleLink)).toBe("Example Resources");
+  });
+
+  it("pluralizes projected resource names used for collection links", () => {
+    const categoryLink = Object.assign(new Link(), {
+      class: [],
+      href: "/api/records/categories",
+      rel: ["collection"],
+      title: "Category",
+    });
+    const summaryLink = Object.assign(new Link(), {
+      class: [],
+      href: "/api/scaffoldings",
+      rel: ["collection"],
+      title: "ScaffoldingSummary",
+    });
+
+    expect(linkLabel(categoryLink)).toBe("Categories");
+    expect(linkLabel(summaryLink)).toBe("Scaffoldings");
   });
 });

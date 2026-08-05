@@ -6,9 +6,10 @@ import { SirenActionForm } from "./SirenActionForm";
 export type SirenActionsProps = {
   actions: Action[];
   onSubmit: (action: Action, values: Record<string, unknown>) => void;
+  values?: object;
 };
 
-export function SirenActions({ actions, onSubmit }: SirenActionsProps) {
+export function SirenActions({ actions, onSubmit, values }: SirenActionsProps) {
   const displayedActions = actions.filter(
     (action) => action.method !== "GET" || action.fields.length > 0,
   );
@@ -25,6 +26,7 @@ export function SirenActions({ actions, onSubmit }: SirenActionsProps) {
             action={action}
             key={`${action.method}-${action.href}-${action.name}`}
             onSubmit={onSubmit}
+            values={values}
           />
         );
       })}

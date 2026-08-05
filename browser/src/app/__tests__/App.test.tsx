@@ -196,3 +196,204 @@ it("keeps an action form mounted while showing structured submission errors", as
   ).toBeInTheDocument();
   expect(screen.queryByText("Unable to load resource")).not.toBeInTheDocument();
 });
+
+it("navigates from the root through a collection to an updated entity", async () => {
+  const updatedEntity = {
+    actions: [],
+    class: ["example-resource"],
+    entities: [],
+    links: [],
+    properties: { title: "Updated example" },
+    title: "Updated example",
+  };
+  sirenClient.get.mockImplementation(async (target: string) => {
+    if (target === "/example-siren/") return rootEntity;
+    if (target === "/example-resources")
+      return {
+        actions: [],
+        class: ["collection", "example-resource"],
+        entities: [
+          {
+            class: ["example-resource"],
+            links: [
+              {
+                href: "/example-resources/one",
+                rel: ["self"],
+                title: "Example one",
+              },
+            ],
+            properties: { title: "Example one" },
+            rel: ["item"],
+            title: "Example one",
+          },
+        ],
+        links: [],
+        properties: {},
+        title: "Example resources",
+      };
+    return {
+      actions: [
+        {
+          fields: [{ name: "title", title: "Title", type: "text" }],
+          href: "/example-resources/one",
+          method: "PUT",
+          name: "update-example",
+          title: "Update example",
+        },
+      ],
+      class: ["example-resource"],
+      entities: [],
+      links: [],
+      properties: { title: "Example one" },
+      title: "Example one",
+    };
+  });
+  sirenClient.execute.mockResolvedValue(updatedEntity);
+
+  render(<App rootTarget="/example-siren/" />);
+
+  fireEvent.click(
+    await screen.findByRole("link", { name: "Example resources" }),
+  );
+  fireEvent.click(await screen.findByRole("link", { name: "Example one" }));
+  fireEvent.change(await screen.findByRole("textbox"), {
+    target: { value: "Updated example" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Update example" }));
+
+  expect(
+    await screen.findByRole("heading", { name: "Updated example" }),
+  ).toBeInTheDocument();
+  expect(sirenClient.execute).toHaveBeenCalledWith(
+    expect.objectContaining({ name: "update-example" }),
+    { title: "Updated example" },
+  );
+  expect(window.location.hash).toBe("#/example-resources/one");
+});
+
+it("creates an entity from an advertised root action", async () => {
+  const createdEntity = {
+    actions: [],
+    class: ["example-resource"],
+    entities: [],
+    links: [],
+    properties: { title: "Created example" },
+    title: "Created example",
+  };
+  sirenClient.get.mockResolvedValue({
+    ...rootEntity,
+    actions: [
+      {
+        fields: [{ name: "title", title: "Title", type: "text" }],
+        href: "/example-resources",
+        method: "POST",
+        name: "create-example",
+        title: "Create example",
+      },
+    ],
+  });
+  sirenClient.execute.mockResolvedValue(createdEntity);
+
+  render(<App rootTarget="/example-siren/" />);
+
+  fireEvent.change(await screen.findByRole("textbox"), {
+    target: { value: "Created example" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Create example" }));
+
+  expect(
+    await screen.findByRole("heading", { name: "Created example" }),
+  ).toBeInTheDocument();
+  expect(sirenClient.execute).toHaveBeenCalledWith(
+    expect.objectContaining({ name: "create-example" }),
+    { title: "Created example" },
+  );
+});
+
+it("renders a command representation from an advertised action", async () => {
+  window.history.replaceState(null, "", "/#/example-resources/one");
+  const detailEntity = {
+    actions: [
+      {
+        fields: [{ name: "format", title: "Format", type: "text" }],
+        href: "/example-resources/one/render",
+        method: "POST",
+        name: "render-example",
+        title: "Render example",
+      },
+    ],
+    class: ["example-resource"],
+    entities: [],
+    links: [],
+    properties: {},
+    title: "Example one",
+  };
+  sirenClient.get.mockImplementation(async (target: string) =>
+    target === "/example-siren/" ? rootEntity : detailEntity,
+  );
+  sirenClient.execute.mockResolvedValue({
+    actions: [],
+    class: ["command"],
+    entities: [],
+    links: [],
+    properties: { content: "Rendered content" },
+    title: "Rendered example",
+  });
+
+  render(<App rootTarget="/example-siren/" />);
+
+  fireEvent.change(await screen.findByRole("textbox"), {
+    target: { value: "markdown" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Render example" }));
+
+  expect(
+    await screen.findByRole("heading", { name: "Rendered example" }),
+  ).toBeInTheDocument();
+  expect(sirenClient.execute).toHaveBeenCalledWith(
+    expect.objectContaining({ name: "render-example" }),
+    { format: "markdown" },
+  );
+});
+
+it("reloads the current resource after a content-free action", async () => {
+  window.history.replaceState(null, "", "/#/example-resources/one");
+  const detailEntity = {
+    actions: [
+      {
+        fields: [],
+        href: "/example-resources/one",
+        method: "DELETE",
+        name: "delete-example",
+        title: "Delete example",
+      },
+    ],
+    class: ["example-resource"],
+    entities: [],
+    links: [],
+    properties: {},
+    title: "Example one",
+  };
+  sirenClient.get.mockImplementation(async (target: string) =>
+    target === "/example-siren/" ? rootEntity : detailEntity,
+  );
+  sirenClient.execute.mockResolvedValue(null);
+
+  render(<App rootTarget="/example-siren/" />);
+
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Delete example" }),
+  );
+
+  await waitFor(() =>
+    expect(
+      sirenClient.get.mock.calls.filter(
+        ([target]) => target === "/example-resources/one",
+      ),
+    ).toHaveLength(2),
+  );
+  expect(sirenClient.execute).toHaveBeenCalledWith(
+    expect.objectContaining({ name: "delete-example" }),
+    {},
+  );
+});

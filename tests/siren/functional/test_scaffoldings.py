@@ -1,15 +1,12 @@
 import pytest
 from django.test import Client
 
-from modwire_agent.core.api import api
-from modwire_agent.core.siren import facade
-
 SIREN_MEDIA_TYPE = "application/vnd.siren+json"
 
 
 @pytest.fixture
 def client() -> Client:
-    return Client()
+    return Client(HTTP_ACCEPT=SIREN_MEDIA_TYPE)
 
 
 @pytest.fixture
@@ -32,20 +29,6 @@ def scaffolding_payload() -> dict[str, object]:
     }
 
 
-def test_siren_operation_catalog_matches_openapi() -> None:
-    schema = api.get_openapi_schema()
-    openapi_operation_ids = {
-        operation["operationId"]
-        for path_item in schema["paths"].values()
-        for operation in path_item.values()
-        if isinstance(operation, dict) and isinstance(operation.get("operationId"), str)
-    }
-
-    assert {operation.name for operation in facade.engine.api.operations} == openapi_operation_ids
-    rendering = schema["paths"]["/api/scaffoldings/{scaffolding_id}/render"]["post"]
-    assert rendering["operationId"] == "render_scaffolding"
-
-
 @pytest.mark.django_db
 def test_siren_discovers_and_creates_scaffoldings(
     client: Client,
@@ -66,8 +49,11 @@ def test_siren_discovers_and_creates_scaffoldings(
     action = next(action for action in collection.json()["actions"] if action["name"] == "create_scaffolding")
     assert action["href"] == "http://testserver/siren/scaffoldings"
     assert action["method"] == "POST"
-    assert [field["name"] for field in action["fields"]] == ["language_id", "name", "description", "spec"]
-    assert action["x-form"]["schema"]["required"] == ["language_id", "name", "description", "spec"]
+    assert [field["name"] for field in action["fields"]] == ["language_id", "name", "description"]
+    structured_form = action["https://modwire.dev/siren/structured-form/v1"]
+    assert structured_form["version"] == "1"
+    assert structured_form["controls"][0]["name"] == "spec"
+    assert structured_form["controls"][0]["schema"]["type"] == "object"
 
     created = client.post(
         action["href"].removeprefix("http://testserver"),
@@ -92,6 +78,18 @@ def test_siren_discovers_and_creates_scaffoldings(
         "update_scaffolding",
     }
 
+    action = next(action for action in details.json()["actions"] if action["name"] == "update_scaffolding")
+    updated = client.put(
+        action["href"].removeprefix("http://testserver"),
+        data={**scaffolding_payload, "name": "Updated package"},
+        content_type="application/json",
+    )
+
+    assert updated.status_code == 200
+    assert updated["Content-Type"] == SIREN_MEDIA_TYPE
+    assert updated.json()["class"] == ["scaffolding"]
+    assert updated.json()["properties"]["name"] == "Updated package"
+
     action = next(action for action in details.json()["actions"] if action["name"] == "render_scaffolding")
     assert action["href"] == f"http://testserver/siren/scaffoldings/{created.json()['properties']['id']}/render"
     assert action["method"] == "POST"
@@ -103,27 +101,34 @@ def test_siren_discovers_and_creates_scaffoldings(
 
     assert rendering.status_code == 200
     assert rendering["Content-Type"] == SIREN_MEDIA_TYPE
-    assert rendering.json()["class"] == ["command"]
+    assert rendering.json()["class"] == ["command-result"]
     assert rendering.json()["properties"] == {"files": {"src/package/__init__.py": ""}}
 
+    action = next(action for action in details.json()["actions"] if action["name"] == "delete_scaffolding")
+    deleted = client.delete(action["href"].removeprefix("http://testserver"))
 
-def test_siren_projects_commands(client: Client) -> None:
-    response = client.get("/siren/openapi.json")
+    assert deleted.status_code == 204
+    assert deleted["Content-Type"] == SIREN_MEDIA_TYPE
+
+
+def test_siren_preserves_ordinary_json_without_siren_negotiation() -> None:
+    response = Client().get("/api/")
 
     assert response.status_code == 200
-    assert response["Content-Type"] == SIREN_MEDIA_TYPE
-    assert response.json()["class"] == ["command"]
-    assert response.json()["properties"]["openapi"] == "3.1.0"
+    assert response["Content-Type"].startswith("application/json")
+    assert response.json()["title"] == "Modwire API"
+    assert "Accept" in response["Vary"]
 
 
+@pytest.mark.django_db
 def test_siren_projects_missing_resources_as_errors(client: Client) -> None:
-    response = client.get("/siren/not-found")
+    response = client.get("/siren/scaffoldings/missing")
 
     assert response.status_code == 404
     assert response["Content-Type"] == SIREN_MEDIA_TYPE
     assert response.json()["class"] == ["error"]
-    assert response.json()["properties"] == {"detail": "Resource not found."}
-    assert response.json()["links"][0]["href"] == "http://testserver/siren/not-found"
+    assert response.json()["properties"] == {"detail": "Resource not found.", "status": 404}
+    assert response.json()["links"][0]["href"] == "http://testserver/siren/scaffoldings/missing"
 
 
 @pytest.mark.django_db
@@ -139,5 +144,6 @@ def test_siren_projects_validation_errors(client: Client) -> None:
             {"type": "missing", "loc": ["body", "body", "name"], "msg": "Field required"},
             {"type": "missing", "loc": ["body", "body", "description"], "msg": "Field required"},
             {"type": "missing", "loc": ["body", "body", "spec"], "msg": "Field required"},
-        ]
+        ],
+        "status": 422,
     }

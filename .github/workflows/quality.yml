@@ -1,0 +1,102 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.2-pg18-bookworm
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: modwire-agent
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          path: modwire-agent
+
+      - name: Check out local modwire-siren source
+        uses: actions/checkout@v6
+        with:
+          repository: modwire/modwire-siren
+          ref: release/4.0.0
+          path: modwire-siren
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Collect static files
+        run: uv run python manage.py collectstatic --noinput
+
+      - name: Test
+        run: uv run pytest
+
+  browser:
+    name: Browser
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modwire-agent/browser
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          path: modwire-agent
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: npm
+          cache-dependency-path: modwire-agent/browser/package-lock.json
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Check committed browser bundle
+        run: git diff --exit-code -- ../src/modwire_agent/browser/adapters/http/static/browser

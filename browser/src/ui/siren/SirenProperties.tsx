@@ -1,5 +1,6 @@
-import { SimpleGrid, Text } from "@mantine/core";
+import { Box, SimpleGrid, Text } from "@mantine/core";
 import type { Entity } from "@siren-js/client";
+import { SirenValue } from "./SirenValue";
 
 export type SirenPropertiesProps = { entity: Entity };
 
@@ -11,9 +12,9 @@ export function SirenProperties({ entity }: SirenPropertiesProps) {
           <Text component="dt" fw={600}>
             {name}
           </Text>
-          <Text component="dd">
-            {typeof value === "string" ? value : JSON.stringify(value)}
-          </Text>
+          <Box component="dd">
+            <SirenValue value={value} />
+          </Box>
         </div>
       ))}
     </SimpleGrid>

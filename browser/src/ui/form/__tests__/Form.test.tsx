@@ -17,24 +17,19 @@ it("preserves falsy and empty form values", async () => {
 
   render(
     <MantineProvider>
-      <Form onSubmit={onSubmit}>
+      <Form
+        controls={[
+          { name: "enabled", valueType: "boolean" },
+          { name: "limit", valueType: "number" },
+          { name: "description" },
+        ]}
+        onSubmit={onSubmit}
+      >
         {() => (
           <>
             <input name="enabled" type="checkbox" />
             <input defaultValue="0" name="limit" type="number" />
             <input defaultValue="" name="description" type="text" />
-            <input
-              data-siren-type="array"
-              name="example_items"
-              type="hidden"
-              value=""
-            />
-            <input
-              data-siren-type="object"
-              name="example_document"
-              type="hidden"
-              value="{}"
-            />
             <button type="submit">Submit</button>
           </>
         )}
@@ -48,8 +43,6 @@ it("preserves falsy and empty form values", async () => {
     expect(onSubmit).toHaveBeenCalledWith({
       description: "",
       enabled: false,
-      example_document: {},
-      example_items: [],
       limit: 0,
     }),
   );
@@ -63,7 +56,10 @@ it("shows submission violations beside their fields", async () => {
 
   render(
     <MantineProvider>
-      <Form onSubmit={vi.fn().mockRejectedValue(error)}>
+      <Form
+        controls={[{ name: "example_property" }]}
+        onSubmit={vi.fn().mockRejectedValue(error)}
+      >
         {(errors) => (
           <>
             <FormField error={errors.example_property} label="Example property">

@@ -8,9 +8,8 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useId } from "react";
-import type { FormSchemaProperty } from "../form/FormSchema";
 
-export type InputProps = { field: Field; schema?: FormSchemaProperty };
+export type InputProps = { field: Field };
 
 type RadioChoice = {
   selected?: boolean;

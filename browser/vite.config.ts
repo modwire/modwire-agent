@@ -20,6 +20,11 @@ function trimOutputWhitespace(): Plugin {
 export default defineConfig({
   plugins: [react(), trimOutputWhitespace()],
   base: "/static/browser/",
+  resolve: {
+    alias: {
+      "dayjs/plugin/customParseFormat": "dayjs/plugin/customParseFormat.js",
+    },
+  },
   build: {
     outDir: resolve(
       import.meta.dirname,
@@ -35,6 +40,11 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    server: {
+      deps: {
+        inline: ["@rjsf/mantine"],
+      },
+    },
     setupFiles: "./src/test/setup.ts",
   },
 });

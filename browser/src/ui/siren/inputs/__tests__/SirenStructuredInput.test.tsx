@@ -6,17 +6,23 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SirenActionForm } from "../../SirenActionForm";
+import {
+  JSON_CONTROL,
+  SirenActionForm,
+  STRUCTURED_FORM_EXTENSION,
+} from "../../SirenActionForm";
 
 const exampleDocumentSchema = {
-  additionalProperties: true,
+  additionalProperties: false,
   properties: {
     count: { type: "number" },
     enabled: { type: "boolean" },
     example_items: {
       items: {
+        additionalProperties: false,
         properties: {
           active: { type: "boolean" },
           label: { minLength: 1, type: "string" },
@@ -28,8 +34,6 @@ const exampleDocumentSchema = {
       type: "array",
     },
     example_property: { minLength: 1, type: "string" },
-    notes: { type: "string" },
-    nullable_value: { type: ["string", "null"] },
   },
   required: ["count", "enabled", "example_items", "example_property"],
   type: "object",
@@ -43,15 +47,18 @@ function action(fields: Field[]): Action {
     name: "create_example_resource",
     title: "Create example resource",
     type: "application/json",
-    "x-form": {
-      schema: {
-        properties: {
-          example_document: exampleDocumentSchema,
-          title: { type: "string" },
+    [STRUCTURED_FORM_EXTENSION]: {
+      controls: [
+        {
+          control: "https://modwire.dev/siren/controls/object/v1",
+          location: "body",
+          mediaType: "application/json",
+          name: "example_document",
+          required: true,
+          schema: exampleDocumentSchema,
         },
-        required: ["example_document", "title"],
-        type: "object",
-      },
+      ],
+      version: "1",
     },
   });
 }
@@ -63,12 +70,133 @@ function field(name: string, type: string, value?: unknown): Field {
 afterEach(cleanup);
 
 describe("SirenStructuredInput", () => {
-  it("edits nested values and preserves their JSON types", async () => {
+  it("initializes a new JSON object instead of rendering Undefined", async () => {
+    const onSubmit = vi.fn();
+    const exampleAction = Object.assign(new Action(), {
+      fields: [field("title", "text", "Example")],
+      href: "/record-categories",
+      method: "POST",
+      name: "create_record_category",
+      title: "Create record category",
+      type: "application/json",
+      [STRUCTURED_FORM_EXTENSION]: {
+        controls: [
+          {
+            control: JSON_CONTROL,
+            location: "body",
+            mediaType: "application/json",
+            name: "content_schema",
+            required: true,
+            schema: {
+              additionalProperties: {},
+              title: "Content Schema",
+              type: "object",
+            },
+          },
+        ],
+        version: "1",
+      },
+    });
+
+    render(
+      <MantineProvider>
+        <SirenActionForm action={exampleAction} onSubmit={onSubmit} />
+      </MantineProvider>,
+    );
+
+    expect(screen.queryByText("Undefined")).not.toBeInTheDocument();
+    expect(screen.getByTitle("Add")).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Create record category" }),
+    );
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(exampleAction, {
+        content_schema: {},
+        title: "Example",
+      }),
+    );
+  });
+
+  it("renders and submits an advertised JSON control as an editable tree", async () => {
+    const onSubmit = vi.fn();
+    const contentSchema = {
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      additionalProperties: false,
+      properties: { title: { type: "string" } },
+      required: ["title"],
+      type: "object",
+    };
+    const exampleAction = Object.assign(new Action(), {
+      fields: [field("content_schema", "object", contentSchema)],
+      href: "/record-categories/example",
+      method: "PATCH",
+      name: "update_record_category",
+      title: "Update record category",
+      type: "application/json",
+      [STRUCTURED_FORM_EXTENSION]: {
+        controls: [
+          {
+            control: JSON_CONTROL,
+            location: "body",
+            mediaType: "application/json",
+            name: "content_schema",
+            required: true,
+            schema: {
+              additionalProperties: {},
+              title: "Content Schema",
+              type: "object",
+            },
+          },
+        ],
+        version: "1",
+      },
+    });
+
+    render(
+      <MantineProvider>
+        <SirenActionForm action={exampleAction} onSubmit={onSubmit} />
+      </MantineProvider>,
+    );
+
+    expect(screen.getAllByText("content_schema")).toHaveLength(2);
+    expect(screen.getByText("$schema")).toBeInTheDocument();
+    expect(screen.getByText("properties")).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Unsupported field schema/),
+    ).not.toBeInTheDocument();
+
+    fireEvent.doubleClick(
+      screen.getByText((content) =>
+        content.includes("https://json-schema.org/draft/2020-12/schema"),
+      ),
+    );
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "https://example.com/schema" },
+    });
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
+    await screen.findByText((content) =>
+      content.includes("https://example.com/schema"),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Update record category" }),
+    );
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(exampleAction, {
+        content_schema: {
+          ...contentSchema,
+          $schema: "https://example.com/schema",
+        },
+      }),
+    );
+  });
+
+  it("renders the advertised schema and submits nested JSON values", async () => {
     const onSubmit = vi.fn();
     const exampleAction = action([
       field("title", "text", "Example"),
       field("example_document", "object", {
-        arbitrary: { nested: [true, 2, "example", null] },
         count: 0,
         enabled: false,
         example_items: [],
@@ -83,64 +211,20 @@ describe("SirenStructuredInput", () => {
     );
 
     fireEvent.change(
-      screen.getByRole("textbox", {
-        name: "example_document.example_property",
-      }),
+      screen.getByRole("textbox", { name: "example_property" }),
       { target: { value: "Updated" } },
     );
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: "example_document.enabled" }),
-    );
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Add item to example_document.example_items",
-      }),
-    );
-    fireEvent.change(
-      screen.getByRole("textbox", {
-        name: "example_document.example_items[0].label",
-      }),
-      { target: { value: "Discarded" } },
-    );
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Add item to example_document.example_items",
-      }),
-    );
-    fireEvent.change(
-      screen.getByRole("textbox", {
-        name: "example_document.example_items[1].label",
-      }),
-      { target: { value: "Kept" } },
-    );
-    fireEvent.change(
-      screen.getByRole("textbox", {
-        name: "example_document.example_items[1].weight",
-      }),
-      { target: { value: "2.5" } },
-    );
-    fireEvent.click(
-      screen.getByRole("checkbox", {
-        name: "example_document.example_items[1].active",
-      }),
-    );
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Remove item 1 from example_document.example_items",
-      }),
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Add notes" }));
-    fireEvent.change(
-      screen.getByRole("textbox", { name: "example_document.notes" }),
-      { target: { value: "Temporary" } },
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Remove notes" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add nullable_value" }));
-    fireEvent.click(
-      screen.getByRole("checkbox", {
-        name: "example_document.nullable_value is null",
-      }),
-    );
+    fireEvent.click(screen.getByRole("checkbox", { name: "enabled" }));
+
+    const items = screen.getByRole("group", { name: "example_items" });
+    fireEvent.click(within(items).getByRole("button", { name: "Add Item" }));
+    fireEvent.change(within(items).getByRole("textbox", { name: "label" }), {
+      target: { value: "Nested" },
+    });
+    fireEvent.change(within(items).getByRole("textbox", { name: "weight" }), {
+      target: { value: "2.5" },
+    });
+    fireEvent.click(within(items).getByRole("checkbox", { name: "active" }));
     fireEvent.click(
       screen.getByRole("button", { name: "Create example resource" }),
     );
@@ -148,21 +232,63 @@ describe("SirenStructuredInput", () => {
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith(exampleAction, {
         example_document: {
-          arbitrary: { nested: [true, 2, "example", null] },
           count: 0,
           enabled: true,
-          example_items: [{ active: true, label: "Kept", weight: 2.5 }],
+          example_items: [{ active: true, label: "Nested", weight: 2.5 }],
           example_property: "Updated",
-          nullable_value: null,
         },
         title: "Example",
       }),
     );
   });
 
-  it("adds missing structured controls and reports nested required fields", async () => {
-    const onSubmit = vi.fn();
+  it("adds an advertised structured control omitted from official fields", () => {
     const exampleAction = action([field("title", "text", "Example")]);
+
+    render(
+      <MantineProvider>
+        <SirenActionForm action={exampleAction} onSubmit={vi.fn()} />
+      </MantineProvider>,
+    );
+
+    expect(
+      screen.getByRole("textbox", { name: "example_property" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "count" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", { name: "enabled" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("group", { name: "example_items" }),
+    ).toBeInTheDocument();
+    expect(exampleAction.fields.map((actionField) => actionField.name)).toEqual(
+      ["title"],
+    );
+  });
+
+  it("renders and submits an advertised list control", async () => {
+    const onSubmit = vi.fn();
+    const exampleAction = Object.assign(new Action(), {
+      fields: [field("example_items", "list", ["Initial"])],
+      href: "/example-resources",
+      method: "POST",
+      name: "create_example_resource",
+      title: "Create example resource",
+      type: "application/json",
+      [STRUCTURED_FORM_EXTENSION]: {
+        controls: [
+          {
+            control: "https://modwire.dev/siren/controls/array/v1",
+            location: "body",
+            mediaType: "application/json",
+            name: "example_items",
+            required: true,
+            schema: { items: { type: "string" }, type: "array" },
+          },
+        ],
+        version: "1",
+      },
+    });
 
     render(
       <MantineProvider>
@@ -170,34 +296,17 @@ describe("SirenStructuredInput", () => {
       </MantineProvider>,
     );
 
-    expect(
-      screen.getByRole("textbox", {
-        name: "example_document.example_property",
-      }),
-    ).toBeInTheDocument();
-
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "Updated" },
+    });
     fireEvent.click(
       screen.getByRole("button", { name: "Create example resource" }),
     );
 
-    expect(
-      await screen.findAllByText("example_document.example_property: Required"),
-    ).toHaveLength(2);
-    expect(onSubmit).not.toHaveBeenCalled();
-
-    fireEvent.change(
-      screen.getByRole("textbox", {
-        name: "example_document.example_property",
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(exampleAction, {
+        example_items: ["Updated"],
       }),
-      { target: { value: "Ready" } },
-    );
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create example resource" }),
-    );
-
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
-    expect(exampleAction.fields.map((actionField) => actionField.name)).toEqual(
-      ["title", "example_document"],
     );
   });
 });
