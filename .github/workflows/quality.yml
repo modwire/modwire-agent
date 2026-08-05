@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: modwire/modwire-siren
-          ref: release/4.0.0
+          ref: v4.0.0
           path: modwire-siren
 
       - name: Set up uv
