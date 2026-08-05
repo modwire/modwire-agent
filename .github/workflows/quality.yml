@@ -12,6 +12,22 @@ jobs:
   python:
     name: Python
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.2-pg18-bookworm
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: modwire-agent
@@ -41,6 +57,9 @@ jobs:
 
       - name: Lint
         run: uv run ruff check .
+
+      - name: Collect static files
+        run: uv run python manage.py collectstatic --noinput
 
       - name: Test
         run: uv run pytest
