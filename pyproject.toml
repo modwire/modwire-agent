@@ -18,7 +18,7 @@ dependencies = [
     "modwire-extraction==2.1.1",
     "modwire-hex",
     "modwire-mermaid>=1.0.1,<2",
-    "modwire-siren",
+    "modwire-siren==4.0.0",
     "pgvector",
     "psycopg[binary]",
     "pydantic",
@@ -45,9 +45,6 @@ dev = [
 [tool.uv]
 package = false
 cache-dir = ".dev/uv-cache"
-
-[tool.uv.sources]
-modwire-siren = { path = "../modwire-siren", editable = true }
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "modwire_agent.core.settings"
