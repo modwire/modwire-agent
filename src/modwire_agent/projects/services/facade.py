@@ -3,12 +3,11 @@ from dataclasses import dataclass
 from django.db.models import QuerySet
 from wireup import injectable
 
-from ..services.reports.adapters import ArchitectureAdapter
-
 from ..errors import ProjectsError
 from ..models import Project
 from .adapters import RecordsAdapter, ScaffoldingsAdapter
 from .reports import ReportsService
+from .reports.adapters import ArchitectureAdapter
 from .repository import ProjectRepository
 from .stack import DiscoveredProject, StackDetector
 
@@ -42,24 +41,38 @@ class ProjectsService:
         scaffolding_id: str,
         record_ids: list[str],
     ) -> Project:
-        if len(record_ids) != len(set(record_ids)):
-            raise ProjectsError("A project cannot bind the same record more than once.")
-
-        self.records.check_records_existence(record_ids)
-        self.scaffoldings.check_scaffolding_existence(scaffolding_id)
-        self.architecture.validate_yaml_config(boundaries_yaml, shape_yaml)
-        
+        self._validate_project(boundaries_yaml, shape_yaml, scaffolding_id, record_ids)
         return self.repository.register(
-            {
-                "root": discovery.root,
-                "architecture_root": architecture_root,
-                "language_id": discovery.stack.language,
-                "language_version": discovery.stack.language_version,
-                "package_manager_id": discovery.stack.package_manager,
-                "boundaries_yaml": boundaries_yaml,
-                "shape_yaml": shape_yaml,
-                "scaffolding_id": scaffolding_id,
-            },
+            self._project_data(
+                discovery,
+                architecture_root,
+                boundaries_yaml,
+                shape_yaml,
+                scaffolding_id,
+            ),
+            record_ids,
+        )
+
+    def update_project(
+        self,
+        project_id: str,
+        discovery: DiscoveredProject,
+        architecture_root: str,
+        boundaries_yaml: str,
+        shape_yaml: str,
+        scaffolding_id: str,
+        record_ids: list[str],
+    ) -> Project:
+        self._validate_project(boundaries_yaml, shape_yaml, scaffolding_id, record_ids)
+        return self.repository.update(
+            project_id,
+            self._project_data(
+                discovery,
+                architecture_root,
+                boundaries_yaml,
+                shape_yaml,
+                scaffolding_id,
+            ),
             record_ids,
         )
 
@@ -80,3 +93,36 @@ class ProjectsService:
             project.boundaries_yaml,
             project.shape_yaml,
         )
+
+    def _validate_project(
+        self,
+        boundaries_yaml: str,
+        shape_yaml: str,
+        scaffolding_id: str,
+        record_ids: list[str],
+    ) -> None:
+        if len(record_ids) != len(set(record_ids)):
+            raise ProjectsError("A project cannot bind the same record more than once.")
+
+        self.records.check_records_existence(record_ids)
+        self.scaffoldings.check_scaffolding_existence(scaffolding_id)
+        self.architecture.validate_yaml_config(boundaries_yaml, shape_yaml)
+
+    @staticmethod
+    def _project_data(
+        discovery: DiscoveredProject,
+        architecture_root: str,
+        boundaries_yaml: str,
+        shape_yaml: str,
+        scaffolding_id: str,
+    ) -> dict[str, str]:
+        return {
+            "root": discovery.root,
+            "architecture_root": architecture_root,
+            "language_id": discovery.stack.language,
+            "language_version": discovery.stack.language_version,
+            "package_manager_id": discovery.stack.package_manager,
+            "boundaries_yaml": boundaries_yaml,
+            "shape_yaml": shape_yaml,
+            "scaffolding_id": scaffolding_id,
+        }
