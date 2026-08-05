@@ -542,7 +542,7 @@ wheels = [
 ]
 
 [[package]]
-name = "modwire-agent"
+name = "enclosure"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

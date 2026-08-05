@@ -1,7 +1,7 @@
 [project]
-name = "modwire-agent"
+name = "enclosure"
 version = "0.1.0"
-description = "Modwire agent runtime."
+description = "Enclosure runtime."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -47,7 +47,7 @@ package = false
 cache-dir = ".dev/uv-cache"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "modwire_agent.core.settings"
+DJANGO_SETTINGS_MODULE = "enclosure.core.settings"
 cache_dir = ".dev/pytest-cache"
 pythonpath = ["src", "."]
 python_files = ["test_*.py", "*_test.py"]
@@ -55,7 +55,7 @@ testpaths = ["src", "tests"]
 
 [tool.ruff]
 cache-dir = ".dev/ruff-cache"
-extend-exclude = ["src/modwire_agent/plans", "src/modwire_agent/records"]
+extend-exclude = ["src/enclosure/plans", "src/enclosure/records"]
 line-length = 120
 target-version = "py312"
 
@@ -65,10 +65,10 @@ ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "*/migrations/*.py" = ["E501"]
-"src/modwire_agent/core/settings.py" = ["E402"]
+"src/enclosure/core/settings.py" = ["E402"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"src.modwire_agent" = { msg = "Import application modules from 'modwire_agent', never from 'src.modwire_agent'." }
+"src.enclosure" = { msg = "Import application modules from 'enclosure', never from 'src.enclosure'." }
 
 [tool.coverage.run]
 data_file = ".dev/coverage"

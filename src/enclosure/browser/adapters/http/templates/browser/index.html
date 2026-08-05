@@ -1,0 +1,14 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enclosure</title>
+    <link rel="stylesheet" href="{% static 'browser/browser.css' %}">
+    <script type="module" src="{% static 'browser/browser.js' %}"></script>
+  </head>
+  <body>
+    <div id="app" data-siren-root="{{ siren_root }}"></div>
+  </body>
+</html>

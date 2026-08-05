@@ -7,7 +7,7 @@ export function AppFooter(_: AppFooterProps) {
     <AppShell.Footer>
       <Group h="100%" px="md">
         <Text c="dimmed" size="sm">
-          Modwire
+          Enclosure
         </Text>
       </Group>
     </AppShell.Footer>

@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: [{"dockerfile": "Dockerfile", "image": "modwire-agent-runtime"}]
+        include: [{"dockerfile": "Dockerfile", "image": "enclosure-runtime"}]
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -55,7 +55,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           platforms: linux/amd64,linux/arm64
           push: true
-          build-args: MODWIRE_RUNTIME_VERSION=${{ steps.metadata.outputs.version }}
+          build-args: ENCLOSURE_RUNTIME_VERSION=${{ steps.metadata.outputs.version }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.image }}

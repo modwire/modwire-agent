@@ -1,4 +1,4 @@
-# modwire-agent
+# enclosure
 
 Django API scaffold with JSON logs, dotenv settings, health checks, and auto-discovered Django Ninja Extra controllers.
 
@@ -33,10 +33,10 @@ in the ignored `.env` file. Compose overrides only its network address to
 `localhost:5433`; credentials have one source of truth.
 
 Released runtime images are pulled from GHCR. The default is `latest`; pin the
-service to one immutable release with `MODWIRE_RUNTIME_VERSION`, for example:
+service to one immutable release with `ENCLOSURE_RUNTIME_VERSION`, for example:
 
 ```sh
-MODWIRE_RUNTIME_VERSION=0.2.1 make runtime-up
+ENCLOSURE_RUNTIME_VERSION=0.2.1 make runtime-up
 ```
 
 The packages are private. Authenticate GitHub CLI once with `read:packages`;
@@ -48,7 +48,7 @@ gh auth refresh -h github.com -s read:packages
 ```
 
 Each GitHub release publishes `linux/amd64` and `linux/arm64` variants of
-`ghcr.io/modwire/modwire-agent-runtime`. Docker selects the matching image on
+`ghcr.io/szpak-dev/enclosure-runtime`. Docker selects the matching image on
 Intel Linux, Intel macOS, or Apple Silicon macOS hosts. Local image builds are
 an explicit development mode and never occur during normal installation:
 

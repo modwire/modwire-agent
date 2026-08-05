@@ -1,6 +1,6 @@
 import pytest
 
-from modwire_agent.shared.diagrams import DiagramsError, DiagramsService
+from enclosure.shared.diagrams import DiagramsError, DiagramsService
 
 
 @pytest.fixture

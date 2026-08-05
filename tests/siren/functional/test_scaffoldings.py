@@ -116,7 +116,7 @@ def test_siren_preserves_ordinary_json_without_siren_negotiation() -> None:
 
     assert response.status_code == 200
     assert response["Content-Type"].startswith("application/json")
-    assert response.json()["title"] == "Modwire API"
+    assert response.json()["title"] == "Enclosure API"
     assert "Accept" in response["Vary"]
 
 

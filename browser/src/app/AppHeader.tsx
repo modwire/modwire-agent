@@ -12,7 +12,7 @@ export function AppHeader({ links, onFollow, target }: AppHeaderProps) {
   return (
     <AppShell.Header>
       <Group h="100%" justify="space-between" px="md">
-        <Text fw={700}>Modwire</Text>
+        <Text fw={700}>Enclosure</Text>
         <Navigation links={links} onFollow={onFollow} target={target} />
       </Group>
     </AppShell.Header>

@@ -28,7 +28,7 @@ export default defineConfig({
   build: {
     outDir: resolve(
       import.meta.dirname,
-      "../src/modwire_agent/browser/adapters/http/static/browser",
+      "../src/enclosure/browser/adapters/http/static/browser",
     ),
     emptyOutDir: true,
     rollupOptions: {

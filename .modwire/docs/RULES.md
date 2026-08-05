@@ -1,6 +1,6 @@
 # Working rules
 
-- Keep each Django API module under `src/modwire_agent` split into domain, ports, use cases, and adapters.
+- Keep each Django API module under `src/enclosure` split into domain, ports, use cases, and adapters.
 - Keep domain and use-case code independent of concrete adapters; let application-level autowiring bind concrete implementations to ports.
 - Preserve public HTTP and OpenAPI behavior. Give every new API operation a unique, stable `operation_id` and test observable responses.
 - Use documentation comments only for public REST API documentation; do not add comments or docstrings elsewhere in code.

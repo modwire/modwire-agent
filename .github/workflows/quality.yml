@@ -30,12 +30,12 @@ jobs:
           --health-retries 5
     defaults:
       run:
-        working-directory: modwire-agent
+        working-directory: enclosure
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
-          path: modwire-agent
+          path: enclosure
 
       - name: Check out local modwire-siren source
         uses: actions/checkout@v6
@@ -69,18 +69,18 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: modwire-agent/browser
+        working-directory: enclosure/browser
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
-          path: modwire-agent
+          path: enclosure
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           cache: npm
-          cache-dependency-path: modwire-agent/browser/package-lock.json
+          cache-dependency-path: enclosure/browser/package-lock.json
           node-version: 24
 
       - name: Install dependencies
@@ -99,4 +99,4 @@ jobs:
         run: npm run build
 
       - name: Check committed browser bundle
-        run: git diff --exit-code -- ../src/modwire_agent/browser/adapters/http/static/browser
+        run: git diff --exit-code -- ../src/enclosure/browser/adapters/http/static/browser

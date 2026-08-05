@@ -26,15 +26,15 @@ const rootEntity = {
   class: ["api", "entry-point"],
   entities: [],
   links: [
-    { href: "/example-siren/", rel: ["self"], title: "Modwire API" },
+    { href: "/example-siren/", rel: ["self"], title: "Enclosure API" },
     {
       href: "/example-resources",
       rel: ["collection"],
       title: "Example resources",
     },
   ],
-  properties: { title: "Modwire API" },
-  title: "Modwire API",
+  properties: { title: "Enclosure API" },
+  title: "Enclosure API",
 };
 
 afterEach(() => {
@@ -56,7 +56,7 @@ it("loads the configured root once for navigation and content", async () => {
   expect(container.querySelector("main")).not.toBeNull();
   expect(container.querySelector("footer")).not.toBeNull();
   expect(
-    await screen.findByRole("heading", { name: "Modwire API" }),
+    await screen.findByRole("heading", { name: "Enclosure API" }),
   ).toBeInTheDocument();
   expect(
     screen.getByRole("link", { name: "Example resources" }),
@@ -109,7 +109,7 @@ it("shows a root failure and retries without reloading the page", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 
   expect(
-    await screen.findByRole("heading", { name: "Modwire API" }),
+    await screen.findByRole("heading", { name: "Enclosure API" }),
   ).toBeInTheDocument();
   expect(window.location.pathname).toBe("/");
   expect(sirenClient.get).toHaveBeenCalledTimes(2);
@@ -181,7 +181,7 @@ it("keeps an action form mounted while showing structured submission errors", as
     await screen.findByRole("button", { name: "Create example" }),
   );
   expect(
-    screen.getByRole("heading", { name: "Modwire API" }),
+    screen.getByRole("heading", { name: "Enclosure API" }),
   ).toBeInTheDocument();
 
   rejectSubmission(
@@ -192,7 +192,7 @@ it("keeps an action form mounted while showing structured submission errors", as
 
   expect(await screen.findByText("This value is required.")).toBeVisible();
   expect(
-    screen.getByRole("heading", { name: "Modwire API" }),
+    screen.getByRole("heading", { name: "Enclosure API" }),
   ).toBeInTheDocument();
   expect(screen.queryByText("Unable to load resource")).not.toBeInTheDocument();
 });

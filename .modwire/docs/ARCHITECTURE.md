@@ -1,10 +1,10 @@
 # Architecture configuration
 
-`architecture.yaml` describes the source-tree boundaries and structural limits that Modwire checks. In this project it covers the Django API under `src/modwire_agent`.
+`architecture.yaml` describes the source-tree boundaries and structural limits that Modwire checks. In this project it covers the Django API under `src/enclosure`.
 
 ## Tags
 
-Each tag gives a source-tree pattern a meaningful name. `module` matches every operational module directly below `src/modwire_agent`, excluding only the root package files and technical `core` package. Adding a module therefore requires no configuration change.
+Each tag gives a source-tree pattern a meaningful name. `module` matches every operational module directly below `src/enclosure`, excluding only the root package files and technical `core` package. Adding a module therefore requires no configuration change.
 
 The configuration separates every module into `domain`, `ports`, `use_cases`, and `adapters`. Dependency registration is discovered from the application-level `autowiring.py`; it is not an architectural layer or module realm.
 
