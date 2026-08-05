@@ -7,8 +7,9 @@ from pydantic import ValidationError
 from ruamel.yaml.error import YAMLError
 from wireup import injectable
 
-from ....errors import ProjectsError
 from modwire_agent.shared import SourceCodeService
+
+from ....errors import ProjectsError
 
 
 @injectable

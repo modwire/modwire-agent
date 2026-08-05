@@ -92,7 +92,7 @@ def dependencies(client: Client) -> dict[str, str]:
 
 def discover(client: Client, root: Path) -> dict:
     response = client.post(
-        "/api/projects/discover",
+        "/api/projects/discoveries",
         data={"root": str(root)},
         content_type="application/json",
     )
@@ -125,7 +125,7 @@ def test_discovers_python_project_without_changing_its_root(client: Client, tmp_
     python_project(tmp_path)
 
     response = client.post(
-        "/api/projects/discover",
+        "/api/projects/discoveries",
         data={"root": str(tmp_path)},
         content_type="application/json",
     )
@@ -146,7 +146,7 @@ def test_discovery_rejects_missing_directory(client: Client, tmp_path: Path) -> 
     missing = tmp_path / "missing"
 
     response = client.post(
-        "/api/projects/discover",
+        "/api/projects/discoveries",
         data={"root": str(missing)},
         content_type="application/json",
     )
@@ -158,7 +158,7 @@ def test_discovery_rejects_missing_directory(client: Client, tmp_path: Path) -> 
 @pytest.mark.django_db
 def test_discovery_rejects_project_without_package_manager(client: Client, tmp_path: Path) -> None:
     response = client.post(
-        "/api/projects/discover",
+        "/api/projects/discoveries",
         data={"root": str(tmp_path)},
         content_type="application/json",
     )
@@ -173,7 +173,7 @@ def test_discovery_rejects_ambiguous_package_managers(client: Client, tmp_path: 
     (tmp_path / "package-lock.json").write_text("{}", encoding="utf-8")
 
     response = client.post(
-        "/api/projects/discover",
+        "/api/projects/discoveries",
         data={"root": str(tmp_path)},
         content_type="application/json",
     )
@@ -210,6 +210,21 @@ def test_registers_discovered_project(
 
 
 @pytest.mark.django_db
+def test_registration_rejects_invalid_architecture_yaml(
+    client: Client,
+    dependencies: dict[str, str],
+    tmp_path: Path,
+) -> None:
+    python_project(tmp_path)
+    payload = registration(discover(client, tmp_path), dependencies, shape_yaml="shape: [")
+
+    response = client.post("/api/projects", data=payload, content_type="application/json")
+
+    assert response.status_code == 422
+    assert response.json()["detail"].startswith("Invalid architecture configuration:")
+
+
+@pytest.mark.django_db
 def test_lists_and_fetches_registered_projects(
     client: Client,
     dependencies: dict[str, str],
@@ -233,11 +248,64 @@ def test_lists_and_fetches_registered_projects(
 
 
 @pytest.mark.django_db
+def test_updates_registered_project(
+    client: Client,
+    dependencies: dict[str, str],
+    tmp_path: Path,
+) -> None:
+    python_project(tmp_path)
+    payload = registration(discover(client, tmp_path), dependencies)
+    created = client.post("/api/projects", data=payload, content_type="application/json")
+    assert created.status_code == 201
+
+    payload["architecture_root"] = str(tmp_path / "src")
+    payload["shape_yaml"] = UNHEALTHY_SHAPE_YAML
+    updated = client.put(
+        f"/api/projects/{created.json()['id']}",
+        data=payload,
+        content_type="application/json",
+    )
+
+    assert updated.status_code == 200
+    assert updated.json() == {
+        **created.json(),
+        "architecture_root": str(tmp_path / "src"),
+        "shape_yaml": UNHEALTHY_SHAPE_YAML,
+    }
+    assert client.get(f"/api/projects/{created.json()['id']}").json() == updated.json()
+
+
+@pytest.mark.django_db
 def test_get_project_returns_not_found(client: Client) -> None:
     response = client.get("/api/projects/missing")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Resource not found."}
+
+
+@pytest.mark.django_db
+def test_update_project_returns_not_found(
+    client: Client,
+    dependencies: dict[str, str],
+    tmp_path: Path,
+) -> None:
+    python_project(tmp_path)
+
+    response = client.put(
+        "/api/projects/missing",
+        data=registration(discover(client, tmp_path), dependencies),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Resource not found."}
+
+
+def test_project_api_exposes_stable_operation_ids(client: Client) -> None:
+    schema = client.get("/api/openapi.json").json()
+
+    assert schema["paths"]["/api/projects/discoveries"]["post"]["operationId"] == "discover_project"
+    assert schema["paths"]["/api/projects/{project_id}"]["put"]["operationId"] == "update_project"
 
 
 def test_siren_root_exposes_projects_collection(client: Client) -> None:
@@ -406,7 +474,7 @@ def test_reports_return_not_found_for_missing_project(client: Client, report: st
 @pytest.mark.parametrize(
     ("path", "payload"),
     [
-        ("/api/projects/discover", {}),
+        ("/api/projects/discoveries", {}),
         ("/api/projects", {}),
         ("/api/projects", {"discovery": {"root": "/tmp", "stack": {}}}),
     ],
