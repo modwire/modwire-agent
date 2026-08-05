@@ -9,9 +9,12 @@ const root = document.querySelector<HTMLDivElement>("#app");
 if (!root) {
   throw new Error("The Siren Browser needs an #app element.");
 }
+if (!root.dataset.sirenRoot) {
+  throw new Error("The Siren Browser needs a data-siren-root setting.");
+}
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <App rootTarget={root.dataset.sirenRoot} />
   </StrictMode>,
 );
