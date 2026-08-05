@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "modwire_agent.browser.adapters.http.apps.BrowserHttpConfig",
     "modwire_agent.scaffoldings.apps.ScaffoldingsDjangoConfig",
     "modwire_agent.records.apps.RecordsConfig",
+    "modwire_agent.projects.apps.ProjectsConfig",
 ]
 
 MIDDLEWARE = [

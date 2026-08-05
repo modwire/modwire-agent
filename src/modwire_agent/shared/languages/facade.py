@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 
 from wireup import injectable
@@ -6,7 +6,7 @@ from wireup import injectable
 from modwire_agent.shared import DiagramsService
 
 from ..source_code.extraction import SourceExtractionService
-from .base import Language
+from .base import Language, PackageManager
 from .errors import LanguagesError
 
 
@@ -22,6 +22,22 @@ class LanguagesService:
 
     def get_ids(self) -> list[str]:
         return [language.id for language in self.languages]
+
+    def recognize_package_manager(self, paths: Collection[str]) -> tuple[Language, PackageManager]:
+        for path_attribute in ("lockfile_paths", "manifest_paths"):
+            matches = [
+                (language, package_manager)
+                for language in self.languages
+                for package_manager in language.package_managers
+                if any(path in paths for path in getattr(package_manager, path_attribute))
+            ]
+            if len(matches) == 1:
+                return matches[0]
+            if matches:
+                names = ", ".join(f"{language.id}/{package_manager.id}" for language, package_manager in matches)
+                raise LanguagesError(f"Ambiguous package manager: {names}")
+
+        raise LanguagesError("Package manager could not be recognized.")
 
     def validate_source(self, language: str, path: str, content: str) -> None:
         supported_language = self._get(language)
