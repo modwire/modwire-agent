@@ -8,7 +8,7 @@ from . import schemas
 
 @api_controller("/projects", tags=["Projects"])
 class ProjectsController(ControllerBase):
-    @route.post("/discover", response=schemas.DiscoveredProject, operation_id="discover_project")
+    @route.post("/discoveries", response=schemas.DiscoveredProject, operation_id="discover_project")
     def discover(self, request, body: schemas.DiscoverProject):
         return DjangoRequest.resolve(request, ProjectsService).discover_project(body.root)
 
@@ -31,6 +31,18 @@ class ProjectsController(ControllerBase):
     @route.get("/{project_id}", response=schemas.Project, operation_id="get_project")
     def get(self, request, project_id: str):
         return DjangoRequest.resolve(request, ProjectsService).get_project(project_id)
+
+    @route.put("/{project_id}", response=schemas.Project, operation_id="update_project")
+    def update(self, request, project_id: str, body: schemas.RegisterProject):
+        return DjangoRequest.resolve(request, ProjectsService).update_project(
+            project_id,
+            body.discovery,
+            body.architecture_root,
+            body.boundaries_yaml,
+            body.shape_yaml,
+            body.scaffolding_id,
+            body.record_ids,
+        )
 
     @route.get("/{project_id}/health", response=schemas.HealthReport, operation_id="check_project_health")
     def check_health(self, request, project_id: str):
