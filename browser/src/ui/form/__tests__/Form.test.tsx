@@ -8,6 +8,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { Form } from "../Form";
+import { FormField } from "../FormField";
 
 afterEach(cleanup);
 
@@ -53,4 +54,30 @@ it("preserves falsy and empty form values", async () => {
     }),
   );
   expect(onSubmit.mock.calls[0][0]).not.toHaveProperty("omitted_value");
+});
+
+it("shows submission violations beside their fields", async () => {
+  const error = Object.assign(new Error("Validation failed"), {
+    fieldErrors: { example_property: "This value is required." },
+  });
+
+  render(
+    <MantineProvider>
+      <Form onSubmit={vi.fn().mockRejectedValue(error)}>
+        {(errors) => (
+          <>
+            <FormField error={errors.example_property} label="Example property">
+              <input name="example_property" />
+            </FormField>
+            <button type="submit">Submit</button>
+          </>
+        )}
+      </Form>
+    </MantineProvider>,
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+
+  expect(await screen.findByText("This value is required.")).toBeVisible();
+  expect(screen.getByRole("alert")).toHaveTextContent("Validation failed");
 });

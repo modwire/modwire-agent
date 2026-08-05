@@ -8,6 +8,9 @@ import {
   type Target,
 } from "@siren-js/client";
 import { applyActionValues } from "./ActionValues";
+import { sirenResponseError } from "./SirenError";
+
+export { SirenResponseError } from "./SirenError";
 
 export const SIREN_ACCEPT = "application/vnd.siren+json, application/json";
 export const SIREN_ACTOR_HEADERS = {
@@ -24,17 +27,6 @@ export type SirenRequestOptions = {
   headers?: HeadersInit;
   signal?: AbortSignal;
 };
-
-export class SirenResponseError extends Error {
-  constructor(
-    readonly status: number,
-    readonly url: string,
-    message: string,
-  ) {
-    super(message);
-    this.name = "SirenResponseError";
-  }
-}
 
 export class SirenClient {
   private readonly baseUrl: Href;
@@ -77,18 +69,18 @@ export class SirenClient {
       return null;
     }
 
-    return this.entity<T>(response);
+    return this.entity<T>(
+      response,
+      action.fields.map((field) => field.name),
+    );
   }
 
   private async entity<T extends object>(
     response: Response,
+    fields: string[] = [],
   ): Promise<Entity<T>> {
     if (!response.ok) {
-      throw new SirenResponseError(
-        response.status,
-        response.url,
-        response.statusText || `Request failed with ${response.status}.`,
-      );
+      throw await sirenResponseError(response, fields);
     }
 
     return parse<T>(response);
