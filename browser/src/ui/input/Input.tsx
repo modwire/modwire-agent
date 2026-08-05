@@ -1,15 +1,65 @@
 import type { Field } from "@siren-js/client";
-import { Checkbox, FileInput, Radio, Textarea, TextInput } from "@mantine/core";
+import {
+  Checkbox,
+  FileInput,
+  Radio,
+  Stack,
+  Textarea,
+  TextInput,
+} from "@mantine/core";
+import { useId } from "react";
 
 export type InputProps = { field: Field };
 
+type RadioChoice = {
+  selected?: boolean;
+  value: string | number | boolean;
+};
+
+function radioChoices(field: Field): RadioChoice[] {
+  if (!Array.isArray(field.value)) return [];
+
+  return field.value.filter(
+    (choice): choice is RadioChoice =>
+      typeof choice === "object" &&
+      choice !== null &&
+      "value" in choice &&
+      ["string", "number", "boolean"].includes(typeof choice.value),
+  );
+}
+
 export function Input({ field }: InputProps) {
+  const inputId = useId();
+
   if (field.type === "checkbox") {
     return <Checkbox defaultChecked={field.value === true} name={field.name} />;
   }
 
   if (field.type === "radio") {
-    return <Radio defaultChecked={field.value === true} name={field.name} />;
+    const choices = radioChoices(field);
+    const selected = choices.find((choice) => choice.selected);
+
+    return (
+      <Radio.Group
+        defaultValue={selected == null ? null : String(selected.value)}
+        name={field.name}
+      >
+        <Stack gap="xs">
+          {choices.map((choice, index) => {
+            const value = String(choice.value);
+
+            return (
+              <Radio
+                id={`${inputId}-${index}`}
+                key={`${value}-${index}`}
+                label={value}
+                value={value}
+              />
+            );
+          })}
+        </Stack>
+      </Radio.Group>
+    );
   }
 
   if (field.type === "file") {
