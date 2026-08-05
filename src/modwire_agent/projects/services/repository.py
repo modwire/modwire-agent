@@ -20,7 +20,8 @@ class ProjectRepository(DjangoRepository):
             with transaction.atomic():
                 project = self.save(**data)
                 ProjectRecord.objects.bulk_create(
-                    ProjectRecord(project=project, record_id=record_id) for record_id in record_ids
+                    ProjectRecord(project=project, record_id=record_id) 
+                    for record_id in record_ids
                 )
                 return project
         except IntegrityError as error:

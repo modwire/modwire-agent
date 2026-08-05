@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from django.db.models import QuerySet
 from wireup import injectable
 
+from ..services.reports.adapters import ArchitectureAdapter
+
 from ..errors import ProjectsError
 from ..models import Project
 from .adapters import RecordsAdapter, ScaffoldingsAdapter
@@ -14,6 +16,7 @@ from .stack import DiscoveredProject, StackDetector
 @injectable
 @dataclass(frozen=True)
 class ProjectsService:
+    architecture: ArchitectureAdapter
     records: RecordsAdapter
     scaffoldings: ScaffoldingsAdapter
     stack: StackDetector
@@ -44,6 +47,8 @@ class ProjectsService:
 
         self.records.check_records_existence(record_ids)
         self.scaffoldings.check_scaffolding_existence(scaffolding_id)
+        self.architecture.validate_yaml_config(boundaries_yaml, shape_yaml)
+        
         return self.repository.register(
             {
                 "root": discovery.root,

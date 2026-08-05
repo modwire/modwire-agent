@@ -13,6 +13,9 @@ from modwire_agent.shared import SourceCodeService
 class ArchitectureAdapter:
     source_code: SourceCodeService
 
+    def validate_yaml_config(self, boundaries_yaml: str, shape_yaml: str):
+        ArchitectureConfig.from_yaml("\n".join((boundaries_yaml, shape_yaml)))
+
     def generate_reports(
         self,
         architecture_root: str,
