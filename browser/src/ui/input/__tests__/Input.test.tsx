@@ -75,3 +75,45 @@ describe("radio input", () => {
     );
   });
 });
+
+it("renders every standard Siren field type", () => {
+  const fields = [
+    field("accepted", "checkbox"),
+    field("attachment", "file"),
+    field("token", "hidden", "example-token"),
+    field("notes", "textarea", "Example notes"),
+    field("title", "text", "Example title"),
+    field("quantity", "number", 0),
+  ];
+
+  const { container } = render(
+    <MantineProvider>
+      {fields.map((exampleField) => (
+        <Input field={exampleField} key={exampleField.name} />
+      ))}
+    </MantineProvider>,
+  );
+
+  expect(container.querySelector('input[name="accepted"]')).toHaveAttribute(
+    "type",
+    "checkbox",
+  );
+  expect(container.querySelector('input[name="attachment"]')).toHaveAttribute(
+    "type",
+    "file",
+  );
+  expect(container.querySelector('input[name="token"]')).toHaveValue(
+    "example-token",
+  );
+  expect(container.querySelector('textarea[name="notes"]')).toHaveValue(
+    "Example notes",
+  );
+  expect(container.querySelector('input[name="title"]')).toHaveValue(
+    "Example title",
+  );
+  expect(container.querySelector('input[name="quantity"]')).toHaveValue(0);
+});
+
+function field(name: string, type: string, value?: unknown): Field {
+  return Object.assign(new Field(), { name, type, value });
+}

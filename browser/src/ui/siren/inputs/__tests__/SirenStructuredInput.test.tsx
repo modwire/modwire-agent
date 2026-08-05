@@ -8,7 +8,10 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SirenActionForm } from "../../SirenActionForm";
+import {
+  SirenActionForm,
+  STRUCTURED_FORM_EXTENSION,
+} from "../../SirenActionForm";
 
 const exampleDocumentSchema = {
   additionalProperties: true,
@@ -43,15 +46,18 @@ function action(fields: Field[]): Action {
     name: "create_example_resource",
     title: "Create example resource",
     type: "application/json",
-    "x-form": {
-      schema: {
-        properties: {
-          example_document: exampleDocumentSchema,
-          title: { type: "string" },
+    [STRUCTURED_FORM_EXTENSION]: {
+      controls: [
+        {
+          control: "https://modwire.dev/siren/controls/object/v1",
+          location: "body",
+          mediaType: "application/json",
+          name: "example_document",
+          required: true,
+          schema: exampleDocumentSchema,
         },
-        required: ["example_document", "title"],
-        type: "object",
-      },
+      ],
+      version: "1",
     },
   });
 }

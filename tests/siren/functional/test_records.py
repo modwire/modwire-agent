@@ -6,7 +6,7 @@ SIREN_MEDIA_TYPE = "application/vnd.siren+json"
 
 @pytest.mark.django_db
 def test_siren_projects_an_empty_tag_collection() -> None:
-    response = Client().get("/siren/records/tags")
+    response = Client(HTTP_ACCEPT=SIREN_MEDIA_TYPE).get("/siren/records/tags")
 
     assert response.status_code == 200
     assert response["Content-Type"] == SIREN_MEDIA_TYPE
@@ -16,7 +16,7 @@ def test_siren_projects_an_empty_tag_collection() -> None:
 
 @pytest.mark.django_db
 def test_siren_searches_records() -> None:
-    response = Client().post(
+    response = Client(HTTP_ACCEPT=SIREN_MEDIA_TYPE).post(
         "/siren/records/search",
         data={"query": "missing", "limit": 5},
         content_type="application/json",
@@ -38,9 +38,9 @@ def test_siren_searches_records() -> None:
     ],
 )
 def test_siren_projects_missing_records_as_not_found(path: str) -> None:
-    response = Client().get(path)
+    response = Client(HTTP_ACCEPT=SIREN_MEDIA_TYPE).get(path)
 
     assert response.status_code == 404
     assert response["Content-Type"] == SIREN_MEDIA_TYPE
     assert response.json()["class"] == ["error"]
-    assert response.json()["properties"] == {"detail": "Resource not found."}
+    assert response.json()["properties"] == {"detail": "Resource not found.", "status": 404}

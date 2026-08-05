@@ -46,6 +46,8 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.http.ConditionalGetMiddleware",
+    "modwire_siren.SirenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -58,6 +60,13 @@ MODWIRE = {
     "APPLICATION": "modwire_agent.autowiring.application",
     "NINJA": {"title": "Modwire API", "version": RELEASE_VERSION},
 }
+MODWIRE_SIREN = {
+    "OPENAPI": "modwire_agent.core.api.api",
+    "SOURCE_PATH": "/api",
+    "PUBLIC_PATH": "/siren",
+    "PROFILES": ["modwire_siren.SirenStructuredFormProfile"],
+}
+MODWIRE_SIREN_ROOT = "/siren/"
 ROOT_URLCONF = "modwire_agent.core.urls"
 TEMPLATES = [
     {

@@ -5,6 +5,9 @@ import { FormField } from "../form/FormField";
 import type { FormSchema, FormSchemaProperty } from "../form/FormSchema";
 import { SirenField } from "./SirenField";
 
+export const STRUCTURED_FORM_EXTENSION =
+  "https://modwire.dev/siren/structured-form/v1";
+
 export type SirenActionFormProps = {
   action: Action;
   onSubmit: (
@@ -45,12 +48,49 @@ function actionFields(action: Action, schema?: FormSchema): Field[] {
   return fields;
 }
 
+function record(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
+
+function structuredFormSchema(action: Action): FormSchema | undefined {
+  const extension = record(action[STRUCTURED_FORM_EXTENSION]);
+  const controls = Array.isArray(extension?.controls)
+    ? extension.controls.flatMap((value) => {
+        const control = record(value);
+        const schema = record(control?.schema);
+        return typeof control?.name === "string" &&
+          control.location === "body" &&
+          schema
+          ? [
+              {
+                name: control.name,
+                required: control.required === true,
+                schema: schema as FormSchemaProperty,
+              },
+            ]
+          : [];
+      })
+    : [];
+  if (controls.length) {
+    return {
+      properties: Object.fromEntries(
+        controls.map((control) => [control.name, control.schema]),
+      ),
+      required: controls
+        .filter((control) => control.required === true)
+        .map((control) => control.name),
+      type: "object",
+    };
+  }
+
+  const legacy = record(action["x-form"]);
+  return record(legacy?.schema) as FormSchema | undefined;
+}
+
 export function SirenActionForm({ action, onSubmit }: SirenActionFormProps) {
-  const form = action["x-form"];
-  const schema =
-    typeof form === "object" && form !== null
-      ? ((form as Record<string, unknown>)["schema"] as FormSchema)
-      : undefined;
+  const schema = structuredFormSchema(action);
   const fields = actionFields(action, schema);
 
   return (

@@ -25,7 +25,9 @@ function text(value: unknown): string | undefined {
 
 function title(value: unknown): string | undefined {
   const result = text(value);
-  return result && !GENERIC_TITLES.has(result.toLowerCase())
+  return result &&
+    !GENERIC_TITLES.has(result.toLowerCase()) &&
+    !/summary$/i.test(result)
     ? result
     : undefined;
 }
@@ -98,7 +100,8 @@ function identifyingProperty(item: object): string | undefined {
 
 export function collectionLabel(entity: Entity): string {
   const projected = title(entity.title);
-  if (projected) return projected;
+  if (projected)
+    return projected.includes(" ") ? projected : pluralize(humanize(projected));
   const className = resourceClass(entity.class);
   if (className) return pluralize(className);
   const link = selfLink(entity);
@@ -141,8 +144,12 @@ export function collectionItemLabel(
 }
 
 export function linkLabel(link: Link): string {
+  const projected = title(link.title);
+  if (projected)
+    return link.rel.includes("collection") && !projected.includes(" ")
+      ? pluralize(humanize(projected))
+      : projected;
   return (
-    title(link.title) ??
     linkPath(link) ??
     link.rel
       .filter((relation) => relation !== "self")

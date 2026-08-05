@@ -10,7 +10,7 @@ uv run python manage.py runserver
 
 ## Siren browser
 
-The TypeScript Siren browser is available at `GET /`. It starts from `/siren/`, validates each representation with `siren-parser`, follows advertised links, and renders forms for advertised actions.
+The TypeScript Siren browser is available at `GET /`. It starts from `/siren/`, follows advertised links, and renders forms for advertised actions.
 
 After changing its source, build the static files before starting Django or building the image:
 
