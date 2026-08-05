@@ -3,6 +3,7 @@ import { Field, type Action } from "@siren-js/client";
 import { Form } from "../form/Form";
 import { FormField } from "../form/FormField";
 import type { FormSchema, FormSchemaProperty } from "../form/FormSchema";
+import type { FormControl } from "../form/FormValues";
 import { SirenField } from "./SirenField";
 
 export const STRUCTURED_FORM_EXTENSION =
@@ -10,6 +11,7 @@ export const STRUCTURED_FORM_EXTENSION =
 
 export type SirenActionFormProps = {
   action: Action;
+  values?: object;
   onSubmit: (
     action: Action,
     values: Record<string, unknown>,
@@ -29,8 +31,27 @@ function structuredFieldType(
   return undefined;
 }
 
-function actionFields(action: Action, schema?: FormSchema): Field[] {
-  const fields = [...action.fields];
+function formControl(field: Field): FormControl {
+  if (field.type === "checkbox")
+    return { name: field.name, valueType: "boolean" };
+  if (field.type === "number" || field.type === "range")
+    return { name: field.name, valueType: "number" };
+  return { name: field.name };
+}
+
+function actionFields(
+  action: Action,
+  schema?: FormSchema,
+  values: object = {},
+): Field[] {
+  const initialValues = record(values) ?? {};
+  const fields = action.fields.map((field) =>
+    field.value === undefined && Object.hasOwn(initialValues, field.name)
+      ? Object.assign(new Field(), field, {
+          value: initialValues[field.name],
+        })
+      : field,
+  );
   const present = new Set(fields.map((field) => field.name));
 
   for (const [name, property] of Object.entries(schema?.properties ?? {})) {
@@ -41,6 +62,9 @@ function actionFields(action: Action, schema?: FormSchema): Field[] {
         name,
         title: property.title ?? name,
         type,
+        value: Object.hasOwn(initialValues, name)
+          ? initialValues[name]
+          : undefined,
       }),
     );
   }
@@ -54,7 +78,25 @@ function record(value: unknown): Record<string, unknown> | undefined {
     : undefined;
 }
 
-function structuredFormSchema(action: Action): FormSchema | undefined {
+function referencedSchema(
+  value: unknown,
+  name: string,
+): FormSchemaProperty | undefined {
+  const objectValue = record(value);
+  if (!objectValue) return undefined;
+  const direct = record(objectValue[`${name}_schema`]);
+  if (direct) return direct as FormSchemaProperty;
+  const matches = Object.values(objectValue).flatMap((candidate) => {
+    const match = referencedSchema(candidate, name);
+    return match ? [match] : [];
+  });
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
+function structuredFormSchema(
+  action: Action,
+  values: object = {},
+): FormSchema | undefined {
   const extension = record(action[STRUCTURED_FORM_EXTENSION]);
   const controls = Array.isArray(extension?.controls)
     ? extension.controls.flatMap((value) => {
@@ -67,7 +109,9 @@ function structuredFormSchema(action: Action): FormSchema | undefined {
               {
                 name: control.name,
                 required: control.required === true,
-                schema: schema as FormSchemaProperty,
+                schema:
+                  referencedSchema(values, control.name) ??
+                  (schema as FormSchemaProperty),
               },
             ]
           : [];
@@ -89,12 +133,17 @@ function structuredFormSchema(action: Action): FormSchema | undefined {
   return record(legacy?.schema) as FormSchema | undefined;
 }
 
-export function SirenActionForm({ action, onSubmit }: SirenActionFormProps) {
-  const schema = structuredFormSchema(action);
-  const fields = actionFields(action, schema);
+export function SirenActionForm({
+  action,
+  onSubmit,
+  values,
+}: SirenActionFormProps) {
+  const schema = structuredFormSchema(action, values);
+  const fields = actionFields(action, schema, values);
 
   return (
     <Form
+      controls={fields.map(formControl)}
       onSubmit={(values) => {
         action.fields = fields;
         return onSubmit(action, values);

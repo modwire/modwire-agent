@@ -44,7 +44,11 @@ export function SirenEntity({ entity, onFollow, onSubmit }: SirenEntityProps) {
       <Stack>
         <Title order={1}>{label}</Title>
         <SirenProperties entity={entity} />
-        <SirenActions actions={entity.actions} onSubmit={onSubmit} />
+        <SirenActions
+          actions={entity.actions}
+          onSubmit={onSubmit}
+          values={entity.properties}
+        />
       </Stack>
     </Paper>
   );

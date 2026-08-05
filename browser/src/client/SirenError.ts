@@ -52,6 +52,17 @@ function detailValues(properties: ErrorProperties): unknown {
   );
 }
 
+function detailText(value: unknown): string {
+  if (Array.isArray(value))
+    return value.map(detailText).filter(Boolean).join(", ");
+  const values = record(value);
+  if (values)
+    return Object.entries(values)
+      .map(([name, item]) => `${name}: ${detailText(item)}`)
+      .join("; ");
+  return value == null ? String(value) : String(value);
+}
+
 function errorDetails(
   entity: Entity,
   fieldNames: Set<string>,
@@ -86,13 +97,8 @@ function errorDetails(
   });
 
   if (!details.length && value != null) {
-    let serialized: string | undefined;
-    try {
-      serialized = JSON.stringify(value);
-    } catch {
-      serialized = undefined;
-    }
-    if (serialized) details.push(serialized);
+    const fallback = detailText(value);
+    if (fallback) details.push(fallback);
   }
   return { details, fieldErrors };
 }

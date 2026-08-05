@@ -1,13 +1,15 @@
 import { useForm } from "@mantine/form";
-import type { FormEvent, ReactNode } from "react";
+import { useMemo, useRef, type FormEvent, type ReactNode } from "react";
 import { FormErrors } from "./FormErrors";
 import type { FormSchema } from "./FormSchema";
 import { validateForm } from "./FormSchema";
-import type { FormValues } from "./FormValues";
+import type { FormControl, FormValues } from "./FormValues";
 import { readFormValues } from "./FormValues";
+import { FormValueProvider } from "./FormValueRegistry";
 
 export type FormProps = {
   children: (errors: Record<string, string>) => ReactNode;
+  controls: readonly FormControl[];
   onSubmit: (values: FormValues) => Promise<void> | void;
   schema?: FormSchema;
 };
@@ -29,42 +31,57 @@ function submittedErrors(reason: unknown): Record<string, string> {
   return { ...fieldErrors, _form: message };
 }
 
-export function Form({ children, onSubmit, schema }: FormProps) {
+export function Form({ children, controls, onSubmit, schema }: FormProps) {
   const form = useForm<FormValues>({ initialValues: {} });
+  const registeredValues = useRef(new Map<string, unknown>());
+  const registry = useMemo(
+    () => ({
+      remove: (name: string) => registeredValues.current.delete(name),
+      set: (name: string, value: unknown) =>
+        registeredValues.current.set(name, value),
+    }),
+    [],
+  );
 
   return (
-    <form
-      noValidate
-      onSubmit={async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const values = readFormValues(event.currentTarget);
-        const errors = validateForm(schema, values);
-        form.setValues(values);
-        form.setErrors(errors);
-        if (Object.keys(errors).length) return;
-        try {
-          await onSubmit(values);
-        } catch (reason) {
-          form.setErrors(submittedErrors(reason));
-        }
-      }}
-    >
-      <FormErrors
-        errors={Object.fromEntries(
-          Object.entries(form.errors).map(([name, error]) => [
-            name,
-            String(error),
-          ]),
+    <FormValueProvider registry={registry}>
+      <form
+        noValidate
+        onSubmit={async (event: FormEvent<HTMLFormElement>) => {
+          event.preventDefault();
+          const values = readFormValues(
+            new FormData(event.currentTarget),
+            controls,
+            registeredValues.current,
+          );
+          const errors = validateForm(schema, values);
+          form.setValues(values);
+          form.setErrors(errors);
+          if (Object.keys(errors).length) return;
+          try {
+            await onSubmit(values);
+          } catch (reason) {
+            form.setErrors(submittedErrors(reason));
+          }
+        }}
+      >
+        <FormErrors
+          errors={Object.fromEntries(
+            Object.entries(form.errors).map(([name, error]) => [
+              name,
+              String(error),
+            ]),
+          )}
+        />
+        {children(
+          Object.fromEntries(
+            Object.entries(form.errors).map(([name, error]) => [
+              name,
+              String(error),
+            ]),
+          ),
         )}
-      />
-      {children(
-        Object.fromEntries(
-          Object.entries(form.errors).map(([name, error]) => [
-            name,
-            String(error),
-          ]),
-        ),
-      )}
-    </form>
+      </form>
+    </FormValueProvider>
   );
 }
