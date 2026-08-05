@@ -1,5 +1,6 @@
 import type { Link, Target } from "@siren-js/client";
 import { Button, Group } from "@mantine/core";
+import { linkLabel } from "./SirenLabels";
 
 export type SirenNavigationProps = {
   activeTarget?: Target;
@@ -41,7 +42,7 @@ export function SirenNavigation({
                   : "subtle"
               }
             >
-              {link.title}
+              {linkLabel(link)}
             </Button>
           );
         })}

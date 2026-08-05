@@ -4,6 +4,7 @@ import { sirenRegistry } from "./SirenRegistry";
 import { SirenActions } from "./SirenActions";
 import { SirenCollection } from "./SirenCollection";
 import { SirenProperties } from "./SirenProperties";
+import { entityLabel } from "./SirenLabels";
 
 export type SirenEntityProps = {
   entity: Entity;
@@ -36,10 +37,12 @@ export function SirenEntity({ entity, onFollow, onSubmit }: SirenEntityProps) {
     );
   }
 
+  const label = entityLabel(entity);
+
   return (
-    <Paper component="article" aria-label={entity.title} p="md" shadow="xs">
+    <Paper component="article" aria-label={label} p="md" shadow="xs">
       <Stack>
-        <Title order={1}>{entity.title}</Title>
+        <Title order={1}>{label}</Title>
         <SirenProperties entity={entity} />
         <SirenActions actions={entity.actions} onSubmit={onSubmit} />
       </Stack>

@@ -2,6 +2,7 @@ import { Paper, Stack, Title } from "@mantine/core";
 import type { Action, Entity, Target } from "@siren-js/client";
 import { SirenCollectionItem } from "./SirenCollectionItem";
 import { SirenActions } from "./SirenActions";
+import { collectionLabel, itemTitle } from "./SirenLabels";
 
 export type SirenCollectionProps = {
   entity: Entity;
@@ -14,14 +15,29 @@ export function SirenCollection({
   onFollow,
   onSubmit,
 }: SirenCollectionProps) {
+  const label = collectionLabel(entity);
+  const titleCounts = new Map<string, number>();
+  entity.entities.forEach((item) => {
+    const itemLabel = itemTitle(item);
+    if (itemLabel)
+      titleCounts.set(itemLabel, (titleCounts.get(itemLabel) ?? 0) + 1);
+  });
+
   return (
-    <Paper component="section" aria-label={entity.title} p="md" shadow="xs">
+    <Paper component="section" aria-label={label} p="md" shadow="xs">
       <Stack>
-        <Title order={1}>{entity.title}</Title>
+        <Title order={1}>{label}</Title>
         <ul>
           {entity.entities.map((item, index) => (
             <li key={`${item.rel.join("-")}-${index}`}>
-              <SirenCollectionItem item={item} onFollow={onFollow} />
+              <SirenCollectionItem
+                ambiguousTitle={
+                  (titleCounts.get(itemTitle(item) ?? "") ?? 0) > 1
+                }
+                index={index}
+                item={item}
+                onFollow={onFollow}
+              />
             </li>
           ))}
         </ul>
