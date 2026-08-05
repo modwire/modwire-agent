@@ -37,7 +37,7 @@ export function readFormValues(form: HTMLFormElement): FormValues {
         (control) => control.dataset.sirenType,
       )?.dataset.sirenType;
 
-      if (sirenType === "object") {
+      if (sirenType === "object" || sirenType === "json") {
         return [name, JSON.parse(String(entries[0]))];
       }
       if (sirenType === "array") {
