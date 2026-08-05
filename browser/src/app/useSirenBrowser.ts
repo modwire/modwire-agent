@@ -104,7 +104,6 @@ export function useSirenBrowser(client: SirenClient, rootTarget: Target) {
 
   const submit = async (action: Action, values: Record<string, unknown>) => {
     setResourceError(null);
-    setIsResourceLoading(true);
     try {
       const response = await client.execute(action, values);
       if (response) {
@@ -119,10 +118,7 @@ export function useSirenBrowser(client: SirenClient, rootTarget: Target) {
         reason,
         "Unable to submit the Siren action.",
       );
-      setResourceError(submissionError);
       throw submissionError;
-    } finally {
-      setIsResourceLoading(false);
     }
   };
 

@@ -12,6 +12,23 @@ export type FormProps = {
   schema?: FormSchema;
 };
 
+function submittedErrors(reason: unknown): Record<string, string> {
+  const message =
+    reason instanceof Error ? reason.message : "Unable to submit the form.";
+  if (!(reason instanceof Error) || !("fieldErrors" in reason))
+    return { _form: message };
+  const value = reason.fieldErrors;
+  const fieldErrors =
+    typeof value === "object" && value !== null
+      ? Object.fromEntries(
+          Object.entries(value).filter(
+            (entry): entry is [string, string] => typeof entry[1] === "string",
+          ),
+        )
+      : {};
+  return { ...fieldErrors, _form: message };
+}
+
 export function Form({ children, onSubmit, schema }: FormProps) {
   const form = useForm<FormValues>({ initialValues: {} });
 
@@ -28,12 +45,7 @@ export function Form({ children, onSubmit, schema }: FormProps) {
         try {
           await onSubmit(values);
         } catch (reason) {
-          form.setErrors({
-            _form:
-              reason instanceof Error
-                ? reason.message
-                : "Unable to submit the form.",
-          });
+          form.setErrors(submittedErrors(reason));
         }
       }}
     >

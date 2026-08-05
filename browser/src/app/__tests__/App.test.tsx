@@ -148,3 +148,51 @@ it("retries failed navigation without replacing a deep-linked resource", async (
   ).toBeInTheDocument();
   expect(window.location.hash).toBe("#/example-resources");
 });
+
+it("keeps an action form mounted while showing structured submission errors", async () => {
+  let rejectSubmission: (reason: unknown) => void = () => undefined;
+  sirenClient.get.mockResolvedValue({
+    ...rootEntity,
+    actions: [
+      {
+        fields: [
+          {
+            name: "example_property",
+            title: "Example property",
+            type: "text",
+          },
+        ],
+        href: "/example-resources",
+        method: "POST",
+        name: "create-example",
+        title: "Create example",
+      },
+    ],
+  });
+  sirenClient.execute.mockReturnValue(
+    new Promise((_resolve, reject) => {
+      rejectSubmission = reject;
+    }),
+  );
+
+  render(<App rootTarget="/example-siren/" />);
+
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Create example" }),
+  );
+  expect(
+    screen.getByRole("heading", { name: "Modwire API" }),
+  ).toBeInTheDocument();
+
+  rejectSubmission(
+    Object.assign(new Error("Validation failed"), {
+      fieldErrors: { example_property: "This value is required." },
+    }),
+  );
+
+  expect(await screen.findByText("This value is required.")).toBeVisible();
+  expect(
+    screen.getByRole("heading", { name: "Modwire API" }),
+  ).toBeInTheDocument();
+  expect(screen.queryByText("Unable to load resource")).not.toBeInTheDocument();
+});
