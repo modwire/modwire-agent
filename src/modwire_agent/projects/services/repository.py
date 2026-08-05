@@ -19,10 +19,26 @@ class ProjectRepository(DjangoRepository):
         try:
             with transaction.atomic():
                 project = self.save(**data)
-                ProjectRecord.objects.bulk_create(
-                    ProjectRecord(project=project, record_id=record_id) 
-                    for record_id in record_ids
-                )
+                self._bind_records(project, record_ids)
                 return project
         except IntegrityError as error:
             raise ProjectsError("A project with this root already exists.") from error
+
+    def update(self, id: str, data: Mapping[str, Any], record_ids: Iterable[str]) -> Project:
+        try:
+            with transaction.atomic():
+                project = self.get(id)
+                for attribute, value in data.items():
+                    setattr(project, attribute, value)
+                project.save()
+                project.record_bindings.all().delete()
+                self._bind_records(project, record_ids)
+                return project
+        except IntegrityError as error:
+            raise ProjectsError("A project with this root already exists.") from error
+
+    @staticmethod
+    def _bind_records(project: Project, record_ids: Iterable[str]) -> None:
+        ProjectRecord.objects.bulk_create(
+            ProjectRecord(project=project, record_id=record_id) for record_id in record_ids
+        )
