@@ -10,17 +10,13 @@ import { useFormValue } from "../../form/FormValueRegistry";
 
 export type SirenStructuredInputProps = {
   field: Field;
-  schema?: FormSchemaProperty;
+  schema: FormSchemaProperty;
 };
 
 export function SirenStructuredInput({
   field,
-  schema = {},
+  schema,
 }: SirenStructuredInputProps) {
-  const effectiveSchema: FormSchemaProperty =
-    Object.keys(schema).length > 0
-      ? schema
-      : { type: field.type === "list" ? "array" : "object" };
   const [value, setValue] = useState<unknown>(field.value);
   const publishValue = useFormValue(field.name, value);
 
@@ -35,7 +31,7 @@ export function SirenStructuredInput({
         formData={value}
         idPrefix={field.name}
         onChange={updateValue}
-        schema={effectiveSchema as RJSFSchema}
+        schema={schema as RJSFSchema}
         tagName="div"
         validator={jsonSchemaValidator}
       >

@@ -10,6 +10,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  JSON_CONTROL,
   SirenActionForm,
   STRUCTURED_FORM_EXTENSION,
 } from "../../SirenActionForm";
@@ -69,6 +70,80 @@ function field(name: string, type: string, value?: unknown): Field {
 afterEach(cleanup);
 
 describe("SirenStructuredInput", () => {
+  it("renders and submits an advertised JSON control as an editable tree", async () => {
+    const onSubmit = vi.fn();
+    const contentSchema = {
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      additionalProperties: false,
+      properties: { title: { type: "string" } },
+      required: ["title"],
+      type: "object",
+    };
+    const exampleAction = Object.assign(new Action(), {
+      fields: [field("content_schema", "object", contentSchema)],
+      href: "/record-categories/example",
+      method: "PATCH",
+      name: "update_record_category",
+      title: "Update record category",
+      type: "application/json",
+      [STRUCTURED_FORM_EXTENSION]: {
+        controls: [
+          {
+            control: JSON_CONTROL,
+            location: "body",
+            mediaType: "application/json",
+            name: "content_schema",
+            required: true,
+            schema: {
+              additionalProperties: {},
+              title: "Content Schema",
+              type: "object",
+            },
+          },
+        ],
+        version: "1",
+      },
+    });
+
+    render(
+      <MantineProvider>
+        <SirenActionForm action={exampleAction} onSubmit={onSubmit} />
+      </MantineProvider>,
+    );
+
+    expect(screen.getAllByText("content_schema")).toHaveLength(2);
+    expect(screen.getByText("$schema")).toBeInTheDocument();
+    expect(screen.getByText("properties")).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Unsupported field schema/),
+    ).not.toBeInTheDocument();
+
+    fireEvent.doubleClick(
+      screen.getByText((content) =>
+        content.includes("https://json-schema.org/draft/2020-12/schema"),
+      ),
+    );
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "https://example.com/schema" },
+    });
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
+    await screen.findByText((content) =>
+      content.includes("https://example.com/schema"),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Update record category" }),
+    );
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(exampleAction, {
+        content_schema: {
+          ...contentSchema,
+          $schema: "https://example.com/schema",
+        },
+      }),
+    );
+  });
+
   it("renders the advertised schema and submits nested JSON values", async () => {
     const onSubmit = vi.fn();
     const exampleAction = action([

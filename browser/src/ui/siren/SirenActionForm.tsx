@@ -5,9 +5,14 @@ import { FormField } from "../form/FormField";
 import type { FormSchema, FormSchemaProperty } from "../form/FormSchema";
 import type { FormControl } from "../form/FormValues";
 import { SirenField } from "./SirenField";
+import { SirenJsonInput } from "./inputs/SirenJsonInput";
+import { SirenStructuredInput } from "./inputs/SirenStructuredInput";
 
 export const STRUCTURED_FORM_EXTENSION =
   "https://modwire.dev/siren/structured-form/v1";
+export const JSON_CONTROL = "https://modwire.dev/siren/controls/json/v1";
+export const OBJECT_CONTROL = "https://modwire.dev/siren/controls/object/v1";
+export const ARRAY_CONTROL = "https://modwire.dev/siren/controls/array/v1";
 
 export type SirenActionFormProps = {
   action: Action;
@@ -78,45 +83,65 @@ function record(value: unknown): Record<string, unknown> | undefined {
     : undefined;
 }
 
-function referencedSchema(
-  value: unknown,
-  name: string,
-): FormSchemaProperty | undefined {
-  const objectValue = record(value);
-  if (!objectValue) return undefined;
-  const direct = record(objectValue[`${name}_schema`]);
-  if (direct) return direct as FormSchemaProperty;
-  const matches = Object.values(objectValue).flatMap((candidate) => {
-    const match = referencedSchema(candidate, name);
-    return match ? [match] : [];
+type StructuredControl = {
+  control: string;
+  name: string;
+  required: boolean;
+  schema: FormSchemaProperty;
+};
+
+function actionFieldInput(field: Field, control?: StructuredControl) {
+  if (!control) return <SirenField field={field} />;
+
+  switch (control.control) {
+    case JSON_CONTROL:
+      return <SirenJsonInput field={field} />;
+    case OBJECT_CONTROL:
+    case ARRAY_CONTROL:
+      return <SirenStructuredInput field={field} schema={control.schema} />;
+    default:
+      throw new Error(`Unsupported Siren control: ${control.control}`);
+  }
+}
+
+function structuredControls(action: Action): StructuredControl[] {
+  const value = action[STRUCTURED_FORM_EXTENSION];
+  if (value === undefined) return [];
+
+  const extension = record(value);
+  if (
+    !extension ||
+    extension.version !== "1" ||
+    !Array.isArray(extension.controls)
+  )
+    throw new Error("Malformed Siren structured-form extension");
+
+  return extension.controls.map((value) => {
+    const control = record(value);
+    if (!control) throw new Error("Malformed Siren structured-form control");
+    const schema = record(control.schema);
+    if (
+      typeof control.control !== "string" ||
+      typeof control.name !== "string" ||
+      control.location !== "body" ||
+      typeof control.required !== "boolean" ||
+      control.mediaType !== "application/json" ||
+      !schema
+    )
+      throw new Error("Malformed Siren structured-form control");
+
+    return {
+      control: control.control,
+      name: control.name,
+      required: control.required,
+      schema: schema as FormSchemaProperty,
+    };
   });
-  return matches.length === 1 ? matches[0] : undefined;
 }
 
 function structuredFormSchema(
-  action: Action,
-  values: object = {},
+  controls: StructuredControl[],
 ): FormSchema | undefined {
-  const extension = record(action[STRUCTURED_FORM_EXTENSION]);
-  const controls = Array.isArray(extension?.controls)
-    ? extension.controls.flatMap((value) => {
-        const control = record(value);
-        const schema = record(control?.schema);
-        return typeof control?.name === "string" &&
-          control.location === "body" &&
-          schema
-          ? [
-              {
-                name: control.name,
-                required: control.required === true,
-                schema:
-                  referencedSchema(values, control.name) ??
-                  (schema as FormSchemaProperty),
-              },
-            ]
-          : [];
-      })
-    : [];
   if (controls.length) {
     return {
       properties: Object.fromEntries(
@@ -128,9 +153,7 @@ function structuredFormSchema(
       type: "object",
     };
   }
-
-  const legacy = record(action["x-form"]);
-  return record(legacy?.schema) as FormSchema | undefined;
+  return undefined;
 }
 
 export function SirenActionForm({
@@ -138,8 +161,12 @@ export function SirenActionForm({
   onSubmit,
   values,
 }: SirenActionFormProps) {
-  const schema = structuredFormSchema(action, values);
+  const controls = structuredControls(action);
+  const schema = structuredFormSchema(controls);
   const fields = actionFields(action, schema, values);
+  const controlsByName = new Map(
+    controls.map((control) => [control.name, control]),
+  );
 
   return (
     <Form
@@ -153,18 +180,18 @@ export function SirenActionForm({
       {(errors) => (
         <Fieldset legend={action.title}>
           <Stack gap="sm">
-            {fields.map((field) => (
-              <FormField
-                error={errors[field.name]}
-                key={field.name}
-                label={field.title ?? field.name}
-              >
-                <SirenField
-                  field={field}
-                  schema={schema?.properties?.[field.name]}
-                />
-              </FormField>
-            ))}
+            {fields.map((field) => {
+              const control = controlsByName.get(field.name);
+              return (
+                <FormField
+                  error={errors[field.name]}
+                  key={field.name}
+                  label={field.title ?? field.name}
+                >
+                  {actionFieldInput(field, control)}
+                </FormField>
+              );
+            })}
             <Button type="submit">{action.title}</Button>
           </Stack>
         </Fieldset>
