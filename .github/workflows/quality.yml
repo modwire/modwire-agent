@@ -12,9 +12,21 @@ jobs:
   python:
     name: Python
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modwire-agent
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          path: modwire-agent
+
+      - name: Check out local modwire-siren source
+        uses: actions/checkout@v6
+        with:
+          repository: modwire/modwire-siren
+          ref: release/4.0.0
+          path: modwire-siren
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -38,16 +50,18 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: browser
+        working-directory: modwire-agent/browser
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          path: modwire-agent
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           cache: npm
-          cache-dependency-path: browser/package-lock.json
+          cache-dependency-path: modwire-agent/browser/package-lock.json
           node-version: 24
 
       - name: Install dependencies
