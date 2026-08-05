@@ -95,7 +95,7 @@ function actionFieldInput(field: Field, control?: StructuredControl) {
 
   switch (control.control) {
     case JSON_CONTROL:
-      return <SirenJsonInput field={field} />;
+      return <SirenJsonInput field={field} schema={control.schema} />;
     case OBJECT_CONTROL:
     case ARRAY_CONTROL:
       return <SirenStructuredInput field={field} schema={control.schema} />;

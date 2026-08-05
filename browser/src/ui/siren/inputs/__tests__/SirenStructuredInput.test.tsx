@@ -70,6 +70,54 @@ function field(name: string, type: string, value?: unknown): Field {
 afterEach(cleanup);
 
 describe("SirenStructuredInput", () => {
+  it("initializes a new JSON object instead of rendering Undefined", async () => {
+    const onSubmit = vi.fn();
+    const exampleAction = Object.assign(new Action(), {
+      fields: [field("title", "text", "Example")],
+      href: "/record-categories",
+      method: "POST",
+      name: "create_record_category",
+      title: "Create record category",
+      type: "application/json",
+      [STRUCTURED_FORM_EXTENSION]: {
+        controls: [
+          {
+            control: JSON_CONTROL,
+            location: "body",
+            mediaType: "application/json",
+            name: "content_schema",
+            required: true,
+            schema: {
+              additionalProperties: {},
+              title: "Content Schema",
+              type: "object",
+            },
+          },
+        ],
+        version: "1",
+      },
+    });
+
+    render(
+      <MantineProvider>
+        <SirenActionForm action={exampleAction} onSubmit={onSubmit} />
+      </MantineProvider>,
+    );
+
+    expect(screen.queryByText("Undefined")).not.toBeInTheDocument();
+    expect(screen.getByTitle("Add")).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Create record category" }),
+    );
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(exampleAction, {
+        content_schema: {},
+        title: "Example",
+      }),
+    );
+  });
+
   it("renders and submits an advertised JSON control as an editable tree", async () => {
     const onSubmit = vi.fn();
     const contentSchema = {
