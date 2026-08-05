@@ -14,3 +14,11 @@ Object.defineProperty(window, "matchMedia", {
       removeListener: () => undefined,
     }) as MediaQueryList,
 });
+
+class ResizeObserverMock implements ResizeObserver {
+  disconnect(): void {}
+  observe(): void {}
+  unobserve(): void {}
+}
+
+globalThis.ResizeObserver = ResizeObserverMock;
