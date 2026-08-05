@@ -14,7 +14,7 @@ export function SirenStringListInput({ field }: SirenStringListInputProps) {
 
   return (
     <Stack gap="xs">
-      <input name={field.name} type="hidden" value="" />
+      <input data-siren-type="array" name={field.name} type="hidden" value="" />
       {values.map((value, index) => (
         <Group key={`${field.name}-${index}`}>
           <TextInput

@@ -4,6 +4,7 @@ import { FormErrors } from "./FormErrors";
 import type { FormSchema } from "./FormSchema";
 import { validateForm } from "./FormSchema";
 import type { FormValues } from "./FormValues";
+import { readFormValues } from "./FormValues";
 
 export type FormProps = {
   children: (errors: Record<string, string>) => ReactNode;
@@ -19,27 +20,7 @@ export function Form({ children, onSubmit, schema }: FormProps) {
       noValidate
       onSubmit={async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const values = Object.fromEntries(
-          [...new Set(formData.keys())].map((name) => {
-            const entries = formData.getAll(name);
-            const control = event.currentTarget.elements.namedItem(name);
-            const element =
-              control instanceof RadioNodeList ? control.item(0) : control;
-            if (
-              element instanceof HTMLElement &&
-              element.dataset.sirenType === "object"
-            ) {
-              return [name, JSON.parse(String(entries[0]))];
-            }
-            return [
-              name,
-              entries.length > 1
-                ? entries.filter((value) => value !== "")
-                : entries[0],
-            ];
-          }),
-        );
+        const values = readFormValues(event.currentTarget);
         const errors = validateForm(schema, values);
         form.setValues(values);
         form.setErrors(errors);
