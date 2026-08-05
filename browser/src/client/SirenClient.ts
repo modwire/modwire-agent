@@ -1,5 +1,4 @@
 import {
-  ActionFiller,
   follow,
   parse,
   submit,
@@ -8,6 +7,7 @@ import {
   type Href,
   type Target,
 } from "@siren-js/client";
+import { applyActionValues } from "./ActionValues";
 
 export const SIREN_ACCEPT = "application/vnd.siren+json, application/json";
 export const SIREN_ACTOR_HEADERS = {
@@ -67,7 +67,7 @@ export class SirenClient {
     values: Record<string, unknown> = {},
     options: SirenRequestOptions = {},
   ): Promise<Entity<T> | null> {
-    await action.accept(new ActionFiller(values));
+    applyActionValues(action, values);
     const response = await submit(action, {
       baseUrl: this.baseUrl,
       requestInit: this.requestInit(options),
